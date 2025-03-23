@@ -100,37 +100,131 @@ class _CalendarScreenState extends State<CalendarScreen> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        AppDateUtils.formatDate(_selectedDay),
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      OutlinedButton.icon(
-                        onPressed: _addTaskForSelectedDay,
-                        icon: const Icon(Icons.add),
-                        label: const Text('Add Task'),
-                      ),
-                    ],
+                  child: Text(
+                    AppDateUtils.formatDate(_selectedDay),
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
                 
-                // 逾期任务（如果查看当天）
-                if (isSameDay(_selectedDay, DateTime.now()))
-                  _buildTaskSection(
-                    context, 
-                    'Overdue', 
-                    Colors.red, 
-                    (provider) => provider.overdueTasks,
+                // 使用 Expanded + ListView 让任务列表可滚动
+                Expanded(
+                  child: Consumer<TaskProvider>(
+                    builder: (context, taskProvider, child) {
+                      final overdueTasks = isSameDay(_selectedDay, DateTime.now()) 
+                          ? taskProvider.overdueTasks
+                          : <Task>[];
+                      final dateTasks = taskProvider.getTasksForDate(_selectedDay);
+                      
+                      if (overdueTasks.isEmpty && dateTasks.isEmpty) {
+                        // 如果没有任务，显示空状态
+                        return Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.event_note,
+                                size: 64,
+                                color: Colors.grey[300],
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'No tasks for ${AppDateUtils.formatDate(_selectedDay)}',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      
+                      // 构建任务列表项
+                      final listItems = <Widget>[];
+                      
+                      // 添加逾期任务
+                      if (overdueTasks.isNotEmpty) {
+                        listItems.add(
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 12,
+                                  height: 12,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.red,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Overdue (${overdueTasks.length})',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                        
+                        // 添加逾期任务项
+                        for (final task in overdueTasks) {
+                          listItems.add(
+                            TaskListItem(
+                              task: task,
+                              onTaskChange: () => setState(() {}),
+                            ),
+                          );
+                        }
+                      }
+                      
+                      // 添加当日任务
+                      if (dateTasks.isNotEmpty) {
+                        listItems.add(
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 12,
+                                  height: 12,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.blue,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Tasks (${dateTasks.length})',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                        
+                        // 添加当日任务项
+                        for (final task in dateTasks) {
+                          listItems.add(
+                            TaskListItem(
+                              task: task,
+                              onTaskChange: () => setState(() {}),
+                            ),
+                          );
+                        }
+                      }
+                      
+                      return ListView(
+                        children: listItems,
+                      );
+                    },
                   ),
-                
-                // 选中日期的任务
-                _buildTaskSection(
-                  context,
-                  'Tasks',
-                  Colors.blue,
-                  (provider) => provider.getTasksForDate(_selectedDay),
                 ),
               ],
             ),
@@ -174,95 +268,5 @@ class _CalendarScreenState extends State<CalendarScreen> {
     if (result == true) {
       setState(() {});
     }
-  }
-  
-  Widget _buildTaskSection(
-    BuildContext context,
-    String title,
-    Color color,
-    List<Task> Function(TaskProvider) tasksSelector,
-  ) {
-    return Consumer<TaskProvider>(
-      builder: (context, taskProvider, child) {
-        final tasks = tasksSelector(taskProvider);
-        
-        if (tasks.isEmpty) {
-          return Expanded(
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.event_note,
-                    size: 64,
-                    color: Colors.grey[300],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No tasks for $title',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  if (title != 'Overdue')
-                    ElevatedButton.icon(
-                      onPressed: _addTaskForSelectedDay,
-                      icon: const Icon(Icons.add),
-                      label: const Text('Add Task'),
-                    ),
-                ],
-              ),
-            ),
-          );
-        }
-        
-        return Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: color,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '$title (${tasks.length})',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: tasks.length,
-                  itemBuilder: (context, index) {
-                    return TaskListItem(
-                      task: tasks[index],
-                      onTaskChange: () {
-                        // 任务状态变化后刷新页面
-                        setState(() {});
-                      }
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
   }
 } 
