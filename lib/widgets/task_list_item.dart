@@ -67,15 +67,30 @@ class TaskListItem extends StatelessWidget {
         ],
       ),
       child: ListTile(
-        leading: Checkbox(
-          value: task.status == TaskStatus.completed,
-          activeColor: task.getPriorityColor(),
-          onChanged: (_) {
-            taskProvider.toggleTaskCompletion(task.id);
-            if (onTaskChange != null) {
-              onTaskChange!();
-            }
-          },
+        leading: SizedBox(
+          width: 24,
+          height: 24,
+          child: Checkbox(
+            value: task.status == TaskStatus.completed,
+            onChanged: (_) {
+              taskProvider.toggleTaskCompletion(task.id);
+              if (onTaskChange != null) {
+                onTaskChange!();
+              }
+            },
+            activeColor: task.priority == TaskPriority.none 
+                ? Colors.black87 
+                : task.getPriorityColor(),
+            side: BorderSide(
+              color: task.priority == TaskPriority.none 
+                  ? Colors.black54
+                  : task.getPriorityColor(),
+              width: 1.5,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
         ),
         title: Text(
           task.title,
@@ -89,7 +104,6 @@ class TaskListItem extends StatelessWidget {
           ),
         ),
         subtitle: _buildSubtitle(project),
-        trailing: _buildPriorityIndicator(),
         onTap: () async {
           // 点击任务打开编辑页面
           final result = await Navigator.push(
@@ -106,32 +120,6 @@ class TaskListItem extends StatelessWidget {
         },
       ),
     );
-  }
-  
-  Widget _buildPriorityIndicator() {
-    if (task.priority == TaskPriority.none) {
-      return const SizedBox.shrink();
-    }
-    
-    IconData iconData = Icons.flag;
-    Color color;
-    
-    switch (task.priority) {
-      case TaskPriority.high:
-        color = Colors.red;
-        break;
-      case TaskPriority.medium:
-        color = Colors.orange;
-        break;
-      case TaskPriority.low:
-        color = Colors.blue;
-        break;
-      default:
-        color = Colors.grey;
-        break;
-    }
-    
-    return Icon(iconData, color: color);
   }
   
   Widget _buildSubtitle(Project? project) {
@@ -181,16 +169,16 @@ class TaskListItem extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            const Icon(
               Icons.folder_outlined,
               size: 14,
-              color: project.color.withOpacity(0.8),
+              color: Colors.grey,
             ),
             const SizedBox(width: 4),
             Text(
               project.name,
-              style: TextStyle(
-                color: project.color.withOpacity(0.8),
+              style: const TextStyle(
+                color: Colors.grey,
               ),
             ),
           ],

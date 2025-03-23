@@ -91,6 +91,39 @@ class _CalendarScreenState extends State<CalendarScreen> {
             eventLoader: (day) {
               return _getEventsForDay(day);
             },
+            // 自定义标记为数字
+            calendarBuilders: CalendarBuilders(
+              markerBuilder: (context, date, events) {
+                if (events.isNotEmpty) {
+                  // 计算未完成任务数量
+                  final uncompletedTasks = events.where((task) => 
+                    task is Task && task.status != TaskStatus.completed).toList();
+                  
+                  if (uncompletedTasks.isEmpty) return const SizedBox.shrink();
+                  
+                  // 显示数字而不是小点
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[500],
+                      shape: BoxShape.circle,
+                    ),
+                    width: 13,
+                    height: 13,
+                    child: Center(
+                      child: Text(
+                        uncompletedTasks.length.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 8,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+                return null;
+              },
+            ),
           ),
           
           // 选中日期的任务
@@ -147,25 +180,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         listItems.add(
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 12,
-                                  height: 12,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.red,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Overdue (${overdueTasks.length})',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
+                            child: Text(
+                              'Overdue (${overdueTasks.length})',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
                             ),
                           ),
                         );
@@ -186,25 +206,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         listItems.add(
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                            child: Row(
-                              children: [
-                                Container(
-                                  width: 12,
-                                  height: 12,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.blue,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Tasks (${dateTasks.length})',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
+                            child: Text(
+                              'Tasks (${dateTasks.length})',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
                             ),
                           ),
                         );
