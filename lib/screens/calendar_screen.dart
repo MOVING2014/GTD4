@@ -22,10 +22,25 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final taskProvider = Provider.of<TaskProvider>(context);
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('日历视图'),
         actions: [
+          // 显示/隐藏已完成任务的过滤器按钮
+          IconButton(
+            icon: Icon(
+              taskProvider.showCompletedTasks 
+                  ? Icons.check_circle_outline 
+                  : Icons.check_circle,
+              color: taskProvider.showCompletedTasks ? Colors.grey : Colors.green,
+            ),
+            tooltip: taskProvider.showCompletedTasks ? '隐藏已完成任务' : '显示已完成任务',
+            onPressed: () {
+              taskProvider.toggleShowCompletedTasks();
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.view_agenda),
             onPressed: () {
@@ -73,14 +88,24 @@ class _CalendarScreenState extends State<CalendarScreen> {
             onPageChanged: (focusedDay) {
               _focusedDay = focusedDay;
             },
-            calendarStyle: const CalendarStyle(
-              todayDecoration: BoxDecoration(
-                color: Colors.blue,
+            calendarStyle: CalendarStyle(
+              todayDecoration: const BoxDecoration(
                 shape: BoxShape.circle,
+                color: Colors.transparent,
               ),
-              selectedDecoration: BoxDecoration(
-                color: Color(0xFF5D69B3),
+              todayTextStyle: const TextStyle(
+                color: Colors.blue,
+                fontWeight: FontWeight.bold,
+                fontSize: 16.0,
+              ),
+              selectedDecoration: const BoxDecoration(
                 shape: BoxShape.circle,
+                color: Colors.transparent,
+              ),
+              selectedTextStyle: TextStyle(
+                color: Color(0xFF5D69B3),
+                fontWeight: FontWeight.bold,
+                fontSize: 16.0,
               ),
               markerDecoration: BoxDecoration(
                 color: Colors.red,

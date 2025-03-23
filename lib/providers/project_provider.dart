@@ -20,6 +20,20 @@ class ProjectProvider with ChangeNotifier {
         .toList();
   }
   
+  // Get completed projects
+  List<Project> get completedProjects {
+    return _projects
+        .where((project) => project.status == ProjectStatus.completed)
+        .toList();
+  }
+  
+  // Get archived projects
+  List<Project> get archivedProjects {
+    return _projects
+        .where((project) => project.status == ProjectStatus.archived)
+        .toList();
+  }
+  
   // Get a project by id
   Project? getProjectById(String id) {
     try {

@@ -8,6 +8,13 @@ import '../widgets/task_list_item.dart';
 import '../screens/project_form_screen.dart';
 import '../screens/task_form_screen.dart';
 
+enum ProjectFilter {
+  active,
+  completed,
+  archived,
+  all
+}
+
 class ProjectsScreen extends StatefulWidget {
   const ProjectsScreen({super.key});
 
@@ -16,12 +23,81 @@ class ProjectsScreen extends StatefulWidget {
 }
 
 class _ProjectsScreenState extends State<ProjectsScreen> {
+  ProjectFilter _currentFilter = ProjectFilter.active;
+  
+  String _getFilterTitle() {
+    switch (_currentFilter) {
+      case ProjectFilter.active:
+        return '活动项目';
+      case ProjectFilter.completed:
+        return '已完成项目';
+      case ProjectFilter.archived:
+        return '已归档项目';
+      case ProjectFilter.all:
+        return '所有项目';
+    }
+  }
+  
+  List<Project> _getFilteredProjects(ProjectProvider provider) {
+    switch (_currentFilter) {
+      case ProjectFilter.active:
+        return provider.activeProjects;
+      case ProjectFilter.completed:
+        return provider.completedProjects;
+      case ProjectFilter.archived:
+        return provider.archivedProjects;
+      case ProjectFilter.all:
+        return provider.allProjects;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final taskProvider = Provider.of<TaskProvider>(context);
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('项目'),
+        title: Text(_getFilterTitle()),
         actions: [
+          // 显示/隐藏已完成任务的过滤器按钮
+          IconButton(
+            icon: Icon(
+              taskProvider.showCompletedTasks 
+                  ? Icons.check_circle_outline 
+                  : Icons.check_circle,
+              color: taskProvider.showCompletedTasks ? Colors.grey : Colors.green,
+            ),
+            tooltip: taskProvider.showCompletedTasks ? '隐藏已完成任务' : '显示已完成任务',
+            onPressed: () {
+              taskProvider.toggleShowCompletedTasks();
+            },
+          ),
+          PopupMenuButton<ProjectFilter>(
+            icon: const Icon(Icons.filter_list),
+            onSelected: (ProjectFilter filter) {
+              setState(() {
+                _currentFilter = filter;
+              });
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem<ProjectFilter>(
+                value: ProjectFilter.active,
+                child: Text('活动项目'),
+              ),
+              const PopupMenuItem<ProjectFilter>(
+                value: ProjectFilter.completed,
+                child: Text('已完成项目'),
+              ),
+              const PopupMenuItem<ProjectFilter>(
+                value: ProjectFilter.archived,
+                child: Text('已归档项目'),
+              ),
+              const PopupMenuItem<ProjectFilter>(
+                value: ProjectFilter.all,
+                child: Text('所有项目'),
+              ),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () async {
@@ -43,11 +119,28 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       ),
       body: Consumer<ProjectProvider>(
         builder: (context, projectProvider, child) {
-          final projects = projectProvider.activeProjects;
+          final projects = _getFilteredProjects(projectProvider);
           
           if (projects.isEmpty) {
-            return const Center(
-              child: Text('暂无项目。点击 + 添加新项目。'),
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.folder_outlined,
+                    size: 64,
+                    color: Colors.grey[300],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '没有${_getFilterTitle()}',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
             );
           }
           
@@ -75,6 +168,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             setState(() {});
           }
         },
+        backgroundColor: const Color(0xFF5D69B3),
         child: const Icon(Icons.add),
       ),
     );
@@ -86,18 +180,12 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         final projectTasks = taskProvider.getTasksByProject(project.id);
         
         return ExpansionTile(
-          leading: Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              color: project.color,
-              shape: BoxShape.circle,
-            ),
-          ),
+          leading: null,
           title: Text(
             project.name,
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
+              color: project.color,
             ),
           ),
           subtitle: Text(
