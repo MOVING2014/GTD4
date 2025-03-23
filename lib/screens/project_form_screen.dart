@@ -73,31 +73,33 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
     if (_formKey.currentState!.validate()) {
       final projectProvider = Provider.of<ProjectProvider>(context, listen: false);
       
+      // 生成唯一颜色 (如果需要)
+      final color = _selectedColor;
+      
       if (_isEditing) {
         // 更新现有项目
         final updatedProject = widget.project!.copyWith(
           name: _nameController.text,
           description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
-          color: _selectedColor,
-          status: _status,
+          color: color,
         );
         
         projectProvider.updateProject(updatedProject);
       } else {
         // 创建新项目
         final newProject = Project(
-          id: 'p${DateTime.now().millisecondsSinceEpoch}', // 生成唯一ID
+          id: 'p${DateTime.now().millisecondsSinceEpoch}',
           name: _nameController.text,
           description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
-          color: _selectedColor,
-          status: _status,
+          color: color,
+          status: ProjectStatus.active,
           createdAt: DateTime.now(),
         );
         
         projectProvider.addProject(newProject);
       }
       
-      Navigator.pop(context);
+      Navigator.pop(context, true); // 返回true表示项目已保存
     }
   }
 
@@ -126,7 +128,7 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
                           Provider.of<ProjectProvider>(context, listen: false)
                             .deleteProject(widget.project!.id);
                           Navigator.of(ctx).pop();
-                          Navigator.of(context).pop();
+                          Navigator.of(context).pop(true); // 返回true表示有更改
                         },
                         child: const Text('Delete'),
                       ),

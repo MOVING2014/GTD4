@@ -30,7 +30,8 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   String _recurrenceRule = 'FREQ=DAILY';
   List<String> _tags = [];
   
-  bool get _isEditing => widget.task != null;
+  bool get _isEditing => widget.task != null && widget.task!.title.isNotEmpty;
+  bool get _isCreatingWithDefaults => widget.task != null && widget.task!.title.isEmpty;
 
   @override
   void initState() {
@@ -52,10 +53,36 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
       _isRecurring = widget.task!.isRecurring;
       _recurrenceRule = widget.task!.recurrenceRule ?? 'FREQ=DAILY';
       _tags = List.from(widget.task!.tags);
-    } else {
-      // 创建新任务的默认值
+    } 
+    // 如果是带有默认值创建任务（例如从日历或项目视图）
+    else if (_isCreatingWithDefaults) {
       _priority = TaskPriority.none;
       _status = TaskStatus.notStarted;
+      
+      // 使用传入的预设值
+      if (widget.task!.dueDate != null) {
+        _dueDate = DateTime(
+          widget.task!.dueDate!.year,
+          widget.task!.dueDate!.month,
+          widget.task!.dueDate!.day
+        );
+        _dueTime = TimeOfDay(
+          hour: widget.task!.dueDate!.hour,
+          minute: widget.task!.dueDate!.minute
+        );
+      }
+      
+      _selectedProjectId = widget.task!.projectId;
+      _tags = [];
+    }
+    // 创建全新任务
+    else {
+      _priority = TaskPriority.none;
+      _status = TaskStatus.notStarted;
+      _dueDate = null;
+      _dueTime = null;
+      _selectedProjectId = null;
+      _tags = [];
     }
   }
 
@@ -108,7 +135,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     });
   }
 
-  void _saveTask() {
+  Future<void> _saveTask() async {
     if (_formKey.currentState!.validate()) {
       final taskProvider = Provider.of<TaskProvider>(context, listen: false);
       
@@ -124,45 +151,43 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
             _dueTime!.minute,
           );
         } else {
-          combinedDateTime = _dueDate;
+          combinedDateTime = DateTime(
+            _dueDate!.year,
+            _dueDate!.month,
+            _dueDate!.day,
+            12, // 默认中午12点
+            0,
+          );
         }
       }
       
+      String taskId = _isEditing 
+          ? widget.task!.id 
+          : 't${DateTime.now().millisecondsSinceEpoch}';
+      
+      // 创建或更新任务
+      final task = Task(
+        id: taskId,
+        title: _titleController.text,
+        notes: _notesController.text.isEmpty ? null : _notesController.text,
+        dueDate: combinedDateTime,
+        priority: _priority,
+        status: _status,
+        createdAt: _isEditing ? widget.task!.createdAt : DateTime.now(),
+        completedAt: _status == TaskStatus.completed ? DateTime.now() : null,
+        projectId: _selectedProjectId,
+        isRecurring: _isRecurring,
+        recurrenceRule: _isRecurring ? _recurrenceRule : null,
+        tags: _tags,
+      );
+      
       if (_isEditing) {
-        // 更新现有任务
-        final updatedTask = widget.task!.copyWith(
-          title: _titleController.text,
-          notes: _notesController.text.isEmpty ? null : _notesController.text,
-          dueDate: combinedDateTime,
-          priority: _priority,
-          status: _status,
-          projectId: _selectedProjectId,
-          isRecurring: _isRecurring,
-          recurrenceRule: _isRecurring ? _recurrenceRule : null,
-          tags: _tags,
-        );
-        
-        taskProvider.updateTask(updatedTask);
+        taskProvider.updateTask(task);
       } else {
-        // 创建新任务
-        final newTask = Task(
-          id: 't${DateTime.now().millisecondsSinceEpoch}', // 生成唯一ID
-          title: _titleController.text,
-          notes: _notesController.text.isEmpty ? null : _notesController.text,
-          dueDate: combinedDateTime,
-          priority: _priority,
-          status: _status,
-          createdAt: DateTime.now(),
-          projectId: _selectedProjectId,
-          isRecurring: _isRecurring,
-          recurrenceRule: _isRecurring ? _recurrenceRule : null,
-          tags: _tags,
-        );
-        
-        taskProvider.addTask(newTask);
+        taskProvider.addTask(task);
       }
       
-      Navigator.pop(context);
+      Navigator.pop(context, true); // 返回true表示成功保存
     }
   }
 
@@ -191,7 +216,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                           Provider.of<TaskProvider>(context, listen: false)
                             .deleteTask(widget.task!.id);
                           Navigator.of(ctx).pop();
-                          Navigator.of(context).pop();
+                          Navigator.of(context).pop(true); // 返回true表示有变更
                         },
                         child: const Text('Delete'),
                       ),
@@ -222,6 +247,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                   }
                   return null;
                 },
+                autofocus: !_isEditing, // 新建任务时自动聚焦到标题
               ),
               
               const SizedBox(height: 16),
@@ -243,14 +269,14 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                 builder: (context, projectProvider, child) {
                   final projects = projectProvider.activeProjects;
                   
-                  return DropdownButtonFormField<String>(
+                  return DropdownButtonFormField<String?>(
                     decoration: const InputDecoration(
                       labelText: 'Project',
                       border: OutlineInputBorder(),
                     ),
                     value: _selectedProjectId,
                     items: [
-                      const DropdownMenuItem<String>(
+                      const DropdownMenuItem<String?>(
                         value: null,
                         child: Text('No Project'),
                       ),
@@ -466,11 +492,16 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                       decoration: const InputDecoration(
                         labelText: 'Add a tag',
                         border: OutlineInputBorder(),
+                        suffixIcon: Icon(Icons.add),
                       ),
                       onFieldSubmitted: (value) {
-                        _addTag(value);
-                        // 清空输入框
-                        (context as Element).markNeedsBuild();
+                        if (value.isNotEmpty) {
+                          _addTag(value);
+                          // 清空输入框
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            (context as Element).markNeedsBuild();
+                          });
+                        }
                       },
                     ),
                   ),

@@ -10,8 +10,13 @@ import '../screens/task_form_screen.dart';
 
 class TaskListItem extends StatelessWidget {
   final Task task;
+  final VoidCallback? onTaskChange;
   
-  const TaskListItem({super.key, required this.task});
+  const TaskListItem({
+    super.key,
+    required this.task,
+    this.onTaskChange,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +24,7 @@ class TaskListItem extends StatelessWidget {
     final projectProvider = Provider.of<ProjectProvider>(context, listen: false);
     
     // 获取项目信息
-    final project = task.projectId != null 
+    Project? project = task.projectId != null 
         ? projectProvider.getProjectById(task.projectId!) 
         : null;
     
@@ -30,6 +35,9 @@ class TaskListItem extends StatelessWidget {
           SlidableAction(
             onPressed: (context) {
               taskProvider.deleteTask(task.id);
+              if (onTaskChange != null) {
+                onTaskChange!();
+              }
             },
             backgroundColor: Colors.red,
             foregroundColor: Colors.white,
@@ -37,14 +45,19 @@ class TaskListItem extends StatelessWidget {
             label: 'Delete',
           ),
           SlidableAction(
-            onPressed: (context) {
+            onPressed: (context) async {
               // 打开任务编辑页面
-              Navigator.push(
+              final result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => TaskFormScreen(task: task),
                 ),
               );
+              
+              // 如果编辑成功，调用回调刷新UI
+              if (result == true && onTaskChange != null) {
+                onTaskChange!();
+              }
             },
             backgroundColor: Colors.blue,
             foregroundColor: Colors.white,
@@ -59,6 +72,9 @@ class TaskListItem extends StatelessWidget {
           activeColor: task.getPriorityColor(),
           onChanged: (_) {
             taskProvider.toggleTaskCompletion(task.id);
+            if (onTaskChange != null) {
+              onTaskChange!();
+            }
           },
         ),
         title: Text(
@@ -74,14 +90,19 @@ class TaskListItem extends StatelessWidget {
         ),
         subtitle: _buildSubtitle(project),
         trailing: _buildPriorityIndicator(),
-        onTap: () {
+        onTap: () async {
           // 点击任务打开编辑页面
-          Navigator.push(
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => TaskFormScreen(task: task),
             ),
           );
+          
+          // 如果编辑成功，调用回调刷新UI
+          if (result == true && onTaskChange != null) {
+            onTaskChange!();
+          }
         },
       ),
     );
@@ -92,14 +113,25 @@ class TaskListItem extends StatelessWidget {
       return const SizedBox.shrink();
     }
     
-    return Container(
-      width: 12,
-      height: 12,
-      decoration: BoxDecoration(
-        color: task.getPriorityColor(),
-        shape: BoxShape.circle,
-      ),
-    );
+    IconData iconData = Icons.flag;
+    Color color;
+    
+    switch (task.priority) {
+      case TaskPriority.high:
+        color = Colors.red;
+        break;
+      case TaskPriority.medium:
+        color = Colors.orange;
+        break;
+      case TaskPriority.low:
+        color = Colors.blue;
+        break;
+      default:
+        color = Colors.grey;
+        break;
+    }
+    
+    return Icon(iconData, color: color);
   }
   
   Widget _buildSubtitle(Project? project) {

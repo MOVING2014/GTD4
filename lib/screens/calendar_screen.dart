@@ -40,9 +40,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () {
+            onPressed: () async {
               // 创建当前选中日期的新任务
-              _addTaskForSelectedDay();
+              await _addTaskForSelectedDay();
             },
           ),
         ],
@@ -150,9 +150,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return tasks;
   }
   
-  void _addTaskForSelectedDay() {
+  Future<void> _addTaskForSelectedDay() async {
     // 创建带有当前选中日期的新任务
-    Navigator.push(
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => TaskFormScreen(
@@ -171,6 +171,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
         ),
       ),
     );
+    
+    // 如果返回true，表示添加/编辑了任务，需要刷新页面
+    if (result == true) {
+      setState(() {});
+    }
   }
   
   Widget _buildTaskSection(
@@ -246,7 +251,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 child: ListView.builder(
                   itemCount: tasks.length,
                   itemBuilder: (context, index) {
-                    return TaskListItem(task: tasks[index]);
+                    return TaskListItem(
+                      task: tasks[index],
+                      onTaskChange: () {
+                        // 任务状态变化后刷新页面
+                        setState(() {});
+                      }
+                    );
                   },
                 ),
               ),
