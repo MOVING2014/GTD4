@@ -65,12 +65,23 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(
             seedColor: const Color(0xFF5D69B3),
             brightness: Brightness.dark,
+            // 自定义暗色主题的背景色为偏暗蓝色
+            background: const Color(0xFF0A1929),
+            surface: const Color(0xFF0F2A43),
+            // 稍微调整其他颜色，保持协调
+            onBackground: const Color(0xFFE1E9F4),
+            onSurface: const Color(0xFFE1E9F4),
           ),
           // 设置AppBar样式
           appBarTheme: const AppBarTheme(
             backgroundColor: Colors.transparent,
             elevation: 0,
           ),
+          // 设置Scaffold默认背景色
+          scaffoldBackgroundColor: const Color(0xFF0A1929),
+          // 调整卡片和对话框背景
+          cardColor: const Color(0xFF0F2A43),
+          dialogBackgroundColor: const Color(0xFF0F2A43),
         ),
         // 在主题应用后设置系统UI样式
         builder: (context, child) {
