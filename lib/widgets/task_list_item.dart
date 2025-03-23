@@ -135,7 +135,7 @@ class TaskListItem extends StatelessWidget {
   }
   
   Widget _buildSubtitle(Project? project) {
-    final List<Widget> elements = [];
+    final List<Widget> rowItems = [];
     
     // 显示到期日期（如果有）
     if (task.dueDate != null) {
@@ -143,8 +143,9 @@ class TaskListItem extends StatelessWidget {
           ? 'Today' 
           : DateFormat.MMMd().format(task.dueDate!);
       
-      elements.add(
+      rowItems.add(
         Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               Icons.calendar_today,
@@ -166,12 +167,19 @@ class TaskListItem extends StatelessWidget {
     
     // 显示项目信息（如果有）
     if (project != null) {
-      if (elements.isNotEmpty) {
-        elements.add(const SizedBox(height: 4));
+      // 如果已经有日期信息，添加间隔
+      if (rowItems.isNotEmpty) {
+        rowItems.add(
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text('•', style: TextStyle(color: Colors.grey)),
+          ),
+        );
       }
       
-      elements.add(
+      rowItems.add(
         Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               Icons.folder_outlined,
@@ -190,13 +198,13 @@ class TaskListItem extends StatelessWidget {
       );
     }
     
-    if (elements.isEmpty) {
+    if (rowItems.isEmpty) {
       return const SizedBox.shrink();
     }
     
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: elements,
+    return Row(
+      children: rowItems,
+      crossAxisAlignment: CrossAxisAlignment.center,
     );
   }
 } 
