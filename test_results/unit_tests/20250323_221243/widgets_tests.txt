@@ -1,0 +1,34 @@
+00:00 +0: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/widgets/task_list_item_test.dart                                                                                            00:00 +0 -1: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/widgets/task_list_item_test.dart [E]                                                                                     
+  Failed to load "/Users/weikuang/Apps/gtd4_without_clean_achitecture/test/widgets/task_list_item_test.dart":
+  Compilation failed for testPath=/Users/weikuang/Apps/gtd4_without_clean_achitecture/test/widgets/task_list_item_test.dart: test/widgets/task_list_item_test.dart:156:9: Error: Method not found: 'Project'.
+          Project(id: 'project1', name: 'Test Project', color: Colors.blue)
+          ^^^^^^^
+  test/widgets/task_list_item_test.dart:136:32: Error: The method 'getProject' isn't defined for the class 'MockProjectProvider'.
+   - 'MockProjectProvider' is from 'test/widgets/task_list_item_test.dart'.
+  Try correcting the name to the name of an existing method, or defining a method named 'getProject'.
+        when(mockProjectProvider.getProject(any)).thenReturn(null);
+                                 ^^^^^^^^^^
+  test/widgets/task_list_item_test.dart:155:32: Error: The method 'getProject' isn't defined for the class 'MockProjectProvider'.
+   - 'MockProjectProvider' is from 'test/widgets/task_list_item_test.dart'.
+  Try correcting the name to the name of an existing method, or defining a method named 'getProject'.
+        when(mockProjectProvider.getProject('project1')).thenReturn(
+                                 ^^^^^^^^^^
+  test/widgets/task_list_item_test.dart:182:29: Error: The method 'toggleTaskStatus' isn't defined for the class 'MockTaskProvider'.
+   - 'MockTaskProvider' is from 'test/widgets/task_list_item_test.dart'.
+  Try correcting the name to the name of an existing method, or defining a method named 'toggleTaskStatus'.
+        when(mockTaskProvider.toggleTaskStatus(any)).thenAnswer((_) async => completedTask);
+                              ^^^^^^^^^^^^^^^^
+  test/widgets/task_list_item_test.dart:192:31: Error: The method 'toggleTaskStatus' isn't defined for the class 'MockTaskProvider'.
+   - 'MockTaskProvider' is from 'test/widgets/task_list_item_test.dart'.
+  Try correcting the name to the name of an existing method, or defining a method named 'toggleTaskStatus'.
+        verify(mockTaskProvider.toggleTaskStatus(any)).called(1);
+                                ^^^^^^^^^^^^^^^^
+  test/widgets/task_list_item_test.dart:240:32: Error: The method 'getProject' isn't defined for the class 'MockProjectProvider'.
+   - 'MockProjectProvider' is from 'test/widgets/task_list_item_test.dart'.
+  Try correcting the name to the name of an existing method, or defining a method named 'getProject'.
+        when(mockProjectProvider.getProject(any)).thenReturn(null);
+                                 ^^^^^^^^^^
+  .
+
+To run this test again: /Users/weikuang/development/flutter/bin/cache/dart-sdk/bin/dart test /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/widgets/task_list_item_test.dart -p vm --plain-name 'loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/widgets/task_list_item_test.dart'
+00:00 +0 -1: Some tests failed.                                                                                                                                                                        

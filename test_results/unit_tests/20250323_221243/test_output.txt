@@ -1,0 +1,424 @@
+00:00 +0: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/providers/task_provider_test.dart                                                                                           00:01 +0: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/providers/task_provider_test.dart                                                                                           00:02 +0: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/providers/task_provider_test.dart                                                                                           00:02 +0 -1: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/providers/task_provider_test.dart [E]                                                                                    
+  Failed to load "/Users/weikuang/Apps/gtd4_without_clean_achitecture/test/providers/task_provider_test.dart":
+  Compilation failed for testPath=/Users/weikuang/Apps/gtd4_without_clean_achitecture/test/providers/task_provider_test.dart: test/providers/task_provider_test.dart:129:43: Error: The method 'getTasksForProject' isn't defined for the class 'TestableTaskProvider'.
+   - 'TestableTaskProvider' is from 'test/providers/task_provider_test.dart'.
+  Try correcting the name to the name of an existing method, or defining a method named 'getTasksForProject'.
+          final projectTasks = taskProvider.getTasksForProject('project1');
+                                            ^^^^^^^^^^^^^^^^^^
+  test/providers/task_provider_test.dart:135:44: Error: The getter 'priorityTasks' isn't defined for the class 'TestableTaskProvider'.
+   - 'TestableTaskProvider' is from 'test/providers/task_provider_test.dart'.
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'priorityTasks'.
+          final priorityTasks = taskProvider.priorityTasks;
+                                             ^^^^^^^^^^^^^
+  test/providers/task_provider_test.dart:141:41: Error: The getter 'todayTasks' isn't defined for the class 'TestableTaskProvider'.
+   - 'TestableTaskProvider' is from 'test/providers/task_provider_test.dart'.
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'todayTasks'.
+          final todayTasks = taskProvider.todayTasks;
+                                          ^^^^^^^^^^
+  test/providers/task_provider_test.dart:150:44: Error: The method 'getTasksForDay' isn't defined for the class 'TestableTaskProvider'.
+   - 'TestableTaskProvider' is from 'test/providers/task_provider_test.dart'.
+  Try correcting the name to the name of an existing method, or defining a method named 'getTasksForDay'.
+          final tasksForToday = taskProvider.getTasksForDay(today);
+                                             ^^^^^^^^^^^^^^
+  test/providers/task_provider_test.dart:159:41: Error: The method 'getVisibleTasks' isn't defined for the class 'TestableTaskProvider'.
+   - 'TestableTaskProvider' is from 'test/providers/task_provider_test.dart'.
+  Try correcting the name to the name of an existing method, or defining a method named 'getVisibleTasks'.
+          final allVisible = taskProvider.getVisibleTasks(taskProvider.allTasks);
+                                          ^^^^^^^^^^^^^^^
+  test/providers/task_provider_test.dart:175:32: Error: The argument type 'Null' can't be assigned to the parameter type 'Task' because 'Task' is not nullable.
+   - 'Task' is from 'package:gtd4_without_clean_achitecture/models/task.dart' ('lib/models/task.dart').
+          when(mockDb.insertTask(any)).thenAnswer((_) async => 1);
+                                 ^
+  test/providers/task_provider_test.dart:182:34: Error: The argument type 'Null' can't be assigned to the parameter type 'Task' because 'Task' is not nullable.
+   - 'Task' is from 'package:gtd4_without_clean_achitecture/models/task.dart' ('lib/models/task.dart').
+          verify(mockDb.insertTask(any)).called(1);
+                                   ^
+  test/providers/task_provider_test.dart:206:32: Error: The argument type 'Null' can't be assigned to the parameter type 'Task' because 'Task' is not nullable.
+   - 'Task' is from 'package:gtd4_without_clean_achitecture/models/task.dart' ('lib/models/task.dart').
+          when(mockDb.updateTask(any)).thenAnswer((_) async => 1);
+                                 ^
+  test/providers/task_provider_test.dart:213:34: Error: The argument type 'Null' can't be assigned to the parameter type 'Task' because 'Task' is not nullable.
+   - 'Task' is from 'package:gtd4_without_clean_achitecture/models/task.dart' ('lib/models/task.dart').
+          verify(mockDb.updateTask(any)).called(1);
+                                   ^
+  test/providers/task_provider_test.dart:237:32: Error: The argument type 'Null' can't be assigned to the parameter type 'String' because 'String' is not nullable.
+          when(mockDb.deleteTask(any)).thenAnswer((_) async => 1);
+                                 ^
+  test/providers/task_provider_test.dart:271:32: Error: The argument type 'Null' can't be assigned to the parameter type 'Task' because 'Task' is not nullable.
+   - 'Task' is from 'package:gtd4_without_clean_achitecture/models/task.dart' ('lib/models/task.dart').
+          when(mockDb.updateTask(any)).thenAnswer((_) async => 1);
+                                 ^
+  test/providers/task_provider_test.dart:275:28: Error: The method 'toggleTaskStatus' isn't defined for the class 'TestableTaskProvider'.
+   - 'TestableTaskProvider' is from 'test/providers/task_provider_test.dart'.
+  Try correcting the name to the name of an existing method, or defining a method named 'toggleTaskStatus'.
+          await taskProvider.toggleTaskStatus(task);
+                             ^^^^^^^^^^^^^^^^
+  test/providers/task_provider_test.dart:278:34: Error: The argument type 'Null' can't be assigned to the parameter type 'Task' because 'Task' is not nullable.
+   - 'Task' is from 'package:gtd4_without_clean_achitecture/models/task.dart' ('lib/models/task.dart').
+          verify(mockDb.updateTask(any)).called(1);
+                                   ^
+  .
+
+To run this test again: /Users/weikuang/development/flutter/bin/cache/dart-sdk/bin/dart test /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/providers/task_provider_test.dart -p vm --plain-name 'loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/providers/task_provider_test.dart'
+  Error: the Dart compiler exited unexpectedly.
+  package:flutter_tools/src/base/common.dart 34:3  throwToolExit
+  package:flutter_tools/src/compile.dart 895:11    DefaultResidentCompiler._compile.<fn>
+  dart:async/zone.dart 1538:47                     _rootRunUnary
+  dart:async/zone.dart 1429:19                     _CustomZone.runUnary
+  dart:async/future_impl.dart 932:45               Future._propagateToListeners.handleValueCallback
+  dart:async/future_impl.dart 961:13               Future._propagateToListeners
+  dart:async/future_impl.dart 846:9                Future._propagateToListeners
+  dart:async/future_impl.dart 712:5                Future._completeWithValue
+  dart:async/future_impl.dart 792:7                Future._asyncCompleteWithValue.<fn>
+  dart:async/zone.dart 1525:13                     _rootRun
+  dart:async/zone.dart 1422:19                     _CustomZone.run
+  dart:async/zone.dart 1321:7                      _CustomZone.runGuarded
+  dart:async/zone.dart 1362:23                     _CustomZone.bindCallbackGuarded.<fn>
+  dart:async/schedule_microtask.dart 40:21         _microtaskLoop
+  dart:async/schedule_microtask.dart 49:5          _startMicrotaskLoop
+  dart:isolate-patch/isolate_patch.dart 128:13     _runPendingImmediateCallback
+  dart:isolate-patch/isolate_patch.dart 195:5      _RawReceivePort._handleMessage
+  
+00:05 +0 -1: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/models/task_test.dart                                                                                                    00:05 +0 -1: /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/models/task_test.dart: Task Model Tests Task constructor creates valid instance                                                  00:05 +1 -1: /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/models/task_test.dart: Task Model Tests Task constructor creates valid instance                                                  00:05 +1 -1: /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/models/task_test.dart: Task Model Tests Task copyWith method creates a new instance with updated values                          00:05 +2 -1: /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/models/task_test.dart: Task Model Tests Task copyWith method creates a new instance with updated values                          00:05 +2 -1: /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/models/task_test.dart: Task Model Tests getPriorityColor returns correct color based on priority                                 00:05 +3 -1: /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/models/task_test.dart: Task Model Tests getPriorityColor returns correct color based on priority                                 00:05 +3 -1: /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/models/task_test.dart: Task Model Tests isOverdue returns correct value based on due date                                        00:05 +4 -1: /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/models/task_test.dart: Task Model Tests isOverdue returns correct value based on due date                                        00:05 +4 -1: /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/models/task_test.dart: Task Model Tests isDueToday returns correct value                                                         00:05 +5 -1: /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/models/task_test.dart: Task Model Tests isDueToday returns correct value                                                         00:05 +5 -2: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/widgets/task_list_item_test.dart [E]                                                                                     
+  Failed to load "/Users/weikuang/Apps/gtd4_without_clean_achitecture/test/widgets/task_list_item_test.dart":
+  Compilation failed for testPath=/Users/weikuang/Apps/gtd4_without_clean_achitecture/test/widgets/task_list_item_test.dart: test/widgets/task_list_item_test.dart:156:9: Error: Method not found: 'Project'.
+          Project(id: 'project1', name: 'Test Project', color: Colors.blue)
+          ^^^^^^^
+  test/widgets/task_list_item_test.dart:136:32: Error: The method 'getProject' isn't defined for the class 'MockProjectProvider'.
+   - 'MockProjectProvider' is from 'test/widgets/task_list_item_test.dart'.
+  Try correcting the name to the name of an existing method, or defining a method named 'getProject'.
+        when(mockProjectProvider.getProject(any)).thenReturn(null);
+                                 ^^^^^^^^^^
+  test/widgets/task_list_item_test.dart:155:32: Error: The method 'getProject' isn't defined for the class 'MockProjectProvider'.
+   - 'MockProjectProvider' is from 'test/widgets/task_list_item_test.dart'.
+  Try correcting the name to the name of an existing method, or defining a method named 'getProject'.
+        when(mockProjectProvider.getProject('project1')).thenReturn(
+                                 ^^^^^^^^^^
+  test/widgets/task_list_item_test.dart:182:29: Error: The method 'toggleTaskStatus' isn't defined for the class 'MockTaskProvider'.
+   - 'MockTaskProvider' is from 'test/widgets/task_list_item_test.dart'.
+  Try correcting the name to the name of an existing method, or defining a method named 'toggleTaskStatus'.
+        when(mockTaskProvider.toggleTaskStatus(any)).thenAnswer((_) async => completedTask);
+                              ^^^^^^^^^^^^^^^^
+  test/widgets/task_list_item_test.dart:192:31: Error: The method 'toggleTaskStatus' isn't defined for the class 'MockTaskProvider'.
+   - 'MockTaskProvider' is from 'test/widgets/task_list_item_test.dart'.
+  Try correcting the name to the name of an existing method, or defining a method named 'toggleTaskStatus'.
+        verify(mockTaskProvider.toggleTaskStatus(any)).called(1);
+                                ^^^^^^^^^^^^^^^^
+  test/widgets/task_list_item_test.dart:240:32: Error: The method 'getProject' isn't defined for the class 'MockProjectProvider'.
+   - 'MockProjectProvider' is from 'test/widgets/task_list_item_test.dart'.
+  Try correcting the name to the name of an existing method, or defining a method named 'getProject'.
+        when(mockProjectProvider.getProject(any)).thenReturn(null);
+                                 ^^^^^^^^^^
+  .
+
+To run this test again: /Users/weikuang/development/flutter/bin/cache/dart-sdk/bin/dart test /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/widgets/task_list_item_test.dart -p vm --plain-name 'loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/widgets/task_list_item_test.dart'
+00:05 +5 -2: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/providers/task_provider_test.dart [E]                                                                                    
+  Error: the Dart compiler exited unexpectedly.
+  package:flutter_tools/src/base/common.dart 34:3  throwToolExit
+  package:flutter_tools/src/compile.dart 895:11    DefaultResidentCompiler._compile.<fn>
+  dart:async/zone.dart 1538:47                     _rootRunUnary
+  dart:async/future_impl.dart 932:45               Future._propagateToListeners.handleValueCallback
+  dart:async/future_impl.dart 961:13               Future._propagateToListeners
+  dart:async/future_impl.dart 846:9                Future._propagateToListeners
+  dart:async/future_impl.dart 712:5                Future._completeWithValue
+  dart:async/future_impl.dart 792:7                Future._asyncCompleteWithValue.<fn>
+  dart:async/zone.dart 1525:13                     _rootRun
+  dart:async/zone.dart 1422:19                     _CustomZone.run
+  dart:async/zone.dart 1321:7                      _CustomZone.runGuarded
+  dart:async/zone.dart 1362:23                     _CustomZone.bindCallbackGuarded.<fn>
+  dart:async/schedule_microtask.dart 40:21         _microtaskLoop
+  dart:async/schedule_microtask.dart 49:5          _startMicrotaskLoop
+  dart:isolate-patch/isolate_patch.dart 128:13     _runPendingImmediateCallback
+  dart:isolate-patch/isolate_patch.dart 195:5      _RawReceivePort._handleMessage
+  
+00:06 +5 -2: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/widget_test.dart                                                                                                         00:06 +5 -2: /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/widget_test.dart: Counter increments smoke test                                                                                  00:06 +5 -2: /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/widget_test.dart: Counter increments smoke test                                                                                  
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following StateError was thrown running a test:
+Bad state: databaseFactory not initialized
+databaseFactory is only initialized when using sqflite. When using `sqflite_common_ffi`
+You must call `databaseFactory = databaseFactoryFfi;` before using global openDatabase API
+
+When the exception was thrown, this was the stack:
+#0      databaseFactory.<anonymous closure> (package:sqflite_common/src/sqflite_database_factory.dart:32:7)
+#1      databaseFactory (package:sqflite_common/src/sqflite_database_factory.dart:36:6)
+#2      getDatabasesPath (package:sqflite_common/sqflite.dart:109:38)
+#3      DatabaseHelper._initDatabase (package:gtd4_without_clean_achitecture/data/database_helper.dart:25:30)
+#4      DatabaseHelper.database (package:gtd4_without_clean_achitecture/data/database_helper.dart:20:23)
+#5      DatabaseHelper.getAllTasks (package:gtd4_without_clean_achitecture/data/database_helper.dart:160:22)
+#6      TaskProvider._loadTasks (package:gtd4_without_clean_achitecture/providers/task_provider.dart:18:30)
+#7      new TaskProvider (package:gtd4_without_clean_achitecture/providers/task_provider.dart:13:5)
+#8      MyApp.build.<anonymous closure> (package:gtd4_without_clean_achitecture/main.dart:42:47)
+#9      _CreateInheritedProviderState.value (package:provider/src/inherited_provider.dart:736:36)
+#10     _InheritedProviderScopeElement.value (package:provider/src/inherited_provider.dart:590:33)
+#11     Provider.of (package:provider/src/provider.dart:303:37)
+#12     _HomeScreenState.build (package:gtd4_without_clean_achitecture/main.dart:143:35)
+#13     StatefulElement.build (package:flutter/src/widgets/framework.dart:5841:27)
+#14     ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5733:15)
+#15     StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5892:11)
+#16     Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#17     ComponentElement._firstBuild (package:flutter/src/widgets/framework.dart:5715:5)
+#18     StatefulElement._firstBuild (package:flutter/src/widgets/framework.dart:5883:11)
+#19     ComponentElement.mount (package:flutter/src/widgets/framework.dart:5709:5)
+...     Normal element mounting (228 frames)
+#247    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4555:16)
+#248    MultiChildRenderObjectElement.inflateWidget (package:flutter/src/widgets/framework.dart:7178:36)
+#249    MultiChildRenderObjectElement.mount (package:flutter/src/widgets/framework.dart:7194:32)
+...     Normal element mounting (469 frames)
+#718    _InheritedProviderScopeElement.mount (package:provider/src/inherited_provider.dart:411:11)
+...     Normal element mounting (7 frames)
+#725    SingleChildWidgetElementMixin.mount (package:nested/nested.dart:222:11)
+...     Normal element mounting (7 frames)
+#732    _NestedHookElement.mount (package:nested/nested.dart:187:11)
+...     Normal element mounting (7 frames)
+#739    _InheritedProviderScopeElement.mount (package:provider/src/inherited_provider.dart:411:11)
+...     Normal element mounting (7 frames)
+#746    SingleChildWidgetElementMixin.mount (package:nested/nested.dart:222:11)
+...     Normal element mounting (7 frames)
+#753    _NestedHookElement.mount (package:nested/nested.dart:187:11)
+...     Normal element mounting (7 frames)
+#760    SingleChildWidgetElementMixin.mount (package:nested/nested.dart:222:11)
+...     Normal element mounting (7 frames)
+#767    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4555:16)
+#768    Element.updateChild (package:flutter/src/widgets/framework.dart:4014:20)
+#769    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#770    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#771    ProxyElement.update (package:flutter/src/widgets/framework.dart:6059:5)
+#772    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#773    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#774    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#775    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5892:11)
+#776    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#777    StatefulElement.update (package:flutter/src/widgets/framework.dart:5917:5)
+#778    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#779    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#780    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#781    ProxyElement.update (package:flutter/src/widgets/framework.dart:6059:5)
+#782    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#783    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#784    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#785    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5892:11)
+#786    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#787    StatefulElement.update (package:flutter/src/widgets/framework.dart:5917:5)
+#788    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#789    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#790    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5892:11)
+#791    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#792    StatefulElement.update (package:flutter/src/widgets/framework.dart:5917:5)
+#793    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#794    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#795    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#796    ProxyElement.update (package:flutter/src/widgets/framework.dart:6059:5)
+#797    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#798    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#799    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5892:11)
+#800    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#801    StatefulElement.update (package:flutter/src/widgets/framework.dart:5917:5)
+#802    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#803    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#804    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#805    ProxyElement.update (package:flutter/src/widgets/framework.dart:6059:5)
+#806    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#807    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#808    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#809    ProxyElement.update (package:flutter/src/widgets/framework.dart:6059:5)
+#810    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#811    _RawViewElement._updateChild (package:flutter/src/widgets/view.dart:481:16)
+#812    _RawViewElement.update (package:flutter/src/widgets/view.dart:569:5)
+#813    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#814    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#815    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#816    StatelessElement.update (package:flutter/src/widgets/framework.dart:5805:5)
+#817    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#818    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#819    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5892:11)
+#820    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#821    StatefulElement.update (package:flutter/src/widgets/framework.dart:5917:5)
+#822    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#823    RootElement._rebuild (package:flutter/src/widgets/binding.dart:1687:16)
+#824    RootElement.update (package:flutter/src/widgets/binding.dart:1665:5)
+#825    RootElement.performRebuild (package:flutter/src/widgets/binding.dart:1679:7)
+#826    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#827    BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2704:15)
+#828    BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2762:11)
+#829    BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3066:18)
+#830    AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:1495:19)
+#831    RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:482:5)
+#832    SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1442:15)
+#833    SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1355:9)
+#834    AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:1340:9)
+#837    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#838    AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:1329:27)
+#839    WidgetTester.pumpWidget.<anonymous closure> (package:flutter_test/src/widget_tester.dart:599:22)
+#842    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#843    WidgetTester.pumpWidget (package:flutter_test/src/widget_tester.dart:596:27)
+#844    main.<anonymous closure> (file:///Users/weikuang/Apps/gtd4_without_clean_achitecture/test/widget_test.dart:16:18)
+#845    testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:29)
+<asynchronous suspension>
+#846    TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1064:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 5 frames from dart:async and package:stack_trace)
+
+The test description was:
+  Counter increments smoke test
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:06 +5 -3: /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/widget_test.dart: Counter increments smoke test [E]                                                                              
+  Test failed. See exception logs above.
+  The test description was: Counter increments smoke test
+  
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following StateError was thrown running a test (but after the test had completed):
+Bad state: databaseFactory not initialized
+databaseFactory is only initialized when using sqflite. When using `sqflite_common_ffi`
+You must call `databaseFactory = databaseFactoryFfi;` before using global openDatabase API
+
+When the exception was thrown, this was the stack:
+#0      databaseFactory.<anonymous closure> (package:sqflite_common/src/sqflite_database_factory.dart:32:7)
+#1      databaseFactory (package:sqflite_common/src/sqflite_database_factory.dart:36:6)
+#2      getDatabasesPath (package:sqflite_common/sqflite.dart:109:38)
+#3      DatabaseHelper._initDatabase (package:gtd4_without_clean_achitecture/data/database_helper.dart:25:30)
+#4      DatabaseHelper.database (package:gtd4_without_clean_achitecture/data/database_helper.dart:20:23)
+#5      DatabaseHelper.getAllProjects (package:gtd4_without_clean_achitecture/data/database_helper.dart:208:22)
+#6      ProjectProvider._loadProjects (package:gtd4_without_clean_achitecture/providers/project_provider.dart:17:33)
+#7      new ProjectProvider (package:gtd4_without_clean_achitecture/providers/project_provider.dart:12:5)
+#8      MyApp.build.<anonymous closure> (package:gtd4_without_clean_achitecture/main.dart:43:47)
+#9      _CreateInheritedProviderState.value (package:provider/src/inherited_provider.dart:736:36)
+#10     _InheritedProviderScopeElement.value (package:provider/src/inherited_provider.dart:590:33)
+#11     Provider.of (package:provider/src/provider.dart:303:37)
+#12     _HomeScreenState.build (package:gtd4_without_clean_achitecture/main.dart:144:38)
+#13     StatefulElement.build (package:flutter/src/widgets/framework.dart:5841:27)
+#14     ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5733:15)
+#15     StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5892:11)
+#16     Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#17     ComponentElement._firstBuild (package:flutter/src/widgets/framework.dart:5715:5)
+#18     StatefulElement._firstBuild (package:flutter/src/widgets/framework.dart:5883:11)
+#19     ComponentElement.mount (package:flutter/src/widgets/framework.dart:5709:5)
+...     Normal element mounting (228 frames)
+#247    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4555:16)
+#248    MultiChildRenderObjectElement.inflateWidget (package:flutter/src/widgets/framework.dart:7178:36)
+#249    MultiChildRenderObjectElement.mount (package:flutter/src/widgets/framework.dart:7194:32)
+...     Normal element mounting (469 frames)
+#718    _InheritedProviderScopeElement.mount (package:provider/src/inherited_provider.dart:411:11)
+...     Normal element mounting (7 frames)
+#725    SingleChildWidgetElementMixin.mount (package:nested/nested.dart:222:11)
+...     Normal element mounting (7 frames)
+#732    _NestedHookElement.mount (package:nested/nested.dart:187:11)
+...     Normal element mounting (7 frames)
+#739    _InheritedProviderScopeElement.mount (package:provider/src/inherited_provider.dart:411:11)
+...     Normal element mounting (7 frames)
+#746    SingleChildWidgetElementMixin.mount (package:nested/nested.dart:222:11)
+...     Normal element mounting (7 frames)
+#753    _NestedHookElement.mount (package:nested/nested.dart:187:11)
+...     Normal element mounting (7 frames)
+#760    SingleChildWidgetElementMixin.mount (package:nested/nested.dart:222:11)
+...     Normal element mounting (7 frames)
+#767    Element.inflateWidget (package:flutter/src/widgets/framework.dart:4555:16)
+#768    Element.updateChild (package:flutter/src/widgets/framework.dart:4014:20)
+#769    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#770    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#771    ProxyElement.update (package:flutter/src/widgets/framework.dart:6059:5)
+#772    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#773    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#774    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#775    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5892:11)
+#776    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#777    StatefulElement.update (package:flutter/src/widgets/framework.dart:5917:5)
+#778    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#779    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#780    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#781    ProxyElement.update (package:flutter/src/widgets/framework.dart:6059:5)
+#782    _InheritedNotifierElement.update (package:flutter/src/widgets/inherited_notifier.dart:108:11)
+#783    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#784    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#785    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5892:11)
+#786    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#787    StatefulElement.update (package:flutter/src/widgets/framework.dart:5917:5)
+#788    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#789    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#790    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5892:11)
+#791    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#792    StatefulElement.update (package:flutter/src/widgets/framework.dart:5917:5)
+#793    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#794    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#795    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#796    ProxyElement.update (package:flutter/src/widgets/framework.dart:6059:5)
+#797    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#798    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#799    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5892:11)
+#800    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#801    StatefulElement.update (package:flutter/src/widgets/framework.dart:5917:5)
+#802    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#803    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#804    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#805    ProxyElement.update (package:flutter/src/widgets/framework.dart:6059:5)
+#806    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#807    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#808    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#809    ProxyElement.update (package:flutter/src/widgets/framework.dart:6059:5)
+#810    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#811    _RawViewElement._updateChild (package:flutter/src/widgets/view.dart:481:16)
+#812    _RawViewElement.update (package:flutter/src/widgets/view.dart:569:5)
+#813    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#814    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#815    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#816    StatelessElement.update (package:flutter/src/widgets/framework.dart:5805:5)
+#817    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#818    ComponentElement.performRebuild (package:flutter/src/widgets/framework.dart:5756:16)
+#819    StatefulElement.performRebuild (package:flutter/src/widgets/framework.dart:5892:11)
+#820    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#821    StatefulElement.update (package:flutter/src/widgets/framework.dart:5917:5)
+#822    Element.updateChild (package:flutter/src/widgets/framework.dart:3998:15)
+#823    RootElement._rebuild (package:flutter/src/widgets/binding.dart:1687:16)
+#824    RootElement.update (package:flutter/src/widgets/binding.dart:1665:5)
+#825    RootElement.performRebuild (package:flutter/src/widgets/binding.dart:1679:7)
+#826    Element.rebuild (package:flutter/src/widgets/framework.dart:5445:7)
+#827    BuildScope._tryRebuild (package:flutter/src/widgets/framework.dart:2704:15)
+#828    BuildScope._flushDirtyElements (package:flutter/src/widgets/framework.dart:2762:11)
+#829    BuildOwner.buildScope (package:flutter/src/widgets/framework.dart:3066:18)
+#830    AutomatedTestWidgetsFlutterBinding.drawFrame (package:flutter_test/src/binding.dart:1495:19)
+#831    RendererBinding._handlePersistentFrameCallback (package:flutter/src/rendering/binding.dart:482:5)
+#832    SchedulerBinding._invokeFrameCallback (package:flutter/src/scheduler/binding.dart:1442:15)
+#833    SchedulerBinding.handleDrawFrame (package:flutter/src/scheduler/binding.dart:1355:9)
+#834    AutomatedTestWidgetsFlutterBinding.pump.<anonymous closure> (package:flutter_test/src/binding.dart:1340:9)
+#837    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#838    AutomatedTestWidgetsFlutterBinding.pump (package:flutter_test/src/binding.dart:1329:27)
+#839    WidgetTester.pumpWidget.<anonymous closure> (package:flutter_test/src/widget_tester.dart:599:22)
+#842    TestAsyncUtils.guard (package:flutter_test/src/test_async_utils.dart:74:41)
+#843    WidgetTester.pumpWidget (package:flutter_test/src/widget_tester.dart:596:27)
+#844    main.<anonymous closure> (file:///Users/weikuang/Apps/gtd4_without_clean_achitecture/test/widget_test.dart:16:18)
+#845    testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:29)
+<asynchronous suspension>
+#846    TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1064:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided 5 frames from dart:async and package:stack_trace)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+  Test failed. See exception logs above.
+  The test description was: Counter increments smoke test
+  
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test (but after the test had completed):
+Expected: exactly one matching candidate
+  Actual: _TextWidgetFinder:<Found 0 widgets with text "0": []>
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#0      fail (package:matcher/src/expect/expect.dart:149:31)
+#1      _expect (package:matcher/src/expect/expect.dart:144:3)
+#2      expect (package:matcher/src/expect/expect.dart:56:3)
+#3      expect (package:flutter_test/src/widget_tester.dart:474:18)
+#4      main.<anonymous closure> (file:///Users/weikuang/Apps/gtd4_without_clean_achitecture/test/widget_test.dart:19:5)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1064:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+  Test failed. See exception logs above.
+  The test description was: Counter increments smoke test
+  
+
+To run this test again: /Users/weikuang/development/flutter/bin/cache/dart-sdk/bin/dart test /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/widget_test.dart -p vm --plain-name 'Counter increments smoke test'
+00:07 +5 -3: Some tests failed.                                                                                                                                                                        

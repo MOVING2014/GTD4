@@ -1,0 +1,72 @@
+Analyzing gtd4_without_clean_achitecture...                     
+
+   info • 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion • lib/data/database_helper.dart:131:35 • deprecated_member_use
+warning • The value of the local variable 'now' isn't used • lib/data/mock_data.dart:8:11 • unused_local_variable
+   info • 'background' is deprecated and shouldn't be used. Use surface instead. This feature was deprecated after v3.18.0-0.1.pre • lib/main.dart:69:13 • deprecated_member_use
+   info • 'onBackground' is deprecated and shouldn't be used. Use onSurface instead. This feature was deprecated after v3.18.0-0.1.pre • lib/main.dart:72:13 • deprecated_member_use
+   info • 'dialogBackgroundColor' is deprecated and shouldn't be used. Use DialogThemeData.backgroundColor instead. This feature was deprecated after v3.27.0-0.1.pre • lib/main.dart:84:11 • deprecated_member_use
+warning • The value of the field '_titles' isn't used • lib/main.dart:133:29 • unused_field
+warning • The value of the local variable 'isDarkMode' isn't used • lib/main.dart:151:11 • unused_local_variable
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/main.dart:183:64 • deprecated_member_use
+warning • This default clause is covered by the previous cases • lib/models/project.dart:81:7 • unreachable_switch_default
+warning • This default clause is covered by the previous cases • lib/models/task.dart:77:7 • unreachable_switch_default
+warning • Unused import: 'package:intl/intl.dart' • lib/screens/calendar_screen.dart:4:8 • unused_import
+warning • Unused import: '../utils/date_utils.dart' • lib/screens/calendar_screen.dart:9:8 • unused_import
+warning • The value of the local variable 'isDarkMode' isn't used • lib/screens/calendar_screen.dart:26:11 • unused_local_variable
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/calendar_screen.dart:40:49 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/calendar_screen.dart:121:52 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/calendar_screen.dart:125:52 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/calendar_screen.dart:176:58 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/calendar_screen.dart:206:71 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/calendar_screen.dart:237:50 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/calendar_screen.dart:274:68 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/calendar_screen.dart:280:70 • deprecated_member_use
+warning • Unused import: '../screens/task_form_screen.dart' • lib/screens/projects_screen.dart:10:8 • unused_import
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/screens/review_screen.dart:63:36 • deprecated_member_use
+   info • Unnecessary braces in a string interpolation • lib/screens/review_screen.dart:230:16 • unnecessary_brace_in_string_interps
+warning • Unused import: 'package:intl/intl.dart' • lib/screens/task_form_screen.dart:3:8 • unused_import
+warning • Unused import: '../models/project.dart' • lib/screens/task_form_screen.dart:5:8 • unused_import
+warning • The value of the local variable 'isDarkMode' isn't used • lib/widgets/add_task_dialog.dart:141:11 • unused_local_variable
+   info • 'dialogBackgroundColor' is deprecated and shouldn't be used. Use DialogThemeData.backgroundColor instead. This feature was deprecated after v3.27.0-0.1.pre • lib/widgets/add_task_dialog.dart:151:30 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/widgets/add_task_dialog.dart:182:60 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/widgets/add_task_dialog.dart:216:60 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/widgets/add_task_dialog.dart:228:56 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/widgets/add_task_dialog.dart:242:100 • deprecated_member_use
+   info • Unnecessary use of 'toList' in a spread • lib/widgets/add_task_dialog.dart:253:34 • unnecessary_to_list_in_spreads
+   info • 'dialogBackgroundColor' is deprecated and shouldn't be used. Use DialogThemeData.backgroundColor instead. This feature was deprecated after v3.27.0-0.1.pre • lib/widgets/add_task_dialog.dart:260:50 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/widgets/add_task_dialog.dart:282:64 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/widgets/add_task_dialog.dart:289:109 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/widgets/add_task_dialog.dart:300:71 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/widgets/add_task_dialog.dart:313:74 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/widgets/add_task_dialog.dart:333:62 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/widgets/add_task_dialog.dart:339:94 • deprecated_member_use
+warning • Unused import: 'package:intl/intl.dart' • lib/widgets/task_list_item.dart:4:8 • unused_import
+warning • Unused import: '../screens/task_form_screen.dart' • lib/widgets/task_list_item.dart:9:8 • unused_import
+   info • 'MaterialStateProperty' is deprecated and shouldn't be used. Use WidgetStateProperty instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre • lib/widgets/task_list_item.dart:182:28 • deprecated_member_use
+   info • 'MaterialStateBorderSide' is deprecated and shouldn't be used. Use WidgetStateBorderSide instead. Moved to the Widgets layer to make code available outside of Material. This feature was deprecated after v3.19.0-0.3.pre • lib/widgets/task_list_item.dart:186:23 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/widgets/task_list_item.dart:191:59 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/widgets/task_list_item.dart:213:55 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/widgets/task_list_item.dart:227:60 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/widgets/task_list_item.dart:242:58 • deprecated_member_use
+   info • 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss • lib/widgets/task_list_item.dart:273:58 • deprecated_member_use
+   info • The 'children' argument should be last in widget constructor invocations • lib/widgets/task_list_item.dart:344:7 • sort_child_properties_last
+  error • The method 'getTasksForProject' isn't defined for the type 'TestableTaskProvider' • test/providers/task_provider_test.dart:129:43 • undefined_method
+  error • The getter 'priorityTasks' isn't defined for the type 'TestableTaskProvider' • test/providers/task_provider_test.dart:135:44 • undefined_getter
+  error • The getter 'todayTasks' isn't defined for the type 'TestableTaskProvider' • test/providers/task_provider_test.dart:141:41 • undefined_getter
+  error • The method 'getTasksForDay' isn't defined for the type 'TestableTaskProvider' • test/providers/task_provider_test.dart:150:44 • undefined_method
+  error • The method 'getVisibleTasks' isn't defined for the type 'TestableTaskProvider' • test/providers/task_provider_test.dart:159:41 • undefined_method
+  error • The argument type 'Null' can't be assigned to the parameter type 'Task'.  • test/providers/task_provider_test.dart:175:32 • argument_type_not_assignable
+  error • The argument type 'Null' can't be assigned to the parameter type 'Task'.  • test/providers/task_provider_test.dart:182:34 • argument_type_not_assignable
+  error • The argument type 'Null' can't be assigned to the parameter type 'Task'.  • test/providers/task_provider_test.dart:206:32 • argument_type_not_assignable
+  error • The argument type 'Null' can't be assigned to the parameter type 'Task'.  • test/providers/task_provider_test.dart:213:34 • argument_type_not_assignable
+  error • The argument type 'Null' can't be assigned to the parameter type 'String'.  • test/providers/task_provider_test.dart:237:32 • argument_type_not_assignable
+  error • The argument type 'Null' can't be assigned to the parameter type 'Task'.  • test/providers/task_provider_test.dart:271:32 • argument_type_not_assignable
+  error • The method 'toggleTaskStatus' isn't defined for the type 'TestableTaskProvider' • test/providers/task_provider_test.dart:275:28 • undefined_method
+  error • The argument type 'Null' can't be assigned to the parameter type 'Task'.  • test/providers/task_provider_test.dart:278:34 • argument_type_not_assignable
+  error • The method 'getProject' isn't defined for the type 'MockProjectProvider' • test/widgets/task_list_item_test.dart:136:32 • undefined_method
+  error • The method 'getProject' isn't defined for the type 'MockProjectProvider' • test/widgets/task_list_item_test.dart:155:32 • undefined_method
+  error • The function 'Project' isn't defined • test/widgets/task_list_item_test.dart:156:9 • undefined_function
+  error • The method 'toggleTaskStatus' isn't defined for the type 'MockTaskProvider' • test/widgets/task_list_item_test.dart:182:29 • undefined_method
+  error • The method 'toggleTaskStatus' isn't defined for the type 'MockTaskProvider' • test/widgets/task_list_item_test.dart:192:31 • undefined_method
+  error • The method 'getProject' isn't defined for the type 'MockProjectProvider' • test/widgets/task_list_item_test.dart:240:32 • undefined_method
+

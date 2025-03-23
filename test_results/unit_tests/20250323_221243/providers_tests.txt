@@ -1,0 +1,63 @@
+00:00 +0: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/providers/task_provider_test.dart                                                                                           00:00 +0 -1: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/providers/task_provider_test.dart [E]                                                                                    
+  Failed to load "/Users/weikuang/Apps/gtd4_without_clean_achitecture/test/providers/task_provider_test.dart":
+  Compilation failed for testPath=/Users/weikuang/Apps/gtd4_without_clean_achitecture/test/providers/task_provider_test.dart: test/providers/task_provider_test.dart:129:43: Error: The method 'getTasksForProject' isn't defined for the class 'TestableTaskProvider'.
+   - 'TestableTaskProvider' is from 'test/providers/task_provider_test.dart'.
+  Try correcting the name to the name of an existing method, or defining a method named 'getTasksForProject'.
+          final projectTasks = taskProvider.getTasksForProject('project1');
+                                            ^^^^^^^^^^^^^^^^^^
+  test/providers/task_provider_test.dart:135:44: Error: The getter 'priorityTasks' isn't defined for the class 'TestableTaskProvider'.
+   - 'TestableTaskProvider' is from 'test/providers/task_provider_test.dart'.
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'priorityTasks'.
+          final priorityTasks = taskProvider.priorityTasks;
+                                             ^^^^^^^^^^^^^
+  test/providers/task_provider_test.dart:141:41: Error: The getter 'todayTasks' isn't defined for the class 'TestableTaskProvider'.
+   - 'TestableTaskProvider' is from 'test/providers/task_provider_test.dart'.
+  Try correcting the name to the name of an existing getter, or defining a getter or field named 'todayTasks'.
+          final todayTasks = taskProvider.todayTasks;
+                                          ^^^^^^^^^^
+  test/providers/task_provider_test.dart:150:44: Error: The method 'getTasksForDay' isn't defined for the class 'TestableTaskProvider'.
+   - 'TestableTaskProvider' is from 'test/providers/task_provider_test.dart'.
+  Try correcting the name to the name of an existing method, or defining a method named 'getTasksForDay'.
+          final tasksForToday = taskProvider.getTasksForDay(today);
+                                             ^^^^^^^^^^^^^^
+  test/providers/task_provider_test.dart:159:41: Error: The method 'getVisibleTasks' isn't defined for the class 'TestableTaskProvider'.
+   - 'TestableTaskProvider' is from 'test/providers/task_provider_test.dart'.
+  Try correcting the name to the name of an existing method, or defining a method named 'getVisibleTasks'.
+          final allVisible = taskProvider.getVisibleTasks(taskProvider.allTasks);
+                                          ^^^^^^^^^^^^^^^
+  test/providers/task_provider_test.dart:175:32: Error: The argument type 'Null' can't be assigned to the parameter type 'Task' because 'Task' is not nullable.
+   - 'Task' is from 'package:gtd4_without_clean_achitecture/models/task.dart' ('lib/models/task.dart').
+          when(mockDb.insertTask(any)).thenAnswer((_) async => 1);
+                                 ^
+  test/providers/task_provider_test.dart:182:34: Error: The argument type 'Null' can't be assigned to the parameter type 'Task' because 'Task' is not nullable.
+   - 'Task' is from 'package:gtd4_without_clean_achitecture/models/task.dart' ('lib/models/task.dart').
+          verify(mockDb.insertTask(any)).called(1);
+                                   ^
+  test/providers/task_provider_test.dart:206:32: Error: The argument type 'Null' can't be assigned to the parameter type 'Task' because 'Task' is not nullable.
+   - 'Task' is from 'package:gtd4_without_clean_achitecture/models/task.dart' ('lib/models/task.dart').
+          when(mockDb.updateTask(any)).thenAnswer((_) async => 1);
+                                 ^
+  test/providers/task_provider_test.dart:213:34: Error: The argument type 'Null' can't be assigned to the parameter type 'Task' because 'Task' is not nullable.
+   - 'Task' is from 'package:gtd4_without_clean_achitecture/models/task.dart' ('lib/models/task.dart').
+          verify(mockDb.updateTask(any)).called(1);
+                                   ^
+  test/providers/task_provider_test.dart:237:32: Error: The argument type 'Null' can't be assigned to the parameter type 'String' because 'String' is not nullable.
+          when(mockDb.deleteTask(any)).thenAnswer((_) async => 1);
+                                 ^
+  test/providers/task_provider_test.dart:271:32: Error: The argument type 'Null' can't be assigned to the parameter type 'Task' because 'Task' is not nullable.
+   - 'Task' is from 'package:gtd4_without_clean_achitecture/models/task.dart' ('lib/models/task.dart').
+          when(mockDb.updateTask(any)).thenAnswer((_) async => 1);
+                                 ^
+  test/providers/task_provider_test.dart:275:28: Error: The method 'toggleTaskStatus' isn't defined for the class 'TestableTaskProvider'.
+   - 'TestableTaskProvider' is from 'test/providers/task_provider_test.dart'.
+  Try correcting the name to the name of an existing method, or defining a method named 'toggleTaskStatus'.
+          await taskProvider.toggleTaskStatus(task);
+                             ^^^^^^^^^^^^^^^^
+  test/providers/task_provider_test.dart:278:34: Error: The argument type 'Null' can't be assigned to the parameter type 'Task' because 'Task' is not nullable.
+   - 'Task' is from 'package:gtd4_without_clean_achitecture/models/task.dart' ('lib/models/task.dart').
+          verify(mockDb.updateTask(any)).called(1);
+                                   ^
+  .
+
+To run this test again: /Users/weikuang/development/flutter/bin/cache/dart-sdk/bin/dart test /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/providers/task_provider_test.dart -p vm --plain-name 'loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/test/providers/task_provider_test.dart'
+00:00 +0 -1: Some tests failed.                                                                                                                                                                        

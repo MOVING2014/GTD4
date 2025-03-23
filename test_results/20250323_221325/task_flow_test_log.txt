@@ -1,0 +1,127 @@
+00:00 +0: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/integration_test/task_flow_test.dart                                                                                             Running Gradle task 'assembleDebug'...                          00:01 +0: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/integration_test/task_flow_test.dart                                                                                             00:02 +0: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/integration_test/task_flow_test.dart                                                                                             00:03 +0: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/integration_test/task_flow_test.dart                                                                                             00:04 +0: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/integration_test/task_flow_test.dart                                                                                             00:05 +0: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/integration_test/task_flow_test.dart                                                                                             00:06 +0: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/integration_test/task_flow_test.dart                                                                                             00:07 +0: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/integration_test/task_flow_test.dart                                                                                                 7.3s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+00:08 +0: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/integration_test/task_flow_test.dart                                                                                             Installing build/app/outputs/flutter-apk/app-debug.apk...       00:09 +0: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/integration_test/task_flow_test.dart                                                                                             00:10 +0: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/integration_test/task_flow_test.dart                                                                                              1,920ms
+00:11 +0: loading /Users/weikuang/Apps/gtd4_without_clean_achitecture/integration_test/task_flow_test.dart                                                                                             00:11 +0: 任务管理流程测试 创建、完成和删除任务的完整流程                                                                                                                                                                     00:11 +0: 任务管理流程测试 创建、完成和删除任务的完整流程                                                                                                                                                                     
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following assertion was thrown running a test:
+The finder "Found 0 widgets with icon "IconData(U+0E33A)": []" (used in a call to "tap()") could not
+find any matching widgets.
+
+When the exception was thrown, this was the stack:
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2009:7)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1861:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1041:7)
+#3      main.<anonymous closure>.<anonymous closure> (file:///Users/weikuang/Apps/gtd4_without_clean_achitecture/integration_test/task_flow_test.dart:16:20)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1064:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  创建、完成和删除任务的完整流程
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:11 +0 -1: 任务管理流程测试 创建、完成和删除任务的完整流程 [E]                                                                                                                                                              
+  Test failed. See exception logs above.
+  The test description was: 创建、完成和删除任务的完整流程
+  
+
+To run this test again: /Users/weikuang/development/flutter/bin/cache/dart-sdk/bin/dart test /Users/weikuang/Apps/gtd4_without_clean_achitecture/integration_test/task_flow_test.dart -p vm --plain-name '任务管理流程测试 创建、完成和删除任务的完整流程'
+00:11 +0 -1: 任务管理流程测试 创建有截止日期的任务并验证在日历视图中显示                                                                                                                                                            00:12 +0 -1: 任务管理流程测试 创建有截止日期的任务并验证在日历视图中显示                                                                                                                                                            00:12 +0 -1: 任务管理流程测试 创建有截止日期的任务并验证在日历视图中显示                                                                                                                                                            
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following assertion was thrown running a test:
+The finder "Found 2 widgets with icon "IconData(U+0E047)": [
+  Icon(IconData(U+0E047), dependencies: [Directionality, IconTheme]),
+  Icon(IconData(U+0E047), color: Color(alpha: 1.0000, red: 0.1373, green: 0.1725, blue: 0.3804,
+colorSpace: ColorSpace.sRGB), dependencies: [Directionality, IconTheme]),
+]" (used in a call to "tap()") ambiguously found multiple matching widgets. The "tap()" method needs
+a single target.
+
+When the exception was thrown, this was the stack:
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2014:7)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1861:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1041:7)
+#3      main.<anonymous closure>.<anonymous closure> (file:///Users/weikuang/Apps/gtd4_without_clean_achitecture/integration_test/task_flow_test.dart:82:20)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1064:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  创建有截止日期的任务并验证在日历视图中显示
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:12 +0 -2: 任务管理流程测试 创建有截止日期的任务并验证在日历视图中显示 [E]                                                                                                                                                        
+  Test failed. See exception logs above.
+  The test description was: 创建有截止日期的任务并验证在日历视图中显示
+  
+
+To run this test again: /Users/weikuang/development/flutter/bin/cache/dart-sdk/bin/dart test /Users/weikuang/Apps/gtd4_without_clean_achitecture/integration_test/task_flow_test.dart -p vm --plain-name '任务管理流程测试 创建有截止日期的任务并验证在日历视图中显示'
+00:12 +0 -2: 任务管理流程测试 任务优先级和过滤测试                                                                                                                                                                       00:13 +0 -2: 任务管理流程测试 任务优先级和过滤测试                                                                                                                                                                       00:13 +0 -2: 任务管理流程测试 任务优先级和过滤测试                                                                                                                                                                       
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following assertion was thrown running a test:
+The finder "Found 2 widgets with icon "IconData(U+0E047)": [
+  Icon(IconData(U+0E047), dependencies: [Directionality, IconTheme]),
+  Icon(IconData(U+0E047), color: Color(alpha: 1.0000, red: 0.1373, green: 0.1725, blue: 0.3804,
+colorSpace: ColorSpace.sRGB), dependencies: [Directionality, IconTheme]),
+]" (used in a call to "tap()") ambiguously found multiple matching widgets. The "tap()" method needs
+a single target.
+
+When the exception was thrown, this was the stack:
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2014:7)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1861:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1041:7)
+#3      main.<anonymous closure>.<anonymous closure> (file:///Users/weikuang/Apps/gtd4_without_clean_achitecture/integration_test/task_flow_test.dart:118:20)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1064:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  任务优先级和过滤测试
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:13 +0 -3: 任务管理流程测试 任务优先级和过滤测试 [E]                                                                                                                                                                   
+  Test failed. See exception logs above.
+  The test description was: 任务优先级和过滤测试
+  
+
+To run this test again: /Users/weikuang/development/flutter/bin/cache/dart-sdk/bin/dart test /Users/weikuang/Apps/gtd4_without_clean_achitecture/integration_test/task_flow_test.dart -p vm --plain-name '任务管理流程测试 任务优先级和过滤测试'
+00:13 +0 -3: 任务管理流程测试 任务详情编辑测试                                                                                                                                                                         00:14 +0 -3: 任务管理流程测试 任务详情编辑测试                                                                                                                                                                         00:14 +0 -3: 任务管理流程测试 任务详情编辑测试                                                                                                                                                                         
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following assertion was thrown running a test:
+The finder "Found 2 widgets with icon "IconData(U+0E047)": [
+  Icon(IconData(U+0E047), dependencies: [Directionality, IconTheme]),
+  Icon(IconData(U+0E047), dependencies: [Directionality, IconTheme]),
+]" (used in a call to "tap()") ambiguously found multiple matching widgets. The "tap()" method needs
+a single target.
+
+When the exception was thrown, this was the stack:
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2014:7)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1861:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1041:7)
+#3      main.<anonymous closure>.<anonymous closure> (file:///Users/weikuang/Apps/gtd4_without_clean_achitecture/integration_test/task_flow_test.dart:153:20)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:193:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1064:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  任务详情编辑测试
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:14 +0 -4: 任务管理流程测试 任务详情编辑测试 [E]                                                                                                                                                                     
+  Test failed. See exception logs above.
+  The test description was: 任务详情编辑测试
+  
+
+To run this test again: /Users/weikuang/development/flutter/bin/cache/dart-sdk/bin/dart test /Users/weikuang/Apps/gtd4_without_clean_achitecture/integration_test/task_flow_test.dart -p vm --plain-name '任务管理流程测试 任务详情编辑测试'
+00:14 +0 -4: (tearDownAll)                                                                                                                                                                             00:15 +0 -4: (tearDownAll)                                                                                                                                                                             00:15 +0 -4: Some tests failed.                                                                                                                                                                        
