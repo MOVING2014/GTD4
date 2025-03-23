@@ -5,6 +5,7 @@ import 'providers/project_provider.dart';
 import 'screens/calendar_screen.dart';
 import 'screens/projects_screen.dart';
 import 'screens/inbox_screen.dart';
+import 'screens/review_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -46,17 +47,21 @@ class _HomeScreenState extends State<HomeScreen> {
     CalendarScreen(),
     InboxScreen(),
     ProjectsScreen(),
+    ReviewScreen(),
   ];
   
   static const List<String> _titles = [
     '日历',
     '收件箱',
     '项目',
+    '回顾',
   ];
   
   @override
   Widget build(BuildContext context) {
     final taskProvider = Provider.of<TaskProvider>(context);
+    final projectProvider = Provider.of<ProjectProvider>(context);
+    final projectsNeedingReview = projectProvider.projectsNeedingReview;
     
     return Scaffold(
       body: _pages[_selectedIndex],
@@ -83,6 +88,13 @@ class _HomeScreenState extends State<HomeScreen> {
           const NavigationDestination(
             icon: Icon(Icons.folder),
             label: '项目',
+          ),
+          NavigationDestination(
+            icon: Badge(
+              isLabelVisible: projectsNeedingReview.isNotEmpty,
+              child: const Icon(Icons.history),
+            ),
+            label: '回顾',
           ),
         ],
       ),

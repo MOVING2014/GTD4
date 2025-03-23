@@ -12,6 +12,8 @@ class Project {
   DateTime? completedAt;
   String? parentProjectId;
   int? order;
+  bool needsMonthlyReview;
+  DateTime? lastReviewDate;
 
   Project({
     required this.id,
@@ -23,6 +25,8 @@ class Project {
     this.completedAt,
     this.parentProjectId,
     this.order,
+    this.needsMonthlyReview = false,
+    this.lastReviewDate,
   });
 
   Project copyWith({
@@ -35,6 +39,8 @@ class Project {
     DateTime? completedAt,
     String? parentProjectId,
     int? order,
+    bool? needsMonthlyReview,
+    DateTime? lastReviewDate,
   }) {
     return Project(
       id: id ?? this.id,
@@ -46,10 +52,21 @@ class Project {
       completedAt: completedAt ?? this.completedAt,
       parentProjectId: parentProjectId ?? this.parentProjectId,
       order: order ?? this.order,
+      needsMonthlyReview: needsMonthlyReview ?? this.needsMonthlyReview,
+      lastReviewDate: lastReviewDate ?? this.lastReviewDate,
     );
   }
 
   bool get isCompleted => status == ProjectStatus.completed;
+  
+  bool get needsReview {
+    if (!needsMonthlyReview) return false;
+    if (lastReviewDate == null) return true;
+    
+    final now = DateTime.now();
+    final lastMonth = DateTime(now.year, now.month - 1, now.day);
+    return lastReviewDate!.isBefore(lastMonth);
+  }
   
   String get statusText {
     switch (status) {

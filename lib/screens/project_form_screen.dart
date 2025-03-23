@@ -19,6 +19,7 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
   
   late Color _selectedColor;
   late ProjectStatus _status;
+  late bool _needsMonthlyReview;  // 添加月度回顾属性
   
   bool get _isEditing => widget.project != null;
 
@@ -55,10 +56,12 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
       _descriptionController.text = widget.project!.description ?? '';
       _selectedColor = widget.project!.color;
       _status = widget.project!.status;
+      _needsMonthlyReview = widget.project!.needsMonthlyReview;  // 初始化月度回顾状态
     } else {
       // 创建新项目的默认值
       _selectedColor = Colors.blue;
       _status = ProjectStatus.active;
+      _needsMonthlyReview = false;  // 默认不需要月度回顾
     }
   }
 
@@ -82,6 +85,8 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
           name: _nameController.text,
           description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
           color: color,
+          status: _status,
+          needsMonthlyReview: _needsMonthlyReview,  // 添加月度回顾设置
         );
         
         projectProvider.updateProject(updatedProject);
@@ -94,6 +99,7 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
           color: color,
           status: ProjectStatus.active,
           createdAt: DateTime.now(),
+          needsMonthlyReview: _needsMonthlyReview,  // 添加月度回顾设置
         );
         
         projectProvider.addProject(newProject);
@@ -246,6 +252,37 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
                   });
                 },
               ),
+              
+              const SizedBox(height: 16),
+              
+              // 月度回顾设置
+              SwitchListTile(
+                title: const Text('启用月度回顾'),
+                subtitle: const Text('每月自动提醒回顾此项目的任务'),
+                value: _needsMonthlyReview,
+                activeColor: _selectedColor,
+                onChanged: (value) {
+                  setState(() {
+                    _needsMonthlyReview = value;
+                  });
+                },
+                secondary: Icon(
+                  Icons.calendar_month,
+                  color: _needsMonthlyReview ? _selectedColor : Colors.grey,
+                ),
+              ),
+              
+              if (_needsMonthlyReview && _isEditing && widget.project!.lastReviewDate != null)
+                Padding(
+                  padding: const EdgeInsets.only(left: 16.0, top: 8.0),
+                  child: Text(
+                    '上次回顾日期: ${_formatDate(widget.project!.lastReviewDate!)}',
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -264,4 +301,9 @@ class _ProjectFormScreenState extends State<ProjectFormScreen> {
       ),
     );
   }
+}
+
+// 格式化日期为中文格式
+String _formatDate(DateTime date) {
+  return '${date.year}年${date.month}月${date.day}日';
 } 

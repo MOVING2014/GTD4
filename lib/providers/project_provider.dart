@@ -180,4 +180,32 @@ class ProjectProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+  
+  // 获取需要月度回顾的项目
+  List<Project> get projectsNeedingReview {
+    return _projects
+        .where((project) => 
+          project.needsMonthlyReview && 
+          project.needsReview && 
+          project.status == ProjectStatus.active)
+        .toList();
+  }
+  
+  // 设置项目回顾属性
+  void setProjectReviewStatus(String projectId, bool needsReview) {
+    final index = _projects.indexWhere((project) => project.id == projectId);
+    if (index != -1) {
+      _projects[index] = _projects[index].copyWith(needsMonthlyReview: needsReview);
+      notifyListeners();
+    }
+  }
+  
+  // 标记项目已回顾
+  void markProjectAsReviewed(String projectId) {
+    final index = _projects.indexWhere((project) => project.id == projectId);
+    if (index != -1) {
+      _projects[index] = _projects[index].copyWith(lastReviewDate: DateTime.now());
+      notifyListeners();
+    }
+  }
 } 
