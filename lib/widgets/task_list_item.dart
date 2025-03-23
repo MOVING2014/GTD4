@@ -7,6 +7,7 @@ import '../models/project.dart';
 import '../providers/task_provider.dart';
 import '../providers/project_provider.dart';
 import '../screens/task_form_screen.dart';
+import '../widgets/add_task_dialog.dart';
 
 class TaskListItem extends StatefulWidget {
   final Task task;
@@ -130,12 +131,10 @@ class _TaskListItemState extends State<TaskListItem> {
           ),
           CustomSlidableAction(
             onPressed: (context) async {
-              // 打开任务编辑页面
-              final result = await Navigator.push(
+              // 使用AddTaskDialog打开任务编辑对话框
+              final result = await showAddTaskDialog(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => TaskFormScreen(task: widget.task),
-                ),
+                task: widget.task,
               );
               
               // 如果编辑成功，调用回调刷新UI
@@ -236,12 +235,10 @@ class _TaskListItemState extends State<TaskListItem> {
                 : null,
             onTap: null,
             onLongPress: () async {
-              // 长按任务打开编辑页面
-              final result = await Navigator.push(
+              // 长按任务使用AddTaskDialog打开编辑对话框
+              final result = await showAddTaskDialog(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => TaskFormScreen(task: widget.task),
-                ),
+                task: widget.task,
               );
               
               // 如果编辑成功，调用回调刷新UI
