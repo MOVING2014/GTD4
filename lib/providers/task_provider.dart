@@ -76,6 +76,14 @@ class TaskProvider with ChangeNotifier {
     ).length;
   }
   
+  // 获取具有优先级的任务数量（橙色优先级，未完成的）
+  int getPrioritizedTasksCount() {
+    return _tasks.where((task) => 
+      task.priority == TaskPriority.medium && 
+      task.status != TaskStatus.completed
+    ).length;
+  }
+  
   // Get all tasks
   List<Task> get allTasks {
     final tasks = List<Task>.from(_tasks);

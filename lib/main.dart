@@ -3,8 +3,9 @@ import 'package:provider/provider.dart';
 import 'providers/task_provider.dart';
 import 'providers/project_provider.dart';
 import 'screens/calendar_screen.dart';
-import 'screens/projects_screen.dart';
 import 'screens/inbox_screen.dart';
+import 'screens/priority_screen.dart';
+import 'screens/projects_screen.dart';
 import 'screens/review_screen.dart';
 
 void main() {
@@ -46,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
   static const List<Widget> _pages = [
     CalendarScreen(),
     InboxScreen(),
+    PriorityScreen(),
     ProjectsScreen(),
     ReviewScreen(),
   ];
@@ -53,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
   static const List<String> _titles = [
     '日历',
     '收件箱',
+    '优先任务',
     '项目',
     '回顾',
   ];
@@ -84,6 +87,10 @@ class _HomeScreenState extends State<HomeScreen> {
               child: const Icon(Icons.inbox),
             ),
             label: '收件箱',
+          ),
+          const NavigationDestination(
+            icon: Icon(Icons.priority_high),
+            label: '优先任务',
           ),
           const NavigationDestination(
             icon: Icon(Icons.folder),
