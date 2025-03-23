@@ -62,6 +62,20 @@ class TaskProvider with ChangeNotifier {
     return _sortTasksByCompletionStatus(filteredTasks);
   }
   
+  // 获取收件箱任务（没有指定项目的任务）
+  List<Task> get inboxTasks {
+    final inboxTasks = _tasks.where((task) => task.projectId == null).toList();
+    return _processTaskList(inboxTasks);
+  }
+  
+  // 获取收件箱任务数量
+  int get inboxTasksCount {
+    return _tasks.where((task) => 
+      task.projectId == null && 
+      task.status != TaskStatus.completed
+    ).length;
+  }
+  
   // Get all tasks
   List<Task> get allTasks {
     final tasks = List<Task>.from(_tasks);
