@@ -212,9 +212,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
-                    isSameDay(_selectedDay, DateTime.now()) 
-                        ? '今天' 
-                        : _formatChineseDate(_selectedDay),
+                    _formatChineseDate(_selectedDay),
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
@@ -241,7 +239,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                '${_formatChineseDate(_selectedDay)} 没有任务',
+                                '${_formatChineseDate(_selectedDay).trim()} 没有任务',
                                 style: TextStyle(
                                   color: Colors.grey[600],
                                   fontSize: 16,
@@ -257,20 +255,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       
                       // 添加逾期任务
                       if (overdueTasks.isNotEmpty) {
-                        listItems.add(
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                            child: Text(
-                              '逾期任务 (${overdueTasks.length})',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        );
-                        
-                        // 添加逾期任务项
+                        // 直接添加逾期任务项，移除标题
                         for (final task in overdueTasks) {
                           listItems.add(
                             TaskListItem(
@@ -283,20 +268,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       
                       // 添加当日任务
                       if (dateTasks.isNotEmpty) {
-                        listItems.add(
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                            child: Text(
-                              '任务 (${dateTasks.length})',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        );
-                        
-                        // 添加当日任务项
+                        // 直接添加当日任务项，移除标题
                         for (final task in dateTasks) {
                           listItems.add(
                             TaskListItem(
@@ -328,7 +300,30 @@ class _CalendarScreenState extends State<CalendarScreen> {
   
   // 将日期格式化为中文格式
   String _formatChineseDate(DateTime date) {
-    return '${date.year}年${date.month}月${date.day}日';
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final tomorrow = today.add(const Duration(days: 1));
+    final yesterday = today.subtract(const Duration(days: 1));
+    final selectedDate = DateTime(date.year, date.month, date.day);
+    
+    String prefix = '';
+    
+    // 使用日期比较
+    if (selectedDate.year == yesterday.year && 
+        selectedDate.month == yesterday.month && 
+        selectedDate.day == yesterday.day) {
+      prefix = '昨天 - ';
+    } else if (selectedDate.year == today.year && 
+               selectedDate.month == today.month && 
+               selectedDate.day == today.day) {
+      prefix = '今天 - ';
+    } else if (selectedDate.year == tomorrow.year && 
+               selectedDate.month == tomorrow.month && 
+               selectedDate.day == tomorrow.day) {
+      prefix = '明天 - ';
+    }
+    
+    return '$prefix${date.month}月${date.day}日 周${['日', '一', '二', '三', '四', '五', '六'][date.weekday % 7]}';
   }
   
   List<dynamic> _getEventsForDay(DateTime day) {

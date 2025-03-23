@@ -197,9 +197,7 @@ class _TaskListItemState extends State<TaskListItem> {
                     color: widget.task.status == TaskStatus.completed 
                         ? Colors.grey 
                         : Colors.black,
-                    fontWeight: widget.task.status == TaskStatus.completed
-                        ? null
-                        : FontWeight.bold,
+                    fontSize: 17.0,
                   ),
                 ),
                 // 展开备注
