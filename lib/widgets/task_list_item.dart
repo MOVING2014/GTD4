@@ -171,15 +171,23 @@ class _TaskListItemState extends State<TaskListItem> {
                     widget.onTaskChange!();
                   }
                 },
-                activeColor: widget.task.priority == TaskPriority.none 
+                activeColor: Colors.transparent,
+                checkColor: widget.task.priority == TaskPriority.none 
                     ? Colors.black87 
                     : widget.task.getPriorityColor(),
-                side: BorderSide(
-                  color: widget.task.priority == TaskPriority.none 
-                      ? Colors.black54
-                      : widget.task.getPriorityColor(),
-                  width: 1.5,
+                fillColor: MaterialStateProperty.resolveWith((states) {
+                  // 始终保持透明背景
+                  return Colors.transparent;
+                }),
+                side: MaterialStateBorderSide.resolveWith(
+                  (states) => BorderSide(
+                    width: 1.5,
+                    color: widget.task.priority == TaskPriority.none 
+                        ? Colors.black54
+                        : widget.task.getPriorityColor(),
+                  ),
                 ),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4),
                 ),
@@ -266,13 +274,13 @@ class _TaskListItemState extends State<TaskListItem> {
             Icon(
               Icons.calendar_today,
               size: 14,
-              color: widget.task.isOverdue ? Colors.red : Colors.grey,
+              color: widget.task.isOverdue ? Colors.red.shade300 : Colors.grey,
             ),
             const SizedBox(width: 4),
             Text(
               dateString,
               style: TextStyle(
-                color: widget.task.isOverdue ? Colors.red : null,
+                color: widget.task.isOverdue ? Colors.red.shade300 : Colors.grey,
                 fontWeight: null,
               ),
             ),
