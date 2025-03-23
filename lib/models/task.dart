@@ -69,15 +69,13 @@ class Task {
   // Helper method to get color based on priority
   Color getPriorityColor() {
     switch (priority) {
-      case TaskPriority.high:
-        return Colors.red;
       case TaskPriority.medium:
-        return Colors.orange;
+        return Colors.orange;  // 橙色优先级
+      case TaskPriority.high:
       case TaskPriority.low:
-        return Colors.blue;
       case TaskPriority.none:
       default:
-        return Colors.grey;
+        return Colors.grey;    // 灰色优先级
     }
   }
 

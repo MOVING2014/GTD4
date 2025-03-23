@@ -83,11 +83,17 @@ class _ReviewScreenState extends State<ReviewScreen> {
                         return DropdownMenuItem<Project>(
                           value: project,
                           child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(Icons.folder, color: project.color),
                               const SizedBox(width: 8),
-                              Text(project.name),
-                              const Spacer(),
+                              Flexible(
+                                child: Text(
+                                  project.name,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
                               const Icon(Icons.access_time, size: 16),
                               Text(
                                 _getLastReviewText(project),
