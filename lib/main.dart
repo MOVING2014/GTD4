@@ -13,16 +13,18 @@ import 'data/database_helper.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // 设置系统UI为沉浸式，使系统导航栏透明
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+  // 设置系统UI为沉浸式，使系统导航栏完全透明
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    // 透明的系统导航栏
     systemNavigationBarColor: Colors.transparent,
     systemNavigationBarDividerColor: Colors.transparent,
-    // 根据平台亮度动态调整图标亮度
-    systemNavigationBarIconBrightness: Brightness.dark, 
+    // 透明的状态栏
+    statusBarColor: Colors.transparent,
+    // 不在这里设置固定的图标亮度，而是在MyApp中根据主题动态设置
   ));
   
   // 启用边缘到边缘显示模式，让应用内容扩展到系统栏区域
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   
   // 确保数据库已初始化
   await DatabaseHelper.instance.database;
@@ -70,6 +72,29 @@ class MyApp extends StatelessWidget {
             elevation: 0,
           ),
         ),
+        // 在主题应用后设置系统UI样式
+        builder: (context, child) {
+          // 根据当前主题亮度调整系统导航栏图标亮度
+          final brightness = Theme.of(context).brightness;
+          
+          // 使用延迟执行，确保UI样式在渲染完成后应用
+          Future.microtask(() {
+            SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+              // 确保系统导航栏完全透明
+              systemNavigationBarColor: Colors.transparent,
+              systemNavigationBarDividerColor: Colors.transparent,
+              // 根据当前主题调整图标亮度
+              systemNavigationBarIconBrightness: brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+              // 同样调整状态栏图标
+              statusBarIconBrightness: brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+              statusBarBrightness: brightness,
+              // 确保状态栏也是透明的
+              statusBarColor: Colors.transparent,
+            ));
+          });
+          
+          return child!;
+        },
         home: const HomeScreen(),
       ),
     );
@@ -113,6 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
     
     // 获取当前主题亮暗模式状态
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
     
     return Scaffold(
       // 使用SafeArea确保内容不会被底部导航手势区遮挡
@@ -124,48 +150,64 @@ class _HomeScreenState extends State<HomeScreen> {
         bottom: true,
         child: _pages[_selectedIndex],
       ),
-      bottomNavigationBar: NavigationBar(
-        // 增加底部填充，确保导航栏不会与系统手势区重叠
-        height: kBottomNavigationBarHeight + bottomPadding,
-        // 设置导航栏背景透明，使用上下文主题
-        backgroundColor: Colors.transparent,
-        // 暗色模式下调整标签和图标颜色
-        indicatorColor: Theme.of(context).colorScheme.secondaryContainer,
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (int index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        destinations: [
-          const NavigationDestination(
-            icon: Icon(Icons.calendar_today),
-            label: '日历',
-          ),
-          NavigationDestination(
-            icon: Badge(
-              isLabelVisible: taskProvider.inboxTasksCount > 0,
-              label: Text(taskProvider.inboxTasksCount.toString()),
-              child: const Icon(Icons.inbox),
+      // 设置背景透明以便系统手势条能够更好地融入
+      backgroundColor: theme.scaffoldBackgroundColor,
+      // 确保Scaffold是透明的
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      bottomNavigationBar: Container(
+        // 添加一个额外的容器来包裹导航栏，便于自定义
+        decoration: BoxDecoration(
+          // 完全透明，没有颜色和边框
+          color: Colors.transparent,
+        ),
+        child: NavigationBar(
+          // 增加底部填充，确保导航栏不会与系统手势区重叠
+          height: kBottomNavigationBarHeight + bottomPadding,
+          // 设置导航栏背景透明
+          backgroundColor: Colors.transparent,
+          // 去掉阴影
+          elevation: 0,
+          // 导航指示器颜色根据主题调整
+          indicatorColor: theme.colorScheme.secondaryContainer.withOpacity(0.7),
+          // 导航项颜色根据主题调整
+          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+          selectedIndex: _selectedIndex,
+          onDestinationSelected: (int index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          destinations: [
+            const NavigationDestination(
+              icon: Icon(Icons.calendar_today),
+              label: '日历',
             ),
-            label: '收件箱',
-          ),
-          const NavigationDestination(
-            icon: Icon(Icons.priority_high),
-            label: '优先任务',
-          ),
-          const NavigationDestination(
-            icon: Icon(Icons.folder),
-            label: '项目',
-          ),
-          NavigationDestination(
-            icon: Badge(
-              isLabelVisible: projectsNeedingReview.isNotEmpty,
-              child: const Icon(Icons.history),
+            NavigationDestination(
+              icon: Badge(
+                isLabelVisible: taskProvider.inboxTasksCount > 0,
+                label: Text(taskProvider.inboxTasksCount.toString()),
+                child: const Icon(Icons.inbox),
+              ),
+              label: '收件箱',
             ),
-            label: '回顾',
-          ),
-        ],
+            const NavigationDestination(
+              icon: Icon(Icons.priority_high),
+              label: '优先任务',
+            ),
+            const NavigationDestination(
+              icon: Icon(Icons.folder),
+              label: '项目',
+            ),
+            NavigationDestination(
+              icon: Badge(
+                isLabelVisible: projectsNeedingReview.isNotEmpty,
+                child: const Icon(Icons.history),
+              ),
+              label: '回顾',
+            ),
+          ],
+        ),
       ),
     );
   }
