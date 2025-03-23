@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'providers/task_provider.dart';
 import 'providers/project_provider.dart';
@@ -9,6 +10,18 @@ import 'screens/projects_screen.dart';
 import 'screens/review_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // 设置系统UI为沉浸式，使系统导航栏透明
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    systemNavigationBarColor: Colors.transparent,
+    systemNavigationBarDividerColor: Colors.transparent,
+    systemNavigationBarIconBrightness: Brightness.dark, // 导航图标使用深色
+  ));
+  
+  // 启用边缘到边缘显示模式，让应用内容扩展到系统栏区域
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  
   runApp(const MyApp());
 }
 
@@ -66,9 +79,24 @@ class _HomeScreenState extends State<HomeScreen> {
     final projectProvider = Provider.of<ProjectProvider>(context);
     final projectsNeedingReview = projectProvider.projectsNeedingReview;
     
+    // 获取底部安全区域的高度
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    
     return Scaffold(
-      body: _pages[_selectedIndex],
+      // 使用SafeArea确保内容不会被底部导航手势区遮挡
+      body: SafeArea(
+        // 只应用底部的SafeArea，顶部和侧面不需要
+        top: false,
+        left: false,
+        right: false,
+        bottom: true,
+        child: _pages[_selectedIndex],
+      ),
       bottomNavigationBar: NavigationBar(
+        // 增加底部填充，确保导航栏不会与系统手势区重叠
+        height: kBottomNavigationBarHeight + bottomPadding,
+        // 设置为透明以与应用背景色融合
+        backgroundColor: Colors.transparent,
         selectedIndex: _selectedIndex,
         onDestinationSelected: (int index) {
           setState(() {
