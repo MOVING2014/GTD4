@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProjectProvider()),
       ],
       child: MaterialApp(
-        title: 'GTD应用',
+        title: 'Todo',
         // 使用系统的亮暗模式设置
         themeMode: ThemeMode.system,
         // 亮色主题
