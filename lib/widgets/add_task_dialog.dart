@@ -130,12 +130,21 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
   Widget build(BuildContext context) {
     final projectProvider = Provider.of<ProjectProvider>(context);
     final List<Project> projects = projectProvider.allProjects;
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    // 简化优先级处理 - 只判断是"无"还是"有"
+    bool hasPriority = _priority != TaskPriority.none;
     
     return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20.0),
+      ),
+      elevation: 8,
+      backgroundColor: Colors.white,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
       child: Container(
         width: MediaQuery.of(context).size.width * 0.95, // 增加弹窗宽度
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(24.0),
         child: SingleChildScrollView(
           child: Form(
             key: _formKey,
@@ -146,10 +155,25 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                 // 标题
                 TextFormField(
                   controller: _titleController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: '标题',
-                    border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0), // 减小行高
+                    floatingLabelBehavior: FloatingLabelBehavior.auto,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey.withOpacity(0.1),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                    prefixIcon: Icon(Icons.title, color: colorScheme.primary),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -165,10 +189,25 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                 // 备注
                 TextFormField(
                   controller: _notesController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: '备注',
-                    border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0), // 减小行高
+                    floatingLabelBehavior: FloatingLabelBehavior.auto,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey.withOpacity(0.1),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+                    prefixIcon: Icon(Icons.note, color: colorScheme.primary),
                   ),
                   maxLines: 2,
                 ),
@@ -176,30 +215,46 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                 const SizedBox(height: 16),
                 
                 // 项目选择
-                DropdownButtonFormField<String?>(
-                  value: _selectedProjectId,
-                  decoration: const InputDecoration(
-                    labelText: '项目',
-                    border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0), // 减小行高
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12.0),
                   ),
-                  items: [
-                    const DropdownMenuItem<String?>(
-                      value: null,
-                      child: Text('收件箱 (无项目)'),
-                    ),
-                    ...projects.map((project) {
-                      return DropdownMenuItem<String?>(
-                        value: project.id,
-                        child: Text(project.name),
-                      );
-                    }).toList(),
-                  ],
-                  onChanged: (newValue) {
-                    setState(() {
-                      _selectedProjectId = newValue;
-                    });
-                  },
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Row(
+                    children: [
+                      Icon(Icons.folder_outlined, color: colorScheme.primary),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String?>(
+                            value: _selectedProjectId,
+                            isExpanded: true,
+                            icon: const Icon(Icons.arrow_drop_down),
+                            hint: const Text('选择项目'),
+                            items: [
+                              const DropdownMenuItem<String?>(
+                                value: null,
+                                child: Text('收件箱 (无项目)'),
+                              ),
+                              ...projects.map((project) {
+                                return DropdownMenuItem<String?>(
+                                  value: project.id,
+                                  child: Text(project.name),
+                                );
+                              }).toList(),
+                            ],
+                            onChanged: (newValue) {
+                              setState(() {
+                                _selectedProjectId = newValue;
+                              });
+                            },
+                            dropdownColor: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 
                 const SizedBox(height: 16),
@@ -209,88 +264,77 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                   children: [
                     // 日期选择器
                     Expanded(
-                      flex: 3,
-                      child: OutlinedButton.icon(
-                        onPressed: () => _selectDate(context),
-                        icon: const Icon(Icons.calendar_today, size: 18),
-                        label: Text(_dueDate == null 
-                          ? '选择日期' 
-                          : '${_dueDate!.year}/${_dueDate!.month}/${_dueDate!.day}'),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                      flex: 4,  // 增加日期选择器的空间
+                      child: InkWell(
+                        onTap: () => _selectDate(context),
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.calendar_today, 
+                                size: 18, 
+                                color: _dueDate != null ? colorScheme.primary : Colors.grey
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  _dueDate == null 
+                                    ? '选择日期' 
+                                    : '${_dueDate!.year}/${_dueDate!.month}/${_dueDate!.day}',
+                                  style: TextStyle(
+                                    color: _dueDate != null ? Colors.black87 : Colors.grey,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              if (_dueDate != null) 
+                                InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      _dueDate = null;
+                                    });
+                                  },
+                                  child: const Icon(Icons.clear, size: 16, color: Colors.grey),
+                                ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                    if (_dueDate != null) 
-                      IconButton(
-                        icon: const Icon(Icons.clear, size: 18),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        onPressed: () {
-                          setState(() {
-                            _dueDate = null;
-                          });
-                        },
-                      ),
                     const SizedBox(width: 12),
-                    // 优先级选择（下拉式）
-                    Expanded(
-                      flex: 2,
-                      child: DropdownButtonFormField<TaskPriority>(
-                        value: _priority,
-                        decoration: const InputDecoration(
-                          labelText: '优先级',
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+                    // 极简化的优先级选择 - 只有图标按钮
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          // 切换优先级状态
+                          _priority = hasPriority ? TaskPriority.none : TaskPriority.medium;
+                        });
+                      },
+                      child: Container(
+                        width: 48,  // 固定宽度
+                        height: 48,  // 固定高度
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        items: TaskPriority.values.map((priority) {
-                          String label;
-                          Color color;
-                          
-                          switch (priority) {
-                            case TaskPriority.high:
-                              label = '高';
-                              color = Colors.red;
-                              break;
-                            case TaskPriority.medium:
-                              label = '中';
-                              color = Colors.orange;
-                              break;
-                            case TaskPriority.low:
-                              label = '低';
-                              color = Colors.blue;
-                              break;
-                            case TaskPriority.none:
-                            default:
-                              label = '无';
-                              color = Colors.grey;
-                              break;
-                          }
-                          
-                          return DropdownMenuItem<TaskPriority>(
-                            value: priority,
-                            child: Row(
-                              children: [
-                                Icon(Icons.flag, color: color, size: 18),
-                                const SizedBox(width: 8),
-                                Text(label),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (newValue) {
-                          if (newValue != null) {
-                            setState(() {
-                              _priority = newValue;
-                            });
-                          }
-                        },
+                        child: Center(
+                          child: Icon(
+                            Icons.flag,
+                            color: hasPriority ? Colors.orange : Colors.grey,
+                            size: 24,
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
                 
-                const SizedBox(height: 16),
+                const SizedBox(height: 28),
                 
                 // 按钮行
                 Row(
@@ -298,11 +342,27 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                   children: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(false),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        foregroundColor: Colors.grey[700],
+                      ),
                       child: const Text('取消'),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 16),
                     ElevatedButton(
                       onPressed: _saveTask,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 0,
+                      ),
                       child: Text(_isEditing ? '更新' : '创建'),
                     ),
                   ],
