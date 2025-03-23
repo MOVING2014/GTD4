@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui'; // 导入 lerpDouble 函数
 import 'package:provider/provider.dart';
 import '../providers/project_provider.dart';
 import '../providers/task_provider.dart';
@@ -144,11 +145,33 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             );
           }
           
-          return ListView.builder(
+          // 使用 ReorderableListView 替换 ListView.builder
+          return ReorderableListView.builder(
             itemCount: projects.length,
             itemBuilder: (context, index) {
               final project = projects[index];
-              return _buildProjectItem(context, project);
+              return _buildProjectItem(context, project, index);
+            },
+            onReorder: (oldIndex, newIndex) {
+              // 调用 Provider 中的重新排序方法
+              projectProvider.reorderProjects(oldIndex, newIndex, _currentFilter);
+            },
+            // 长按提示
+            proxyDecorator: (child, index, animation) {
+              return AnimatedBuilder(
+                animation: animation,
+                builder: (BuildContext context, Widget? child) {
+                  final double animValue = Curves.easeInOut.transform(animation.value);
+                  final double elevation = lerpDouble(0, 6, animValue)!;
+                  return Material(
+                    elevation: elevation,
+                    color: Colors.transparent,
+                    shadowColor: Colors.grey[100],
+                    child: child,
+                  );
+                },
+                child: child,
+              );
             },
           );
         },
@@ -174,8 +197,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     );
   }
   
-  Widget _buildProjectItem(BuildContext context, Project project) {
+  Widget _buildProjectItem(BuildContext context, Project project, int index) {
     return Consumer<TaskProvider>(
+      key: ValueKey(project.id),
       builder: (context, taskProvider, child) {
         final projectTasks = taskProvider.getTasksByProject(project.id);
         
