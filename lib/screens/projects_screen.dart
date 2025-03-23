@@ -20,7 +20,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Projects'),
+        title: const Text('项目'),
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -47,7 +47,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           
           if (projects.isEmpty) {
             return const Center(
-              child: Text('No projects yet. Tap + to add a project.'),
+              child: Text('暂无项目。点击 + 添加新项目。'),
             );
           }
           
@@ -101,7 +101,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             ),
           ),
           subtitle: Text(
-            project.description ?? 'No description',
+            project.description ?? '无描述',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -109,28 +109,25 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               _buildProgressIndicator(context, project),
-              IconButton(
-                icon: const Icon(Icons.edit),
-                onPressed: () async {
-                  // 打开项目编辑页面
-                  final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ProjectFormScreen(project: project),
-                    ),
-                  );
-                  
-                  // 如果返回true，页面状态已更新
-                  if (result == true) {
-                    setState(() {});
-                  }
-                },
-              ),
               PopupMenuButton<String>(
                 onSelected: (value) async {
                   final projectProvider = Provider.of<ProjectProvider>(context, listen: false);
                   
                   switch (value) {
+                    case 'edit':
+                      // 打开项目编辑页面
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProjectFormScreen(project: project),
+                        ),
+                      );
+                      
+                      // 如果返回true，页面状态已更新
+                      if (result == true) {
+                        setState(() {});
+                      }
+                      break;
                     case 'toggle_completion':
                       projectProvider.toggleProjectCompletion(project.id);
                       setState(() {});
@@ -164,12 +161,12 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       showDialog(
                         context: context,
                         builder: (ctx) => AlertDialog(
-                          title: const Text('Delete Project'),
-                          content: const Text('Are you sure you want to delete this project?'),
+                          title: const Text('删除项目'),
+                          content: const Text('确定要删除此项目吗？'),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.of(ctx).pop(),
-                              child: const Text('Cancel'),
+                              child: const Text('取消'),
                             ),
                             TextButton(
                               onPressed: () {
@@ -177,7 +174,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                                 Navigator.of(ctx).pop();
                                 setState(() {});
                               },
-                              child: const Text('Delete'),
+                              child: const Text('删除'),
                             ),
                           ],
                         ),
@@ -186,21 +183,25 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                   }
                 },
                 itemBuilder: (context) => [
+                  const PopupMenuItem<String>(
+                    value: 'edit',
+                    child: Text('编辑项目'),
+                  ),
                   PopupMenuItem<String>(
                     value: 'toggle_completion',
-                    child: Text(project.isCompleted ? 'Mark as Active' : 'Mark as Completed'),
+                    child: Text(project.isCompleted ? '标记为活动' : '标记为已完成'),
                   ),
                   const PopupMenuItem<String>(
                     value: 'archive',
-                    child: Text('Archive Project'),
+                    child: Text('归档项目'),
                   ),
                   const PopupMenuItem<String>(
                     value: 'add_task',
-                    child: Text('Add Task to Project'),
+                    child: Text('添加任务到项目'),
                   ),
                   const PopupMenuItem<String>(
                     value: 'delete',
-                    child: Text('Delete Project'),
+                    child: Text('删除项目'),
                   ),
                 ],
               ),
@@ -210,7 +211,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               ? [
                   const Padding(
                     padding: EdgeInsets.all(16.0),
-                    child: Text('No tasks in this project yet.'),
+                    child: Text('该项目还没有任务。'),
                   ),
                 ]
               : projectTasks.map((task) => TaskListItem(task: task)).toList(),
