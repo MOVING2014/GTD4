@@ -137,9 +137,8 @@ class TaskListItem extends StatelessWidget {
   Widget _buildSubtitle(Project? project) {
     final List<Widget> elements = [];
     
-    // 显示到期时间（如果有）
+    // 显示到期日期（如果有）
     if (task.dueDate != null) {
-      final timeString = DateFormat.jm().format(task.dueDate!);
       final dateString = task.isDueToday 
           ? 'Today' 
           : DateFormat.MMMd().format(task.dueDate!);
@@ -148,13 +147,13 @@ class TaskListItem extends StatelessWidget {
         Row(
           children: [
             Icon(
-              Icons.access_time,
+              Icons.calendar_today,
               size: 14,
               color: task.isOverdue ? Colors.red : Colors.grey,
             ),
             const SizedBox(width: 4),
             Text(
-              '$dateString at $timeString',
+              dateString,
               style: TextStyle(
                 color: task.isOverdue ? Colors.red : null,
                 fontWeight: task.isOverdue ? FontWeight.bold : null,

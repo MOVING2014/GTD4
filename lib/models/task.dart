@@ -84,7 +84,12 @@ class Task {
   // Check if task is overdue
   bool get isOverdue {
     if (dueDate == null || status == TaskStatus.completed) return false;
-    return dueDate!.isBefore(DateTime.now());
+    
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final dueDay = DateTime(dueDate!.year, dueDate!.month, dueDate!.day);
+    
+    return dueDay.isBefore(today);
   }
 
   // Check if task is due today

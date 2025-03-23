@@ -24,7 +24,6 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   late TaskPriority _priority;
   late TaskStatus _status;
   DateTime? _dueDate;
-  TimeOfDay? _dueTime;
   String? _selectedProjectId;
   bool _isRecurring = false;
   String _recurrenceRule = 'FREQ=DAILY';
@@ -46,9 +45,6 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
       _dueDate = widget.task!.dueDate != null ? 
                  DateTime(widget.task!.dueDate!.year, widget.task!.dueDate!.month, widget.task!.dueDate!.day) : 
                  null;
-      _dueTime = widget.task!.dueDate != null ? 
-                 TimeOfDay(hour: widget.task!.dueDate!.hour, minute: widget.task!.dueDate!.minute) : 
-                 null;
       _selectedProjectId = widget.task!.projectId;
       _isRecurring = widget.task!.isRecurring;
       _recurrenceRule = widget.task!.recurrenceRule ?? 'FREQ=DAILY';
@@ -66,10 +62,6 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
           widget.task!.dueDate!.month,
           widget.task!.dueDate!.day
         );
-        _dueTime = TimeOfDay(
-          hour: widget.task!.dueDate!.hour,
-          minute: widget.task!.dueDate!.minute
-        );
       }
       
       _selectedProjectId = widget.task!.projectId;
@@ -80,7 +72,6 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
       _priority = TaskPriority.none;
       _status = TaskStatus.notStarted;
       _dueDate = null;
-      _dueTime = null;
       _selectedProjectId = null;
       _tags = [];
     }
@@ -108,19 +99,6 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     }
   }
 
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: _dueTime ?? TimeOfDay.now(),
-    );
-    
-    if (picked != null && picked != _dueTime) {
-      setState(() {
-        _dueTime = picked;
-      });
-    }
-  }
-
   void _addTag(String tag) {
     if (tag.isNotEmpty && !_tags.contains(tag)) {
       setState(() {
@@ -139,26 +117,14 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
     if (_formKey.currentState!.validate()) {
       final taskProvider = Provider.of<TaskProvider>(context, listen: false);
       
-      // 合并日期和时间
-      DateTime? combinedDateTime;
+      // 处理截止日期 - 只保留日期部分
+      DateTime? dueDateOnly;
       if (_dueDate != null) {
-        if (_dueTime != null) {
-          combinedDateTime = DateTime(
-            _dueDate!.year,
-            _dueDate!.month,
-            _dueDate!.day,
-            _dueTime!.hour,
-            _dueTime!.minute,
-          );
-        } else {
-          combinedDateTime = DateTime(
-            _dueDate!.year,
-            _dueDate!.month,
-            _dueDate!.day,
-            12, // 默认中午12点
-            0,
-          );
-        }
+        dueDateOnly = DateTime(
+          _dueDate!.year,
+          _dueDate!.month,
+          _dueDate!.day,
+        );
       }
       
       String taskId = _isEditing 
@@ -170,7 +136,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
         id: taskId,
         title: _titleController.text,
         notes: _notesController.text.isEmpty ? null : _notesController.text,
-        dueDate: combinedDateTime,
+        dueDate: dueDateOnly,
         priority: _priority,
         status: _status,
         createdAt: _isEditing ? widget.task!.createdAt : DateTime.now(),
@@ -396,33 +362,15 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
               
               const SizedBox(height: 16),
               
-              // 日期和时间
-              Row(
-                children: [
-                  Expanded(
-                    child: ListTile(
-                      title: const Text('Due Date'),
-                      subtitle: Text(_dueDate == null 
-                          ? 'No date selected' 
-                          : AppDateUtils.formatDate(_dueDate!)),
-                      onTap: () => _selectDate(context),
-                      leading: const Icon(Icons.calendar_today),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                  Expanded(
-                    child: ListTile(
-                      title: const Text('Due Time'),
-                      subtitle: Text(_dueTime == null 
-                          ? 'No time selected' 
-                          : _dueTime!.format(context)),
-                      onTap: () => _selectTime(context),
-                      leading: const Icon(Icons.access_time),
-                      enabled: _dueDate != null,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                ],
+              // 日期
+              ListTile(
+                title: const Text('Due Date'),
+                subtitle: Text(_dueDate == null 
+                    ? 'No date selected' 
+                    : AppDateUtils.formatDate(_dueDate!)),
+                onTap: () => _selectDate(context),
+                leading: const Icon(Icons.calendar_today),
+                contentPadding: EdgeInsets.zero,
               ),
               
               const SizedBox(height: 16),

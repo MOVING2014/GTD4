@@ -22,14 +22,9 @@ class AppDateUtils {
     }
   }
 
-  // Format a time to a human-readable string
-  static String formatTime(DateTime time) {
-    return DateFormat.jm().format(time); // e.g., "2:30 PM"
-  }
-
   // Format a date and time to a human-readable string
   static String formatDateTime(DateTime dateTime) {
-    return '${formatDate(dateTime)} at ${formatTime(dateTime)}';
+    return formatDate(dateTime);
   }
 
   // Get the first day of the week containing the given date

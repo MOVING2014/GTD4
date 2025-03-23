@@ -163,8 +163,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
               _selectedDay.year,
               _selectedDay.month,
               _selectedDay.day,
-              12, // 默认中午
-              0,
             ),
             createdAt: DateTime.now(),
           ),

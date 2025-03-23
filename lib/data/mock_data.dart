@@ -47,6 +47,7 @@ class MockData {
   // Generate demo tasks
   static List<Task> getDemoTasks() {
     final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
     
     return [
       // Today's tasks
@@ -54,22 +55,22 @@ class MockData {
         id: 't1',
         title: 'Prepare presentation for meeting',
         notes: 'Focus on Q2 results and future projections',
-        dueDate: DateTime(now.year, now.month, now.day, 14, 0),
+        dueDate: today,
         priority: TaskPriority.high,
         status: TaskStatus.inProgress,
         projectId: 'p1',
-        createdAt: now.subtract(const Duration(days: 2)),
+        createdAt: today.subtract(const Duration(days: 2)),
         tags: ['meeting', 'presentation'],
       ),
       Task(
         id: 't2',
         title: 'Go for a run',
-        dueDate: DateTime(now.year, now.month, now.day, 7, 0),
+        dueDate: today,
         priority: TaskPriority.medium,
         status: TaskStatus.completed,
         projectId: 'p4',
-        createdAt: now.subtract(const Duration(days: 1)),
-        completedAt: now,
+        createdAt: today.subtract(const Duration(days: 1)),
+        completedAt: today,
         isRecurring: true,
         recurrenceRule: 'FREQ=DAILY',
       ),
@@ -78,11 +79,11 @@ class MockData {
       Task(
         id: 't3',
         title: 'Review project proposal',
-        dueDate: DateTime(now.year, now.month, now.day + 1, 11, 0),
+        dueDate: DateTime(today.year, today.month, today.day + 1),
         priority: TaskPriority.medium,
         status: TaskStatus.notStarted,
         projectId: 'p1',
-        createdAt: now.subtract(const Duration(days: 3)),
+        createdAt: today.subtract(const Duration(days: 3)),
       ),
       
       // This week's tasks
@@ -90,31 +91,31 @@ class MockData {
         id: 't4',
         title: 'Plan weekend trip',
         notes: 'Check accommodations and transportation options',
-        dueDate: DateTime(now.year, now.month, now.day + 3),
+        dueDate: DateTime(today.year, today.month, today.day + 3),
         priority: TaskPriority.low,
         status: TaskStatus.notStarted,
         projectId: 'p2',
-        createdAt: now.subtract(const Duration(days: 7)),
+        createdAt: today.subtract(const Duration(days: 7)),
       ),
       Task(
         id: 't5',
         title: 'Fix kitchen sink',
-        dueDate: DateTime(now.year, now.month, now.day + 4),
+        dueDate: DateTime(today.year, today.month, today.day + 4),
         priority: TaskPriority.high,
         status: TaskStatus.notStarted,
         projectId: 'p3',
-        createdAt: now.subtract(const Duration(days: 2)),
+        createdAt: today.subtract(const Duration(days: 2)),
       ),
       
       // Next week's tasks
       Task(
         id: 't6',
         title: 'Quarterly budget review',
-        dueDate: DateTime(now.year, now.month, now.day + 8),
+        dueDate: DateTime(today.year, today.month, today.day + 8),
         priority: TaskPriority.high,
         status: TaskStatus.notStarted,
         projectId: 'p1',
-        createdAt: now.subtract(const Duration(days: 10)),
+        createdAt: today.subtract(const Duration(days: 10)),
         tags: ['finance', 'quarterly'],
       ),
       
@@ -122,11 +123,11 @@ class MockData {
       Task(
         id: 't7',
         title: 'Call insurance company',
-        dueDate: DateTime(now.year, now.month, now.day - 2),
+        dueDate: DateTime(today.year, today.month, today.day - 2),
         priority: TaskPriority.medium,
         status: TaskStatus.notStarted,
         projectId: 'p2',
-        createdAt: now.subtract(const Duration(days: 5)),
+        createdAt: today.subtract(const Duration(days: 5)),
       ),
       
       // No due date tasks
@@ -137,7 +138,7 @@ class MockData {
         priority: TaskPriority.low,
         status: TaskStatus.notStarted,
         projectId: 'p5',
-        createdAt: now.subtract(const Duration(days: 14)),
+        createdAt: today.subtract(const Duration(days: 14)),
         tags: ['learning', 'programming'],
       ),
       
@@ -145,22 +146,22 @@ class MockData {
       Task(
         id: 't9',
         title: 'Start meditation practice',
-        dueDate: DateTime(now.year, now.month, now.day + 2),
+        dueDate: DateTime(today.year, today.month, today.day + 2),
         priority: TaskPriority.medium,
         status: TaskStatus.notStarted,
         projectId: 'p4',
-        createdAt: now.subtract(const Duration(days: 3)),
+        createdAt: today.subtract(const Duration(days: 3)),
         isRecurring: true,
         recurrenceRule: 'FREQ=DAILY',
       ),
       Task(
         id: 't10',
         title: 'Read book on productivity',
-        dueDate: DateTime(now.year, now.month, now.day + 10),
+        dueDate: DateTime(today.year, today.month, today.day + 10),
         priority: TaskPriority.low,
         status: TaskStatus.inProgress,
         projectId: 'p5',
-        createdAt: now.subtract(const Duration(days: 20)),
+        createdAt: today.subtract(const Duration(days: 20)),
         tags: ['reading', 'productivity'],
       ),
     ];

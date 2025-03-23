@@ -44,10 +44,12 @@ class TaskProvider with ChangeNotifier {
   // Get overdue tasks
   List<Task> get overdueTasks {
     final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    
     return _tasks
         .where((task) => 
           task.dueDate != null && 
-          task.dueDate!.isBefore(DateTime(now.year, now.month, now.day)) &&
+          DateTime(task.dueDate!.year, task.dueDate!.month, task.dueDate!.day).isBefore(today) &&
           task.status != TaskStatus.completed)
         .toList();
   }
