@@ -8,36 +8,36 @@ class MockData {
     return [
       Project(
         id: 'p1',
-        name: 'Work',
-        description: 'Work-related projects and tasks',
+        name: '工作',
+        description: '工作相关项目和任务',
         color: Colors.blue,
         createdAt: DateTime.now().subtract(const Duration(days: 30)),
       ),
       Project(
         id: 'p2',
-        name: 'Personal',
-        description: 'Personal goals and tasks',
+        name: '个人',
+        description: '个人目标和任务',
         color: Colors.green,
         createdAt: DateTime.now().subtract(const Duration(days: 25)),
       ),
       Project(
         id: 'p3',
-        name: 'Home',
-        description: 'Home improvements and maintenance',
+        name: '家庭',
+        description: '家庭改善和维护',
         color: Colors.orange,
         createdAt: DateTime.now().subtract(const Duration(days: 20)),
       ),
       Project(
         id: 'p4',
-        name: 'Health',
-        description: 'Health and fitness goals',
+        name: '健康',
+        description: '健康和健身目标',
         color: Colors.red,
         createdAt: DateTime.now().subtract(const Duration(days: 15)),
       ),
       Project(
         id: 'p5',
-        name: 'Learning',
-        description: 'Courses and learning goals',
+        name: '学习',
+        description: '课程和学习目标',
         color: Colors.purple,
         createdAt: DateTime.now().subtract(const Duration(days: 10)),
       ),
@@ -53,18 +53,18 @@ class MockData {
       // Today's tasks
       Task(
         id: 't1',
-        title: 'Prepare presentation for meeting',
-        notes: 'Focus on Q2 results and future projections',
+        title: '准备会议演示文稿',
+        notes: '关注第二季度业绩和未来预测',
         dueDate: today,
         priority: TaskPriority.high,
         status: TaskStatus.inProgress,
         projectId: 'p1',
         createdAt: today.subtract(const Duration(days: 2)),
-        tags: ['meeting', 'presentation'],
+        tags: ['会议', '演示'],
       ),
       Task(
         id: 't2',
-        title: 'Go for a run',
+        title: '去跑步',
         dueDate: today,
         priority: TaskPriority.medium,
         status: TaskStatus.completed,
@@ -78,7 +78,7 @@ class MockData {
       // Tomorrow's tasks
       Task(
         id: 't3',
-        title: 'Review project proposal',
+        title: '审核项目提案',
         dueDate: DateTime(today.year, today.month, today.day + 1),
         priority: TaskPriority.medium,
         status: TaskStatus.notStarted,
@@ -89,8 +89,8 @@ class MockData {
       // This week's tasks
       Task(
         id: 't4',
-        title: 'Plan weekend trip',
-        notes: 'Check accommodations and transportation options',
+        title: '计划周末旅行',
+        notes: '检查住宿和交通选项',
         dueDate: DateTime(today.year, today.month, today.day + 3),
         priority: TaskPriority.low,
         status: TaskStatus.notStarted,
@@ -99,7 +99,7 @@ class MockData {
       ),
       Task(
         id: 't5',
-        title: 'Fix kitchen sink',
+        title: '修理厨房水槽',
         dueDate: DateTime(today.year, today.month, today.day + 4),
         priority: TaskPriority.high,
         status: TaskStatus.notStarted,
@@ -110,19 +110,19 @@ class MockData {
       // Next week's tasks
       Task(
         id: 't6',
-        title: 'Quarterly budget review',
+        title: '季度预算审核',
         dueDate: DateTime(today.year, today.month, today.day + 8),
         priority: TaskPriority.high,
         status: TaskStatus.notStarted,
         projectId: 'p1',
         createdAt: today.subtract(const Duration(days: 10)),
-        tags: ['finance', 'quarterly'],
+        tags: ['财务', '季度'],
       ),
       
       // Overdue tasks
       Task(
         id: 't7',
-        title: 'Call insurance company',
+        title: '联系保险公司',
         dueDate: DateTime(today.year, today.month, today.day - 2),
         priority: TaskPriority.medium,
         status: TaskStatus.notStarted,
@@ -133,19 +133,19 @@ class MockData {
       // No due date tasks
       Task(
         id: 't8',
-        title: 'Research new programming language',
-        notes: 'Look into Rust and its use cases',
+        title: '研究新的编程语言',
+        notes: '了解Rust及其用例',
         priority: TaskPriority.low,
         status: TaskStatus.notStarted,
         projectId: 'p5',
         createdAt: today.subtract(const Duration(days: 14)),
-        tags: ['learning', 'programming'],
+        tags: ['学习', '编程'],
       ),
       
       // Tasks for specific projects
       Task(
         id: 't9',
-        title: 'Start meditation practice',
+        title: '开始冥想练习',
         dueDate: DateTime(today.year, today.month, today.day + 2),
         priority: TaskPriority.medium,
         status: TaskStatus.notStarted,
@@ -156,13 +156,13 @@ class MockData {
       ),
       Task(
         id: 't10',
-        title: 'Read book on productivity',
+        title: '阅读有关生产力的书籍',
         dueDate: DateTime(today.year, today.month, today.day + 10),
         priority: TaskPriority.low,
         status: TaskStatus.inProgress,
         projectId: 'p5',
         createdAt: today.subtract(const Duration(days: 20)),
-        tags: ['reading', 'productivity'],
+        tags: ['阅读', '生产力'],
       ),
     ];
   }

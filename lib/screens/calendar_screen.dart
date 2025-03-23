@@ -24,7 +24,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Calendar View'),
+        title: const Text('日历视图'),
         actions: [
           IconButton(
             icon: const Icon(Icons.view_agenda),
@@ -79,7 +79,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 shape: BoxShape.circle,
               ),
               selectedDecoration: BoxDecoration(
-                color: Colors.deepPurple,
+                color: Color(0xFF5D69B3),
                 shape: BoxShape.circle,
               ),
               markerDecoration: BoxDecoration(
@@ -104,7 +104,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   // 显示数字而不是小点
                   return Container(
                     decoration: BoxDecoration(
-                      color: Colors.grey[500],
+                      color: const Color(0xFF5D69B3),
                       shape: BoxShape.circle,
                     ),
                     width: 13,
@@ -123,6 +123,59 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 }
                 return null;
               },
+              // 自定义星期几的标题
+              dowBuilder: (context, day) {
+                final text = const ['日', '一', '二', '三', '四', '五', '六'][day.weekday % 7];
+                return Center(
+                  child: Text(
+                    text,
+                    style: const TextStyle(color: Colors.black87),
+                  ),
+                );
+              },
+              // 自定义月份标题显示
+              headerTitleBuilder: (context, month) {
+                // 直接使用中文年月格式，不使用DateFormat
+                final formattedMonth = '${month.year}年${month.month}月';
+                return Center(
+                  child: Text(
+                    formattedMonth,
+                    style: const TextStyle(
+                      fontSize: 17.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                );
+              },
+            ),
+            // 自定义格式切换按钮
+            availableCalendarFormats: const {
+              CalendarFormat.month: '月',
+              CalendarFormat.week: '周',
+            },
+            // 设置月份格式
+            headerStyle: HeaderStyle(
+              formatButtonVisible: true,
+              formatButtonDecoration: BoxDecoration(
+                border: Border.all(color: Colors.grey),
+                borderRadius: BorderRadius.circular(16.0),
+              ),
+              formatButtonTextStyle: const TextStyle(color: Colors.black87),
+              formatButtonPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+            ),
+            // 不设置国际化locale，但自定义显示元素
+            startingDayOfWeek: StartingDayOfWeek.monday,
+          ),
+          
+          // 添加分割线
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: const Divider(
+              height: 0,
+              thickness: 0.5,
+              color: Color(0xFFDDDDDD),
+              indent: 16.0,
+              endIndent: 16.0,
             ),
           ),
           
@@ -134,7 +187,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
-                    AppDateUtils.formatDate(_selectedDay),
+                    isSameDay(_selectedDay, DateTime.now()) 
+                        ? '今天' 
+                        : _formatChineseDate(_selectedDay),
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                 ),
@@ -161,7 +216,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                'No tasks for ${AppDateUtils.formatDate(_selectedDay)}',
+                                '${_formatChineseDate(_selectedDay)} 没有任务',
                                 style: TextStyle(
                                   color: Colors.grey[600],
                                   fontSize: 16,
@@ -181,7 +236,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                             child: Text(
-                              'Overdue (${overdueTasks.length})',
+                              '逾期任务 (${overdueTasks.length})',
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
@@ -207,7 +262,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                             child: Text(
-                              'Tasks (${dateTasks.length})',
+                              '任务 (${dateTasks.length})',
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
@@ -240,9 +295,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addTaskForSelectedDay,
+        backgroundColor: const Color(0xFF5D69B3),
         child: const Icon(Icons.add),
       ),
     );
+  }
+  
+  // 将日期格式化为中文格式
+  String _formatChineseDate(DateTime date) {
+    return '${date.year}年${date.month}月${date.day}日';
   }
   
   List<dynamic> _getEventsForDay(DateTime day) {

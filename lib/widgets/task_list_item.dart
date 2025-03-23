@@ -128,8 +128,8 @@ class TaskListItem extends StatelessWidget {
     // 显示到期日期（如果有）
     if (task.dueDate != null) {
       final dateString = task.isDueToday 
-          ? 'Today' 
-          : DateFormat.MMMd().format(task.dueDate!);
+          ? '今天' 
+          : _formatChineseDate(task.dueDate!);
       
       rowItems.add(
         Row(
@@ -194,5 +194,20 @@ class TaskListItem extends StatelessWidget {
       children: rowItems,
       crossAxisAlignment: CrossAxisAlignment.center,
     );
+  }
+  
+  // 将日期格式化为中文格式
+  String _formatChineseDate(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final tomorrow = DateTime(now.year, now.month, now.day + 1);
+    
+    if (date.year == today.year && date.month == today.month && date.day == today.day) {
+      return '今天';
+    } else if (date.year == tomorrow.year && date.month == tomorrow.month && date.day == tomorrow.day) {
+      return '明天';
+    } else {
+      return '${date.month}月${date.day}日';
+    }
   }
 } 

@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProjectProvider()),
       ],
       child: MaterialApp(
-        title: 'GTD App',
+        title: 'GTD应用',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
@@ -47,8 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
   
   static const List<String> _titles = [
-    'Calendar',
-    'Projects',
+    '日历',
+    '项目',
   ];
   
   @override
@@ -65,11 +65,11 @@ class _HomeScreenState extends State<HomeScreen> {
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.calendar_today),
-            label: 'Calendar',
+            label: '日历',
           ),
           NavigationDestination(
             icon: Icon(Icons.folder),
-            label: 'Projects',
+            label: '项目',
           ),
         ],
       ),
