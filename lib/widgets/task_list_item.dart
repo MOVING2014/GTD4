@@ -261,6 +261,10 @@ class _TaskListItemState extends State<TaskListItem> {
   Widget _buildSubtitle(Project? project) {
     final List<Widget> rowItems = [];
     
+    // 定义统一的标签颜色
+    final Color labelColor = Colors.grey.shade500;
+    final Color overdueColor = Colors.red.shade300;
+    
     // 显示到期日期（如果有）
     if (widget.task.dueDate != null) {
       final dateString = widget.task.isDueToday 
@@ -274,13 +278,13 @@ class _TaskListItemState extends State<TaskListItem> {
             Icon(
               Icons.calendar_today,
               size: 14,
-              color: widget.task.isOverdue ? Colors.red.shade300 : Colors.grey,
+              color: widget.task.isOverdue ? overdueColor : labelColor,
             ),
             const SizedBox(width: 4),
             Text(
               dateString,
               style: TextStyle(
-                color: widget.task.isOverdue ? Colors.red.shade300 : Colors.grey,
+                color: widget.task.isOverdue ? overdueColor : labelColor,
                 fontWeight: null,
               ),
             ),
@@ -294,9 +298,9 @@ class _TaskListItemState extends State<TaskListItem> {
       // 如果已经有日期信息，添加间隔
       if (rowItems.isNotEmpty) {
         rowItems.add(
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text('•', style: TextStyle(color: Colors.grey)),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text('•', style: TextStyle(color: labelColor)),
           ),
         );
       }
@@ -305,16 +309,16 @@ class _TaskListItemState extends State<TaskListItem> {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
+            Icon(
               Icons.folder_outlined,
               size: 14,
-              color: Colors.grey,
+              color: labelColor,
             ),
             const SizedBox(width: 4),
             Text(
               project.name,
-              style: const TextStyle(
-                color: Colors.grey,
+              style: TextStyle(
+                color: labelColor,
               ),
             ),
           ],
