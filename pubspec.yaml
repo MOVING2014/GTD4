@@ -48,6 +48,8 @@ dependencies:
   
   # Local storage
   shared_preferences: ^2.2.2
+  sqflite: ^2.3.0  # For SQLite database
+  path: ^1.8.3  # For managing database file paths
 
 dev_dependencies:
   flutter_test:

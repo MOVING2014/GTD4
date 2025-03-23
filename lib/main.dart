@@ -8,8 +8,9 @@ import 'screens/inbox_screen.dart';
 import 'screens/priority_screen.dart';
 import 'screens/projects_screen.dart';
 import 'screens/review_screen.dart';
+import 'data/database_helper.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // 设置系统UI为沉浸式，使系统导航栏透明
@@ -21,6 +22,9 @@ void main() {
   
   // 启用边缘到边缘显示模式，让应用内容扩展到系统栏区域
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  
+  // 确保数据库已初始化
+  await DatabaseHelper.instance.database;
   
   runApp(const MyApp());
 }

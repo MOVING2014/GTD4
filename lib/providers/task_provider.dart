@@ -1,15 +1,22 @@
 import 'package:flutter/foundation.dart';
 import '../models/task.dart';
-import '../data/mock_data.dart';
+import '../data/database_helper.dart';
 
 class TaskProvider with ChangeNotifier {
   List<Task> _tasks = [];
   // 控制是否显示已完成的任务
   bool _showCompletedTasks = true;
+  final DatabaseHelper _dbHelper = DatabaseHelper.instance;
   
   TaskProvider() {
-    // Load mock data initially
-    _tasks = MockData.getDemoTasks();
+    // 从数据库加载任务
+    _loadTasks();
+  }
+
+  // 从数据库加载所有任务
+  Future<void> _loadTasks() async {
+    _tasks = await _dbHelper.getAllTasks();
+    notifyListeners();
   }
 
   // 获取是否显示已完成任务的状态
@@ -136,41 +143,41 @@ class TaskProvider with ChangeNotifier {
   }
   
   // Add a new task
-  void addTask(Task task) {
-    _tasks.add(task);
-    notifyListeners();
+  Future<void> addTask(Task task) async {
+    await _dbHelper.insertTask(task);
+    await _loadTasks(); // 重新加载任务来更新UI
   }
   
   // Update an existing task
-  void updateTask(Task updatedTask) {
-    final index = _tasks.indexWhere((task) => task.id == updatedTask.id);
-    if (index != -1) {
-      _tasks[index] = updatedTask;
-      notifyListeners();
-    }
+  Future<void> updateTask(Task updatedTask) async {
+    await _dbHelper.updateTask(updatedTask);
+    await _loadTasks(); // 重新加载任务来更新UI
   }
   
   // Delete a task
-  void deleteTask(String taskId) {
-    _tasks.removeWhere((task) => task.id == taskId);
-    notifyListeners();
+  Future<void> deleteTask(String taskId) async {
+    await _dbHelper.deleteTask(taskId);
+    await _loadTasks(); // 重新加载任务来更新UI
   }
   
   // Toggle task completion status
-  void toggleTaskCompletion(String taskId) {
-    final index = _tasks.indexWhere((task) => task.id == taskId);
-    if (index != -1) {
-      final task = _tasks[index];
-      final newStatus = task.status == TaskStatus.completed 
-          ? TaskStatus.notStarted 
-          : TaskStatus.completed;
-      
-      _tasks[index] = task.copyWith(
-        status: newStatus,
-        completedAt: newStatus == TaskStatus.completed ? DateTime.now() : null,
-      );
-      
-      notifyListeners();
-    }
+  Future<void> toggleTaskCompletion(String taskId) async {
+    final task = _tasks.firstWhere((task) => task.id == taskId);
+    final newStatus = task.status == TaskStatus.completed 
+        ? TaskStatus.notStarted 
+        : TaskStatus.completed;
+    
+    final updatedTask = task.copyWith(
+      status: newStatus,
+      completedAt: newStatus == TaskStatus.completed ? DateTime.now() : null,
+    );
+    
+    await _dbHelper.updateTask(updatedTask);
+    await _loadTasks(); // 重新加载任务来更新UI
+  }
+
+  // 刷新任务列表
+  Future<void> refreshTasks() async {
+    await _loadTasks();
   }
 } 

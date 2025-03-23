@@ -1,26 +1,39 @@
 import 'package:flutter/foundation.dart';
 import '../models/project.dart';
-import '../data/mock_data.dart';
+import '../data/database_helper.dart';
 import '../screens/projects_screen.dart'; // 导入 ProjectFilter 枚举
 
 class ProjectProvider with ChangeNotifier {
   List<Project> _projects = [];
+  final DatabaseHelper _dbHelper = DatabaseHelper.instance;
   
   ProjectProvider() {
-    // Load mock data initially
-    _projects = MockData.getDemoProjects();
+    // 从数据库加载项目
+    _loadProjects();
+  }
+  
+  // 从数据库加载所有项目
+  Future<void> _loadProjects() async {
+    _projects = await _dbHelper.getAllProjects();
     // 确保所有项目都有order属性
     _initializeProjectOrders();
+    notifyListeners();
   }
   
   // 初始化项目顺序
   void _initializeProjectOrders() {
     // 根据现有顺序，为没有order值的项目设置order
+    List<Project> updatedProjects = [];
+    
     for (int i = 0; i < _projects.length; i++) {
       if (_projects[i].order == null) {
-        _projects[i] = _projects[i].copyWith(order: i);
+        updatedProjects.add(_projects[i].copyWith(order: i));
+      } else {
+        updatedProjects.add(_projects[i]);
       }
     }
+    
+    _projects = updatedProjects;
     
     // 按order属性排序
     _sortProjectsByOrder();
@@ -32,7 +45,7 @@ class ProjectProvider with ChangeNotifier {
   }
   
   // 重新排序项目
-  void reorderProjects(int oldIndex, int newIndex, ProjectFilter filter) {
+  Future<void> reorderProjects(int oldIndex, int newIndex, ProjectFilter filter) async {
     List<Project> filteredProjects;
     
     // 根据过滤类型获取对应的项目列表
@@ -67,7 +80,9 @@ class ProjectProvider with ChangeNotifier {
         final currentOrder = currentProject.order ?? i + 1;
         final index = _projects.indexWhere((p) => p.id == currentProject.id);
         if (index != -1) {
-          _projects[index] = currentProject.copyWith(order: currentOrder - 1);
+          final updatedProject = currentProject.copyWith(order: currentOrder - 1);
+          _projects[index] = updatedProject;
+          await _dbHelper.updateProject(updatedProject);
         }
       }
     } else if (oldIndex > newIndex) {
@@ -77,7 +92,9 @@ class ProjectProvider with ChangeNotifier {
         final currentOrder = currentProject.order ?? i - 1;
         final index = _projects.indexWhere((p) => p.id == currentProject.id);
         if (index != -1) {
-          _projects[index] = currentProject.copyWith(order: currentOrder + 1);
+          final updatedProject = currentProject.copyWith(order: currentOrder + 1);
+          _projects[index] = updatedProject;
+          await _dbHelper.updateProject(updatedProject);
         }
       }
     }
@@ -85,7 +102,9 @@ class ProjectProvider with ChangeNotifier {
     // 更新被拖动项目的顺序
     final projectIndex = _projects.indexWhere((p) => p.id == project.id);
     if (projectIndex != -1) {
-      _projects[projectIndex] = project.copyWith(order: newIndex);
+      final updatedProject = project.copyWith(order: newIndex);
+      _projects[projectIndex] = updatedProject;
+      await _dbHelper.updateProject(updatedProject);
     }
     
     // 重新排序项目列表
@@ -129,56 +148,57 @@ class ProjectProvider with ChangeNotifier {
   }
   
   // Add a new project
-  void addProject(Project project) {
+  Future<void> addProject(Project project) async {
     // 为新项目设置顺序，放在最后
     final int lastOrder = _projects.isEmpty ? 0 : (_projects.map((p) => p.order ?? 0).reduce((a, b) => a > b ? a : b) + 1);
     final newProject = project.copyWith(order: lastOrder);
-    _projects.add(newProject);
-    notifyListeners();
+    
+    await _dbHelper.insertProject(newProject);
+    await _loadProjects(); // 重新加载项目来更新UI
   }
   
   // Update an existing project
-  void updateProject(Project updatedProject) {
+  Future<void> updateProject(Project updatedProject) async {
     final index = _projects.indexWhere((project) => project.id == updatedProject.id);
     if (index != -1) {
       // 保留原有的order
       final oldOrder = _projects[index].order;
-      _projects[index] = updatedProject.copyWith(order: oldOrder);
-      notifyListeners();
+      final projectToUpdate = updatedProject.copyWith(order: oldOrder);
+      
+      await _dbHelper.updateProject(projectToUpdate);
+      await _loadProjects(); // 重新加载项目来更新UI
     }
   }
   
   // Delete a project
-  void deleteProject(String projectId) {
-    _projects.removeWhere((project) => project.id == projectId);
-    notifyListeners();
+  Future<void> deleteProject(String projectId) async {
+    await _dbHelper.deleteProject(projectId);
+    await _loadProjects(); // 重新加载项目来更新UI
   }
   
   // Toggle project completion status
-  void toggleProjectCompletion(String projectId) {
-    final index = _projects.indexWhere((project) => project.id == projectId);
-    if (index != -1) {
-      final project = _projects[index];
-      final newStatus = project.status == ProjectStatus.completed 
-          ? ProjectStatus.active 
-          : ProjectStatus.completed;
-      
-      _projects[index] = project.copyWith(
-        status: newStatus,
-        completedAt: newStatus == ProjectStatus.completed ? DateTime.now() : null,
-      );
-      
-      notifyListeners();
-    }
+  Future<void> toggleProjectCompletion(String projectId) async {
+    final project = _projects.firstWhere((project) => project.id == projectId);
+    final newStatus = project.status == ProjectStatus.completed 
+        ? ProjectStatus.active 
+        : ProjectStatus.completed;
+    
+    final updatedProject = project.copyWith(
+      status: newStatus,
+      completedAt: newStatus == ProjectStatus.completed ? DateTime.now() : null,
+    );
+    
+    await _dbHelper.updateProject(updatedProject);
+    await _loadProjects(); // 重新加载项目来更新UI
   }
   
   // Archive a project
-  void archiveProject(String projectId) {
-    final index = _projects.indexWhere((project) => project.id == projectId);
-    if (index != -1) {
-      _projects[index] = _projects[index].copyWith(status: ProjectStatus.archived);
-      notifyListeners();
-    }
+  Future<void> archiveProject(String projectId) async {
+    final project = _projects.firstWhere((project) => project.id == projectId);
+    final updatedProject = project.copyWith(status: ProjectStatus.archived);
+    
+    await _dbHelper.updateProject(updatedProject);
+    await _loadProjects(); // 重新加载项目来更新UI
   }
   
   // 获取需要月度回顾的项目
@@ -192,20 +212,25 @@ class ProjectProvider with ChangeNotifier {
   }
   
   // 设置项目回顾属性
-  void setProjectReviewStatus(String projectId, bool needsReview) {
-    final index = _projects.indexWhere((project) => project.id == projectId);
-    if (index != -1) {
-      _projects[index] = _projects[index].copyWith(needsMonthlyReview: needsReview);
-      notifyListeners();
-    }
+  Future<void> setProjectReviewStatus(String projectId, bool needsReview) async {
+    final project = _projects.firstWhere((project) => project.id == projectId);
+    final updatedProject = project.copyWith(needsMonthlyReview: needsReview);
+    
+    await _dbHelper.updateProject(updatedProject);
+    await _loadProjects(); // 重新加载项目来更新UI
   }
   
   // 标记项目已回顾
-  void markProjectAsReviewed(String projectId) {
-    final index = _projects.indexWhere((project) => project.id == projectId);
-    if (index != -1) {
-      _projects[index] = _projects[index].copyWith(lastReviewDate: DateTime.now());
-      notifyListeners();
-    }
+  Future<void> markProjectAsReviewed(String projectId) async {
+    final project = _projects.firstWhere((project) => project.id == projectId);
+    final updatedProject = project.copyWith(lastReviewDate: DateTime.now());
+    
+    await _dbHelper.updateProject(updatedProject);
+    await _loadProjects(); // 重新加载项目来更新UI
+  }
+  
+  // 刷新项目列表
+  Future<void> refreshProjects() async {
+    await _loadProjects();
   }
 } 
