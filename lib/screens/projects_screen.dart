@@ -8,6 +8,7 @@ import '../models/task.dart';
 import '../widgets/task_list_item.dart';
 import '../screens/project_form_screen.dart';
 import '../screens/task_form_screen.dart';
+import '../widgets/add_task_dialog.dart';
 
 enum ProjectFilter {
   active,
@@ -178,13 +179,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // 打开任务创建页面，不指定项目
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const TaskFormScreen(),
-            ),
-          );
+          // 使用弹窗创建新任务
+          final result = await showAddTaskDialog(context);
           
           // 如果返回true，页面状态已更新
           if (result == true) {
@@ -249,18 +245,14 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       setState(() {});
                       break;
                     case 'add_task':
-                      // 打开任务创建页面，并预设项目
-                      final result = await Navigator.push(
+                      // 使用弹窗添加任务到项目
+                      final result = await showAddTaskDialog(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => TaskFormScreen(
-                            task: Task(
-                              id: 't${DateTime.now().millisecondsSinceEpoch}',
-                              title: '',
-                              createdAt: DateTime.now(),
-                              projectId: project.id,
-                            ),
-                          ),
+                        task: Task(
+                          id: 't${DateTime.now().millisecondsSinceEpoch}',
+                          title: '',
+                          createdAt: DateTime.now(),
+                          projectId: project.id,
                         ),
                       );
                       

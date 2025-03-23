@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/task_provider.dart';
 import '../models/task.dart';
 import '../widgets/task_list_item.dart';
-import '../screens/task_form_screen.dart';
+import '../widgets/add_task_dialog.dart';
 
 class InboxScreen extends StatefulWidget {
   const InboxScreen({super.key});
@@ -39,13 +39,8 @@ class _InboxScreenState extends State<InboxScreen> {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () async {
-              // 打开任务创建页面
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const TaskFormScreen(),
-                ),
-              );
+              // 使用弹窗添加任务
+              final result = await showAddTaskDialog(context);
               
               // 如果返回true，页面状态已更新
               if (result == true) {
@@ -102,13 +97,8 @@ class _InboxScreenState extends State<InboxScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // 打开任务创建页面
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const TaskFormScreen(),
-            ),
-          );
+          // 使用弹窗添加任务
+          final result = await showAddTaskDialog(context);
           
           // 如果返回true，页面状态已更新
           if (result == true) {

@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import '../providers/task_provider.dart';
 import '../models/task.dart';
 import '../widgets/task_list_item.dart';
-import '../screens/task_form_screen.dart';
+import '../widgets/add_task_dialog.dart';
 import '../utils/date_utils.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -338,22 +338,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
   
   Future<void> _addTaskForSelectedDay() async {
-    // 创建带有当前选中日期的新任务
-    final result = await Navigator.push(
+    // 使用弹窗创建当前选中日期的新任务
+    final result = await showAddTaskDialog(
       context,
-      MaterialPageRoute(
-        builder: (context) => TaskFormScreen(
-          task: Task(
-            id: 't${DateTime.now().millisecondsSinceEpoch}',
-            title: '',
-            dueDate: DateTime(
-              _selectedDay.year,
-              _selectedDay.month,
-              _selectedDay.day,
-            ),
-            createdAt: DateTime.now(),
-          ),
+      task: Task(
+        id: 't${DateTime.now().millisecondsSinceEpoch}',
+        title: '',
+        dueDate: DateTime(
+          _selectedDay.year,
+          _selectedDay.month,
+          _selectedDay.day,
         ),
+        createdAt: DateTime.now(),
       ),
     );
     
