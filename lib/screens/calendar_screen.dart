@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import '../providers/task_provider.dart';
 import '../models/task.dart';
 import '../widgets/task_list_item.dart';
+import '../screens/task_form_screen.dart';
+import '../utils/date_utils.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -39,7 +41,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              // TODO: Implement add task
+              // 创建当前选中日期的新任务
+              _addTaskForSelectedDay();
             },
           ),
         ],
@@ -47,7 +50,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Calendar widget
+          // 日历组件
           TableCalendar(
             firstDay: DateTime.utc(2020, 1, 1),
             lastDay: DateTime.utc(2030, 12, 31),
@@ -84,22 +87,36 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 shape: BoxShape.circle,
               ),
             ),
+            // 添加任务标记点
+            eventLoader: (day) {
+              return _getEventsForDay(day);
+            },
           ),
           
-          // Tasks for selected day
+          // 选中日期的任务
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    DateFormat.yMMMMd().format(_selectedDay),
-                    style: Theme.of(context).textTheme.titleLarge,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        AppDateUtils.formatDate(_selectedDay),
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      OutlinedButton.icon(
+                        onPressed: _addTaskForSelectedDay,
+                        icon: const Icon(Icons.add),
+                        label: const Text('Add Task'),
+                      ),
+                    ],
                   ),
                 ),
                 
-                // Overdue tasks (if viewing today)
+                // 逾期任务（如果查看当天）
                 if (isSameDay(_selectedDay, DateTime.now()))
                   _buildTaskSection(
                     context, 
@@ -108,7 +125,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     (provider) => provider.overdueTasks,
                   ),
                 
-                // Tasks for selected day
+                // 选中日期的任务
                 _buildTaskSection(
                   context,
                   'Tasks',
@@ -121,10 +138,37 @@ class _CalendarScreenState extends State<CalendarScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // TODO: Implement add task
-        },
+        onPressed: _addTaskForSelectedDay,
         child: const Icon(Icons.add),
+      ),
+    );
+  }
+  
+  List<dynamic> _getEventsForDay(DateTime day) {
+    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    final tasks = taskProvider.getTasksForDate(day);
+    return tasks;
+  }
+  
+  void _addTaskForSelectedDay() {
+    // 创建带有当前选中日期的新任务
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TaskFormScreen(
+          task: Task(
+            id: 't${DateTime.now().millisecondsSinceEpoch}',
+            title: '',
+            dueDate: DateTime(
+              _selectedDay.year,
+              _selectedDay.month,
+              _selectedDay.day,
+              12, // 默认中午
+              0,
+            ),
+            createdAt: DateTime.now(),
+          ),
+        ),
       ),
     );
   }
@@ -140,7 +184,35 @@ class _CalendarScreenState extends State<CalendarScreen> {
         final tasks = tasksSelector(taskProvider);
         
         if (tasks.isEmpty) {
-          return const SizedBox.shrink();
+          return Expanded(
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.event_note,
+                    size: 64,
+                    color: Colors.grey[300],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No tasks for $title',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  if (title != 'Overdue')
+                    ElevatedButton.icon(
+                      onPressed: _addTaskForSelectedDay,
+                      icon: const Icon(Icons.add),
+                      label: const Text('Add Task'),
+                    ),
+                ],
+              ),
+            ),
+          );
         }
         
         return Expanded(

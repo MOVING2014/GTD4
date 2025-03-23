@@ -3,7 +3,10 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../models/task.dart';
+import '../models/project.dart';
 import '../providers/task_provider.dart';
+import '../providers/project_provider.dart';
+import '../screens/task_form_screen.dart';
 
 class TaskListItem extends StatelessWidget {
   final Task task;
@@ -13,6 +16,12 @@ class TaskListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+    final projectProvider = Provider.of<ProjectProvider>(context, listen: false);
+    
+    // 获取项目信息
+    final project = task.projectId != null 
+        ? projectProvider.getProjectById(task.projectId!) 
+        : null;
     
     return Slidable(
       endActionPane: ActionPane(
@@ -29,7 +38,13 @@ class TaskListItem extends StatelessWidget {
           ),
           SlidableAction(
             onPressed: (context) {
-              // TODO: Implement edit task
+              // 打开任务编辑页面
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TaskFormScreen(task: task),
+                ),
+              );
             },
             backgroundColor: Colors.blue,
             foregroundColor: Colors.white,
@@ -57,8 +72,17 @@ class TaskListItem extends StatelessWidget {
                 : Colors.black,
           ),
         ),
-        subtitle: _buildSubtitle(),
+        subtitle: _buildSubtitle(project),
         trailing: _buildPriorityIndicator(),
+        onTap: () {
+          // 点击任务打开编辑页面
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TaskFormScreen(task: task),
+            ),
+          );
+        },
       ),
     );
   }
@@ -78,10 +102,10 @@ class TaskListItem extends StatelessWidget {
     );
   }
   
-  Widget _buildSubtitle() {
+  Widget _buildSubtitle(Project? project) {
     final List<Widget> elements = [];
     
-    // Show due time if available
+    // 显示到期时间（如果有）
     if (task.dueDate != null) {
       final timeString = DateFormat.jm().format(task.dueDate!);
       final dateString = task.isDueToday 
@@ -109,23 +133,27 @@ class TaskListItem extends StatelessWidget {
       );
     }
     
-    // Show project if available
-    if (task.projectId != null) {
+    // 显示项目信息（如果有）
+    if (project != null) {
       if (elements.isNotEmpty) {
         elements.add(const SizedBox(height: 4));
       }
       
       elements.add(
-        const Row(
+        Row(
           children: [
             Icon(
               Icons.folder_outlined,
               size: 14,
-              color: Colors.grey,
+              color: project.color.withOpacity(0.8),
             ),
-            SizedBox(width: 4),
-            // TODO: Get actual project name
-            Text('Project'),
+            const SizedBox(width: 4),
+            Text(
+              project.name,
+              style: TextStyle(
+                color: project.color.withOpacity(0.8),
+              ),
+            ),
           ],
         ),
       );

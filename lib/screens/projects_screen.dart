@@ -5,6 +5,8 @@ import '../providers/task_provider.dart';
 import '../models/project.dart';
 import '../models/task.dart';
 import '../widgets/task_list_item.dart';
+import '../screens/project_form_screen.dart';
+import '../screens/task_form_screen.dart';
 
 class ProjectsScreen extends StatelessWidget {
   const ProjectsScreen({super.key});
@@ -18,7 +20,13 @@ class ProjectsScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              // TODO: Implement add project
+              // 打开项目创建页面
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProjectFormScreen(),
+                ),
+              );
             },
           ),
         ],
@@ -44,7 +52,13 @@ class ProjectsScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: Implement add project
+          // 打开任务创建页面，不指定项目
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const TaskFormScreen(),
+            ),
+          );
         },
         child: const Icon(Icons.add),
       ),
@@ -72,9 +86,119 @@ class ProjectsScreen extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      trailing: _buildProgressIndicator(context, project),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildProgressIndicator(context, project),
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              // 打开项目编辑页面
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProjectFormScreen(project: project),
+                ),
+              );
+            },
+          ),
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              final projectProvider = Provider.of<ProjectProvider>(context, listen: false);
+              
+              switch (value) {
+                case 'toggle_completion':
+                  projectProvider.toggleProjectCompletion(project.id);
+                  break;
+                case 'archive':
+                  projectProvider.archiveProject(project.id);
+                  break;
+                case 'add_task':
+                  // 打开任务创建页面，并预设项目
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TaskFormScreen(
+                        task: Task(
+                          id: 't${DateTime.now().millisecondsSinceEpoch}',
+                          title: '',
+                          createdAt: DateTime.now(),
+                          projectId: project.id,
+                        ),
+                      ),
+                    ),
+                  );
+                  break;
+                case 'delete':
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: const Text('Delete Project'),
+                      content: const Text('Are you sure you want to delete this project?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(ctx).pop(),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            projectProvider.deleteProject(project.id);
+                            Navigator.of(ctx).pop();
+                          },
+                          child: const Text('Delete'),
+                        ),
+                      ],
+                    ),
+                  );
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem<String>(
+                value: 'toggle_completion',
+                child: Text(project.isCompleted ? 'Mark as Active' : 'Mark as Completed'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'archive',
+                child: Text('Archive Project'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'add_task',
+                child: Text('Add Task to Project'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'delete',
+                child: Text('Delete Project'),
+              ),
+            ],
+          ),
+        ],
+      ),
       children: [
         _buildProjectTasks(context, project),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: OutlinedButton.icon(
+            onPressed: () {
+              // 打开任务创建页面，并预设项目
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TaskFormScreen(
+                    task: Task(
+                      id: 't${DateTime.now().millisecondsSinceEpoch}',
+                      title: '',
+                      createdAt: DateTime.now(),
+                      projectId: project.id,
+                    ),
+                  ),
+                ),
+              );
+            },
+            icon: const Icon(Icons.add),
+            label: const Text('Add Task to Project'),
+          ),
+        ),
       ],
     );
   }
