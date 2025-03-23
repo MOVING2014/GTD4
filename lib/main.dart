@@ -17,7 +17,8 @@ void main() async {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     systemNavigationBarColor: Colors.transparent,
     systemNavigationBarDividerColor: Colors.transparent,
-    systemNavigationBarIconBrightness: Brightness.dark, // 导航图标使用深色
+    // 根据平台亮度动态调整图标亮度
+    systemNavigationBarIconBrightness: Brightness.dark, 
   ));
   
   // 启用边缘到边缘显示模式，让应用内容扩展到系统栏区域
@@ -41,9 +42,33 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'GTD应用',
+        // 使用系统的亮暗模式设置
+        themeMode: ThemeMode.system,
+        // 亮色主题
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF5D69B3),
+            brightness: Brightness.light,
+          ),
+          // 设置AppBar样式
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+          ),
+        ),
+        // 暗色主题
+        darkTheme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF5D69B3),
+            brightness: Brightness.dark,
+          ),
+          // 设置AppBar样式
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+          ),
         ),
         home: const HomeScreen(),
       ),
@@ -86,6 +111,9 @@ class _HomeScreenState extends State<HomeScreen> {
     // 获取底部安全区域的高度
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     
+    // 获取当前主题亮暗模式状态
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
       // 使用SafeArea确保内容不会被底部导航手势区遮挡
       body: SafeArea(
@@ -99,8 +127,10 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: NavigationBar(
         // 增加底部填充，确保导航栏不会与系统手势区重叠
         height: kBottomNavigationBarHeight + bottomPadding,
-        // 设置为透明以与应用背景色融合
+        // 设置导航栏背景透明，使用上下文主题
         backgroundColor: Colors.transparent,
+        // 暗色模式下调整标签和图标颜色
+        indicatorColor: Theme.of(context).colorScheme.secondaryContainer,
         selectedIndex: _selectedIndex,
         onDestinationSelected: (int index) {
           setState(() {

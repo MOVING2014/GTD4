@@ -23,6 +23,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     final taskProvider = Provider.of<TaskProvider>(context);
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
     
     return Scaffold(
       appBar: AppBar(
@@ -34,7 +36,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
               taskProvider.showCompletedTasks 
                   ? Icons.check_circle_outline 
                   : Icons.check_circle,
-              color: taskProvider.showCompletedTasks ? Colors.grey : Colors.green,
+              color: taskProvider.showCompletedTasks 
+                  ? theme.colorScheme.onSurface.withOpacity(0.5) 
+                  : Colors.green,
             ),
             tooltip: taskProvider.showCompletedTasks ? '隐藏已完成任务' : '显示已完成任务',
             onPressed: () {
@@ -89,12 +93,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
               _focusedDay = focusedDay;
             },
             calendarStyle: CalendarStyle(
+              // 适配暗黑模式的日历样式
               todayDecoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.transparent,
               ),
-              todayTextStyle: const TextStyle(
-                color: Colors.blue,
+              todayTextStyle: TextStyle(
+                color: theme.colorScheme.primary,
                 fontWeight: FontWeight.bold,
                 fontSize: 16.0,
               ),
@@ -103,12 +108,25 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 color: Colors.transparent,
               ),
               selectedTextStyle: TextStyle(
-                color: Color(0xFF5D69B3),
+                color: theme.colorScheme.primary,
                 fontWeight: FontWeight.bold,
                 fontSize: 16.0,
               ),
+              // 调整默认文本颜色为主题适配
+              defaultTextStyle: TextStyle(
+                color: theme.colorScheme.onSurface,
+              ),
+              // 周末文本颜色适配
+              weekendTextStyle: TextStyle(
+                color: theme.colorScheme.onSurface.withOpacity(0.8),
+              ),
+              // 日历外部日期文本颜色
+              outsideTextStyle: TextStyle(
+                color: theme.colorScheme.onSurface.withOpacity(0.5),
+              ),
+              // 标记样式
               markerDecoration: BoxDecoration(
-                color: Colors.red,
+                color: theme.colorScheme.primary,
                 shape: BoxShape.circle,
               ),
             ),
@@ -129,7 +147,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   // 显示数字而不是小点
                   return Container(
                     decoration: BoxDecoration(
-                      color: const Color(0xFF5D69B3),
+                      color: theme.colorScheme.primary,
                       shape: BoxShape.circle,
                     ),
                     width: 13,
@@ -137,8 +155,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     child: Center(
                       child: Text(
                         uncompletedTasks.length.toString(),
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: theme.colorScheme.onPrimary,
                           fontSize: 8,
                           fontWeight: FontWeight.bold,
                         ),
@@ -154,7 +172,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 return Center(
                   child: Text(
                     text,
-                    style: const TextStyle(color: Colors.black87),
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface.withOpacity(0.8),
+                    ),
                   ),
                 );
               },
@@ -165,9 +185,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 return Center(
                   child: Text(
                     formattedMonth,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 17.0,
                       fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                 );
@@ -182,11 +203,26 @@ class _CalendarScreenState extends State<CalendarScreen> {
             headerStyle: HeaderStyle(
               formatButtonVisible: true,
               formatButtonDecoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
+                border: Border.all(color: theme.colorScheme.onSurface.withOpacity(0.5)),
                 borderRadius: BorderRadius.circular(16.0),
               ),
-              formatButtonTextStyle: const TextStyle(color: Colors.black87),
+              formatButtonTextStyle: TextStyle(color: theme.colorScheme.onSurface),
               formatButtonPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+              // 调整标题颜色
+              titleTextStyle: TextStyle(
+                color: theme.colorScheme.onSurface,
+                fontSize: 17.0,
+                fontWeight: FontWeight.bold,
+              ),
+              // 调整左右箭头颜色
+              leftChevronIcon: Icon(
+                Icons.chevron_left,
+                color: theme.colorScheme.onSurface,
+              ),
+              rightChevronIcon: Icon(
+                Icons.chevron_right,
+                color: theme.colorScheme.onSurface,
+              ),
             ),
             // 不设置国际化locale，但自定义显示元素
             startingDayOfWeek: StartingDayOfWeek.monday,
@@ -195,10 +231,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
           // 添加分割线
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: const Divider(
+            child: Divider(
               height: 0,
               thickness: 0.5,
-              color: Color(0xFFDDDDDD),
+              color: theme.colorScheme.onSurface.withOpacity(0.2),
               indent: 16.0,
               endIndent: 16.0,
             ),
@@ -213,7 +249,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
                     _formatChineseDate(_selectedDay),
-                    style: Theme.of(context).textTheme.titleLarge,
+                    style: theme.textTheme.titleLarge,
                   ),
                 ),
                 
@@ -235,13 +271,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                               Icon(
                                 Icons.event_note,
                                 size: 64,
-                                color: Colors.grey[300],
+                                color: theme.colorScheme.onSurface.withOpacity(0.2),
                               ),
                               const SizedBox(height: 16),
                               Text(
                                 '${_formatChineseDate(_selectedDay).trim()} 没有任务',
                                 style: TextStyle(
-                                  color: Colors.grey[600],
+                                  color: theme.colorScheme.onSurface.withOpacity(0.6),
                                   fontSize: 16,
                                 ),
                               ),
@@ -292,8 +328,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addTaskForSelectedDay,
-        backgroundColor: const Color(0xFF5D69B3),
-        child: const Icon(Icons.add),
+        backgroundColor: theme.colorScheme.primary,
+        child: Icon(Icons.add, color: theme.colorScheme.onPrimary),
       ),
     );
   }

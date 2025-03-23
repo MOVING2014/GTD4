@@ -74,6 +74,12 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
       initialDate: _dueDate ?? DateTime.now(),
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context), // Use the app's current theme
+          child: child!,
+        );
+      },
     );
     
     if (picked != null && picked != _dueDate) {
@@ -130,7 +136,9 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
   Widget build(BuildContext context) {
     final projectProvider = Provider.of<ProjectProvider>(context);
     final List<Project> projects = projectProvider.allProjects;
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDarkMode = theme.brightness == Brightness.dark;
     
     // 简化优先级处理 - 只判断是"无"还是"有"
     bool hasPriority = _priority != TaskPriority.none;
@@ -140,7 +148,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
         borderRadius: BorderRadius.circular(20.0),
       ),
       elevation: 8,
-      backgroundColor: Colors.white,
+      backgroundColor: theme.dialogBackgroundColor,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
       child: Container(
         width: MediaQuery.of(context).size.width * 0.95, // 增加弹窗宽度
@@ -171,7 +179,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                       borderSide: BorderSide.none,
                     ),
                     filled: true,
-                    fillColor: Colors.grey.withOpacity(0.1),
+                    fillColor: theme.colorScheme.onSurface.withOpacity(0.1),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
                     prefixIcon: Icon(Icons.title, color: colorScheme.primary),
                   ),
@@ -205,7 +213,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                       borderSide: BorderSide.none,
                     ),
                     filled: true,
-                    fillColor: Colors.grey.withOpacity(0.1),
+                    fillColor: theme.colorScheme.onSurface.withOpacity(0.1),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
                     prefixIcon: Icon(Icons.note, color: colorScheme.primary),
                   ),
@@ -217,7 +225,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                 // 项目选择
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.1),
+                    color: theme.colorScheme.onSurface.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -230,17 +238,17 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                           child: DropdownButton<String?>(
                             value: _selectedProjectId,
                             isExpanded: true,
-                            icon: const Icon(Icons.arrow_drop_down),
-                            hint: const Text('选择项目'),
+                            icon: Icon(Icons.arrow_drop_down, color: theme.colorScheme.onSurface),
+                            hint: Text('选择项目', style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.7))),
                             items: [
-                              const DropdownMenuItem<String?>(
+                              DropdownMenuItem<String?>(
                                 value: null,
-                                child: Text('收件箱 (无项目)'),
+                                child: Text('收件箱 (无项目)', style: TextStyle(color: theme.colorScheme.onSurface)),
                               ),
                               ...projects.map((project) {
                                 return DropdownMenuItem<String?>(
                                   value: project.id,
-                                  child: Text(project.name),
+                                  child: Text(project.name, style: TextStyle(color: theme.colorScheme.onSurface)),
                                 );
                               }).toList(),
                             ],
@@ -249,7 +257,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                                 _selectedProjectId = newValue;
                               });
                             },
-                            dropdownColor: Colors.white,
+                            dropdownColor: theme.dialogBackgroundColor,
                           ),
                         ),
                       ),
@@ -271,14 +279,14 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                           decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.1),
+                            color: theme.colorScheme.onSurface.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
                             children: [
                               Icon(Icons.calendar_today, 
                                 size: 18, 
-                                color: _dueDate != null ? colorScheme.primary : Colors.grey
+                                color: _dueDate != null ? colorScheme.primary : theme.colorScheme.onSurface.withOpacity(0.5)
                               ),
                               const SizedBox(width: 10),
                               Expanded(
@@ -287,7 +295,9 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                                     ? '选择日期' 
                                     : '${_dueDate!.year}/${_dueDate!.month}/${_dueDate!.day}',
                                   style: TextStyle(
-                                    color: _dueDate != null ? Colors.black87 : Colors.grey,
+                                    color: _dueDate != null 
+                                        ? theme.colorScheme.onSurface 
+                                        : theme.colorScheme.onSurface.withOpacity(0.5),
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -299,7 +309,8 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                                       _dueDate = null;
                                     });
                                   },
-                                  child: const Icon(Icons.clear, size: 16, color: Colors.grey),
+                                  child: Icon(Icons.clear, size: 16, 
+                                      color: theme.colorScheme.onSurface.withOpacity(0.5)),
                                 ),
                             ],
                           ),
@@ -319,13 +330,13 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                         width: 48,  // 固定宽度
                         height: 48,  // 固定高度
                         decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.1),
+                          color: theme.colorScheme.onSurface.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Center(
                           child: Icon(
                             Icons.flag,
-                            color: hasPriority ? Colors.orange : Colors.grey,
+                            color: hasPriority ? Colors.orange : theme.colorScheme.onSurface.withOpacity(0.5),
                             size: 24,
                           ),
                         ),
@@ -347,7 +358,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        foregroundColor: Colors.grey[700],
+                        foregroundColor: theme.colorScheme.onSurface,
                       ),
                       child: const Text('取消'),
                     ),
@@ -356,7 +367,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                       onPressed: _saveTask,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: colorScheme.primary,
-                        foregroundColor: Colors.white,
+                        foregroundColor: colorScheme.onPrimary,
                         padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),

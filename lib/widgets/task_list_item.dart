@@ -30,6 +30,9 @@ class _TaskListItemState extends State<TaskListItem> {
   Widget build(BuildContext context) {
     final taskProvider = Provider.of<TaskProvider>(context, listen: false);
     final projectProvider = Provider.of<ProjectProvider>(context, listen: false);
+    // 获取当前主题和暗黑模式状态
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
     
     // 获取项目信息
     Project? project = widget.task.projectId != null 
@@ -172,8 +175,9 @@ class _TaskListItemState extends State<TaskListItem> {
                   }
                 },
                 activeColor: Colors.transparent,
+                // 适配暗黑模式的复选框颜色
                 checkColor: widget.task.priority == TaskPriority.none 
-                    ? Colors.black87 
+                    ? isDarkMode ? theme.colorScheme.onSurface : Colors.black87
                     : widget.task.getPriorityColor(),
                 fillColor: MaterialStateProperty.resolveWith((states) {
                   // 始终保持透明背景
@@ -183,7 +187,9 @@ class _TaskListItemState extends State<TaskListItem> {
                   (states) => BorderSide(
                     width: 1.5,
                     color: widget.task.priority == TaskPriority.none 
-                        ? Colors.black54
+                        ? isDarkMode 
+                            ? theme.colorScheme.onSurface.withOpacity(0.7)
+                            : Colors.black54
                         : widget.task.getPriorityColor(),
                   ),
                 ),
@@ -202,9 +208,10 @@ class _TaskListItemState extends State<TaskListItem> {
                     decoration: widget.task.status == TaskStatus.completed 
                         ? TextDecoration.lineThrough 
                         : null,
+                    // 适配暗黑模式的任务标题文字颜色
                     color: widget.task.status == TaskStatus.completed 
-                        ? Colors.grey 
-                        : Colors.black,
+                        ? theme.colorScheme.onSurface.withOpacity(0.6)
+                        : theme.colorScheme.onSurface,
                     fontSize: 17.0,
                   ),
                 ),
@@ -214,9 +221,10 @@ class _TaskListItemState extends State<TaskListItem> {
                     padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
                     child: Text(
                       widget.task.notes!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14.0,
-                        color: Colors.grey,
+                        // 适配暗黑模式的备注文字颜色
+                        color: theme.colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                   ),
@@ -230,7 +238,8 @@ class _TaskListItemState extends State<TaskListItem> {
                     icon: Icon(
                       _isNotesExpanded ? Icons.keyboard_arrow_up : Icons.notes,
                       size: 18,
-                      color: Colors.grey,
+                      // 适配暗黑模式的图标颜色
+                      color: theme.colorScheme.onSurface.withOpacity(0.5),
                     ),
                     onPressed: () {
                       setState(() {
@@ -259,11 +268,12 @@ class _TaskListItemState extends State<TaskListItem> {
   }
   
   Widget _buildSubtitle(Project? project) {
-    final List<Widget> rowItems = [];
-    
-    // 定义统一的标签颜色
-    final Color labelColor = Colors.grey.shade500;
+    final theme = Theme.of(context);
+    // 定义统一的标签颜色，使用主题适配
+    final Color labelColor = theme.colorScheme.onSurface.withOpacity(0.6);
     final Color overdueColor = Colors.red.shade300;
+    
+    final List<Widget> rowItems = [];
     
     // 显示到期日期（如果有）
     if (widget.task.dueDate != null) {
