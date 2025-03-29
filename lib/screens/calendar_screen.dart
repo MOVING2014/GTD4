@@ -76,7 +76,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
             focusedDay: _focusedDay,
             calendarFormat: _calendarFormat,
             selectedDayPredicate: (day) {
-              return isSameDay(_selectedDay, day);
+              // 排除当天，让 todayBuilder 完全控制今天的样式
+              return isSameDay(_selectedDay, day) && !isSameDay(day, DateTime.now());
             },
             onDaySelected: (selectedDay, focusedDay) {
               setState(() {
@@ -94,12 +95,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
             },
             calendarStyle: CalendarStyle(
               // 适配暗黑模式的日历样式
-              todayDecoration: const BoxDecoration(
+              todayDecoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.transparent,
+                // 确保内置的今天装饰完全透明
+                border: Border.all(color: Colors.transparent, width: 0),
               ),
               todayTextStyle: TextStyle(
-                color: theme.colorScheme.primary,
+                color: isDarkMode ? Colors.orange : Colors.red,  // 暗黑模式下用橙色，亮色模式用红色
                 fontWeight: FontWeight.bold,
                 fontSize: 16.0,
               ),
@@ -165,6 +168,61 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   );
                 }
                 return null;
+              },
+              // 自定义今天的日期单元格，确保今天的日期样式优先于选中的日期样式
+              todayBuilder: (context, day, focusedDay) {
+                final isSelected = isSameDay(day, _selectedDay);
+                
+                return Center(
+                  child: Container(
+                    height: 36,
+                    width: 36,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      // 使用淡绿色代替淡橙色，透明度为0.3
+                      color: isDarkMode 
+                          ? Colors.green.shade100.withOpacity(0.3) 
+                          : Colors.red.shade100.withOpacity(0.3),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${day.day}',
+                        style: TextStyle(
+                          // 使用主题的primary color
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+              // 自定义选中的日期单元格
+              selectedBuilder: (context, day, focusedDay) {
+                // 如果选中的日期是今天，让todayBuilder处理
+                if (isSameDay(day, DateTime.now())) return null;
+                
+                return Center(
+                  child: Container(
+                    height: 36,
+                    width: 36,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: theme.colorScheme.primary.withOpacity(0.2),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${day.day}',
+                        style: TextStyle(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
               },
               // 自定义星期几的标题
               dowBuilder: (context, day) {
