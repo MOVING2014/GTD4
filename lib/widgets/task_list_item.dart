@@ -202,18 +202,44 @@ class _TaskListItemState extends State<TaskListItem> {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  widget.task.title,
-                  style: TextStyle(
-                    decoration: widget.task.status == TaskStatus.completed 
-                        ? TextDecoration.lineThrough 
-                        : null,
-                    // 适配暗黑模式的任务标题文字颜色
-                    color: widget.task.status == TaskStatus.completed 
-                        ? theme.colorScheme.onSurface.withOpacity(0.6)
-                        : theme.colorScheme.onSurface,
-                    fontSize: 17.0,
-                  ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        widget.task.title,
+                        style: TextStyle(
+                          decoration: widget.task.status == TaskStatus.completed 
+                              ? TextDecoration.lineThrough 
+                              : null,
+                          // 适配暗黑模式的任务标题文字颜色
+                          color: widget.task.status == TaskStatus.completed 
+                              ? theme.colorScheme.onSurface.withOpacity(0.6)
+                              : theme.colorScheme.onSurface,
+                          fontSize: 17.0,
+                        ),
+                      ),
+                    ),
+                    // 将备注按钮放在与标题同一行
+                    if (widget.task.notes != null && widget.task.notes!.isNotEmpty)
+                      InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () {
+                          setState(() {
+                            _isNotesExpanded = !_isNotesExpanded;
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Icon(
+                            _isNotesExpanded ? Icons.keyboard_arrow_up : Icons.notes,
+                            size: 18,
+                            // 适配暗黑模式的图标颜色
+                            color: theme.colorScheme.onSurface.withOpacity(0.5),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
                 // 展开备注
                 if (_isNotesExpanded && widget.task.notes != null && widget.task.notes!.isNotEmpty)
@@ -233,21 +259,7 @@ class _TaskListItemState extends State<TaskListItem> {
               ],
             ),
             subtitle: null,
-            trailing: widget.task.notes != null && widget.task.notes!.isNotEmpty
-                ? IconButton(
-                    icon: Icon(
-                      _isNotesExpanded ? Icons.keyboard_arrow_up : Icons.notes,
-                      size: 18,
-                      // 适配暗黑模式的图标颜色
-                      color: theme.colorScheme.onSurface.withOpacity(0.5),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _isNotesExpanded = !_isNotesExpanded;
-                      });
-                    },
-                  )
-                : null,
+            trailing: null, // 移除原有的trailing
             onTap: null,
             onLongPress: () async {
               // 长按任务使用AddTaskDialog打开编辑对话框
@@ -287,16 +299,18 @@ class _TaskListItemState extends State<TaskListItem> {
           children: [
             Icon(
               Icons.calendar_today,
-              size: 14,
+              size: 12,
               color: widget.task.isOverdue ? overdueColor : labelColor,
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: 2),
             Text(
               dateString,
               style: TextStyle(
                 color: widget.task.isOverdue ? overdueColor : labelColor,
+                fontSize: 14.0,
                 fontWeight: null,
               ),
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -309,8 +323,13 @@ class _TaskListItemState extends State<TaskListItem> {
       if (rowItems.isNotEmpty) {
         rowItems.add(
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text('•', style: TextStyle(color: labelColor)),
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: Text('•', 
+              style: TextStyle(
+                color: labelColor,
+                fontSize: 14.0,
+              ),
+            ),
           ),
         );
       }
@@ -321,14 +340,19 @@ class _TaskListItemState extends State<TaskListItem> {
           children: [
             Icon(
               Icons.folder_outlined,
-              size: 14,
+              size: 12,
               color: labelColor,
             ),
-            const SizedBox(width: 4),
-            Text(
-              project.name,
-              style: TextStyle(
-                color: labelColor,
+            const SizedBox(width: 2),
+            Flexible(
+              child: Text(
+                project.name,
+                style: TextStyle(
+                  color: labelColor,
+                  fontSize: 14.0,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
               ),
             ),
           ],
@@ -343,6 +367,7 @@ class _TaskListItemState extends State<TaskListItem> {
     return Row(
       children: rowItems,
       crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
     );
   }
   
