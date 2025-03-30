@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:provider/provider.dart';
+import '../providers/theme_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -31,6 +33,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDarkModeCurrent = Theme.of(context).brightness == Brightness.dark;
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isFollowingSystem = themeProvider.isFollowingSystem();
     
     return Scaffold(
       appBar: AppBar(
@@ -82,7 +87,92 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           
-          const SizedBox(height: 40),
+          const SizedBox(height: 30),
+          
+          // 显示模式设置
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '显示设置',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                
+                // 跟随系统设置
+                SwitchListTile(
+                  title: const Text('跟随系统'),
+                  subtitle: Text(
+                    '使用系统深色/浅色模式设置',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    ),
+                  ),
+                  value: isFollowingSystem,
+                  secondary: Icon(
+                    Icons.settings_brightness,
+                    color: theme.colorScheme.primary,
+                  ),
+                  onChanged: (bool value) {
+                    if (value) {
+                      // 切换到跟随系统
+                      themeProvider.setThemeMode(ThemeMode.system);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('已切换到跟随系统模式'),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    } else {
+                      // 如果关闭跟随系统，则根据当前显示的模式设置为明确的深色或浅色模式
+                      themeProvider.setThemeMode(
+                        isDarkModeCurrent ? ThemeMode.dark : ThemeMode.light
+                      );
+                    }
+                  },
+                ),
+                
+                // 深色模式设置 (仅当不跟随系统时可用)
+                SwitchListTile(
+                  title: const Text('深色模式'),
+                  subtitle: Text(
+                    isDarkModeCurrent ? '当前使用深色模式' : '当前使用浅色模式',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    ),
+                  ),
+                  value: isDarkModeCurrent,
+                  secondary: Icon(
+                    isDarkModeCurrent ? Icons.dark_mode : Icons.light_mode,
+                    color: theme.colorScheme.primary,
+                  ),
+                  onChanged: isFollowingSystem 
+                    ? null  // 如果跟随系统，则不可用
+                    : (bool value) {
+                        themeProvider.setThemeMode(
+                          value ? ThemeMode.dark : ThemeMode.light
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(value ? '已切换到深色模式' : '已切换到浅色模式'),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                ),
+                const Divider(),
+              ],
+            ),
+          ),
+          
+          const SizedBox(height: 20),
           
           // App Introduction
           const Padding(

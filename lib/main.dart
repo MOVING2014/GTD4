@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'providers/task_provider.dart';
 import 'providers/project_provider.dart';
+import 'providers/theme_provider.dart';
 import 'screens/calendar_screen.dart';
 import 'screens/inbox_screen.dart';
 import 'screens/priority_screen.dart';
@@ -41,71 +42,76 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => TaskProvider()),
         ChangeNotifierProvider(create: (_) => ProjectProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
-      child: MaterialApp(
-        title: 'Todo',
-        // 使用系统的亮暗模式设置
-        themeMode: ThemeMode.system,
-        // 亮色主题
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF5D69B3),
-            brightness: Brightness.light,
-          ),
-          // 设置AppBar样式
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-          ),
-        ),
-        // 暗色主题
-        darkTheme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF5D69B3),
-            brightness: Brightness.dark,
-            // 自定义暗色主题的背景色为偏暗蓝色
-            background: const Color(0xFF0A1929),
-            surface: const Color(0xFF0F2A43),
-            // 稍微调整其他颜色，保持协调
-            onBackground: const Color(0xFFE1E9F4),
-            onSurface: const Color(0xFFE1E9F4),
-          ),
-          // 设置AppBar样式
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-          ),
-          // 设置Scaffold默认背景色
-          scaffoldBackgroundColor: const Color(0xFF0A1929),
-          // 调整卡片和对话框背景
-          cardColor: const Color(0xFF0F2A43), dialogTheme: DialogThemeData(backgroundColor: const Color(0xFF0F2A43)),
-        ),
-        // 在主题应用后设置系统UI样式
-        builder: (context, child) {
-          // 根据当前主题亮度调整系统导航栏图标亮度
-          final brightness = Theme.of(context).brightness;
-          
-          // 使用延迟执行，确保UI样式在渲染完成后应用
-          Future.microtask(() {
-            SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-              // 确保系统导航栏完全透明
-              systemNavigationBarColor: Colors.transparent,
-              systemNavigationBarDividerColor: Colors.transparent,
-              // 根据当前主题调整图标亮度
-              systemNavigationBarIconBrightness: brightness == Brightness.dark ? Brightness.light : Brightness.dark,
-              // 同样调整状态栏图标
-              statusBarIconBrightness: brightness == Brightness.dark ? Brightness.light : Brightness.dark,
-              statusBarBrightness: brightness,
-              // 确保状态栏也是透明的
-              statusBarColor: Colors.transparent,
-            ));
-          });
-          
-          return child!;
-        },
-        home: const HomeScreen(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            title: 'Todo',
+            // 使用ThemeProvider中的主题模式设置
+            themeMode: themeProvider.themeMode,
+            // 亮色主题
+            theme: ThemeData(
+              useMaterial3: true,
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: const Color(0xFF5D69B3),
+                brightness: Brightness.light,
+              ),
+              // 设置AppBar样式
+              appBarTheme: const AppBarTheme(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+              ),
+            ),
+            // 暗色主题
+            darkTheme: ThemeData(
+              useMaterial3: true,
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: const Color(0xFF5D69B3),
+                brightness: Brightness.dark,
+                // 自定义暗色主题的背景色为偏暗蓝色
+                background: const Color(0xFF0A1929),
+                surface: const Color(0xFF0F2A43),
+                // 稍微调整其他颜色，保持协调
+                onBackground: const Color(0xFFE1E9F4),
+                onSurface: const Color(0xFFE1E9F4),
+              ),
+              // 设置AppBar样式
+              appBarTheme: const AppBarTheme(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+              ),
+              // 设置Scaffold默认背景色
+              scaffoldBackgroundColor: const Color(0xFF0A1929),
+              // 调整卡片和对话框背景
+              cardColor: const Color(0xFF0F2A43), dialogTheme: DialogThemeData(backgroundColor: const Color(0xFF0F2A43)),
+            ),
+            // 在主题应用后设置系统UI样式
+            builder: (context, child) {
+              // 根据当前主题亮度调整系统导航栏图标亮度
+              final brightness = Theme.of(context).brightness;
+              
+              // 使用延迟执行，确保UI样式在渲染完成后应用
+              Future.microtask(() {
+                SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+                  // 确保系统导航栏完全透明
+                  systemNavigationBarColor: Colors.transparent,
+                  systemNavigationBarDividerColor: Colors.transparent,
+                  // 根据当前主题调整图标亮度
+                  systemNavigationBarIconBrightness: brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+                  // 同样调整状态栏图标
+                  statusBarIconBrightness: brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+                  statusBarBrightness: brightness,
+                  // 确保状态栏也是透明的
+                  statusBarColor: Colors.transparent,
+                ));
+              });
+              
+              return child!;
+            },
+            home: const HomeScreen(),
+          );
+        }
       ),
     );
   }
