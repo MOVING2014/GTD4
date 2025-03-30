@@ -3,7 +3,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 import '../utils/backup_helper.dart';
-import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 
 class SettingsScreen extends StatefulWidget {
