@@ -48,6 +48,23 @@ class _TaskListItemState extends State<TaskListItem> {
         children: [
           CustomSlidableAction(
             onPressed: (context) {
+              _toggleTaskPriority(taskProvider);
+            },
+            backgroundColor: widget.task.priority == TaskPriority.medium ? Colors.grey : Colors.orange,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  widget.task.priority == TaskPriority.medium ? Icons.flag_outlined : Icons.flag,
+                  size: 20
+                ),
+              ],
+            ),
+          ),
+          CustomSlidableAction(
+            onPressed: (context) {
               _delayTaskToday(taskProvider);
             },
             backgroundColor: Colors.blue,
@@ -494,6 +511,35 @@ class _TaskListItemState extends State<TaskListItem> {
     // 显示提示
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('任务已设置为下月到期')),
+    );
+  }
+
+  // 切换任务优先级
+  void _toggleTaskPriority(TaskProvider taskProvider) {
+    // 在高优先级和无优先级之间切换
+    final newPriority = widget.task.priority == TaskPriority.medium
+        ? TaskPriority.none
+        : TaskPriority.medium;
+    
+    // 创建更新后的任务
+    final updatedTask = widget.task.copyWith(
+      priority: newPriority,
+    );
+    
+    // 更新任务
+    taskProvider.updateTask(updatedTask);
+    
+    // 通知UI更新
+    if (widget.onTaskChange != null) {
+      widget.onTaskChange!();
+    }
+    
+    // 显示提示
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(newPriority == TaskPriority.medium ? '任务已标记为优先' : '已取消任务优先级标记'),
+        duration: const Duration(seconds: 1),
+      ),
     );
   }
 } 
