@@ -212,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Badge(
                 isLabelVisible: taskProvider.getPrioritizedTasksCount() > 0,
                 label: Text(taskProvider.getPrioritizedTasksCount().toString()),
-                child: const Icon(Icons.priority_high),
+                child: const Icon(Icons.flag),
               ),
               label: '优先任务',
             ),
