@@ -242,12 +242,15 @@ class _InboxScreenState extends State<InboxScreen> {
             ),
           ),
         ),
-        Divider(
-          color: Colors.grey[300],
-          thickness: 1,
-          height: 1,
-          indent: 16,
-          endIndent: 16,
+        Padding(
+          padding: const EdgeInsets.only(bottom: 12.0),
+          child: Divider(
+            color: Colors.grey[300],
+            thickness: 1,
+            height: 1,
+            indent: 16,
+            endIndent: 16,
+          ),
         ),
       ],
     );
