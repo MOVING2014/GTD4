@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import '../providers/task_provider.dart';
 import '../models/task.dart';
 import '../widgets/task_list_item.dart';
 import '../widgets/add_task_dialog.dart';
-import '../utils/date_utils.dart';
+import '../widgets/settings_button.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -64,6 +63,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               await _addTaskForSelectedDay();
             },
           ),
+          const SettingsButton(),
         ],
       ),
       body: Column(

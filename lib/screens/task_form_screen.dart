@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import '../models/task.dart';
-import '../models/project.dart';
 import '../providers/task_provider.dart';
 import '../providers/project_provider.dart';
 import '../utils/date_utils.dart';

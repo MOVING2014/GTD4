@@ -250,7 +250,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                                   value: project.id,
                                   child: Text(project.name, style: TextStyle(color: theme.colorScheme.onSurface)),
                                 );
-                              }).toList(),
+                              }),
                             ],
                             onChanged: (newValue) {
                               setState(() {

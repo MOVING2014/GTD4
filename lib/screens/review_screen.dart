@@ -6,6 +6,7 @@ import '../providers/project_provider.dart';
 import '../providers/task_provider.dart';
 import '../widgets/task_list_item.dart';
 import '../widgets/add_task_dialog.dart';
+import '../widgets/settings_button.dart';
 
 class ReviewScreen extends StatefulWidget {
   const ReviewScreen({super.key});
@@ -34,6 +35,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
             },
             tooltip: '查看上次回顾日期',
           ),
+          const SettingsButton(),
         ],
       ),
       body: projectsToReview.isEmpty
@@ -227,7 +229,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
       return ' ${difference.inDays}天前回顾';
     } else {
       final months = (difference.inDays / 30).floor();
-      return ' ${months}个月前回顾';
+      return ' $months个月前回顾';
     }
   }
   

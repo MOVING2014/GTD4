@@ -4,6 +4,7 @@ import '../providers/task_provider.dart';
 import '../models/task.dart';
 import '../widgets/task_list_item.dart';
 import '../widgets/add_task_dialog.dart';
+import '../widgets/settings_button.dart';
 
 class InboxScreen extends StatefulWidget {
   const InboxScreen({super.key});
@@ -51,6 +52,7 @@ class _InboxScreenState extends State<InboxScreen> {
               }
             },
           ),
+          const SettingsButton(),
         ],
       ),
       body: Consumer<TaskProvider>(

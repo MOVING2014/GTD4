@@ -179,11 +179,11 @@ class _TaskListItemState extends State<TaskListItem> {
                 checkColor: widget.task.priority == TaskPriority.none 
                     ? isDarkMode ? theme.colorScheme.onSurface : Colors.black87
                     : widget.task.getPriorityColor(),
-                fillColor: MaterialStateProperty.resolveWith((states) {
+                fillColor: WidgetStateProperty.resolveWith((states) {
                   // 始终保持透明背景
                   return Colors.transparent;
                 }),
-                side: MaterialStateBorderSide.resolveWith(
+                side: WidgetStateBorderSide.resolveWith(
                   (states) => BorderSide(
                     width: 1.5,
                     color: widget.task.priority == TaskPriority.none 
@@ -365,9 +365,9 @@ class _TaskListItemState extends State<TaskListItem> {
     }
     
     return Row(
-      children: rowItems,
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
+      children: rowItems,
     );
   }
   

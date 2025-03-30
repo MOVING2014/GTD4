@@ -80,8 +80,7 @@ class MyApp extends StatelessWidget {
           // 设置Scaffold默认背景色
           scaffoldBackgroundColor: const Color(0xFF0A1929),
           // 调整卡片和对话框背景
-          cardColor: const Color(0xFF0F2A43),
-          dialogBackgroundColor: const Color(0xFF0F2A43),
+          cardColor: const Color(0xFF0F2A43), dialogTheme: DialogThemeData(backgroundColor: const Color(0xFF0F2A43)),
         ),
         // 在主题应用后设置系统UI样式
         builder: (context, child) {

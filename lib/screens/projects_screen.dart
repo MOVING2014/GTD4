@@ -7,8 +7,8 @@ import '../models/project.dart';
 import '../models/task.dart';
 import '../widgets/task_list_item.dart';
 import '../screens/project_form_screen.dart';
-import '../screens/task_form_screen.dart';
 import '../widgets/add_task_dialog.dart';
+import '../widgets/settings_button.dart';
 
 enum ProjectFilter {
   active,
@@ -117,6 +117,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               }
             },
           ),
+          const SettingsButton(),
         ],
       ),
       body: Consumer<ProjectProvider>(

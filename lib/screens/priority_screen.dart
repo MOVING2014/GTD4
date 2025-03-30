@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/task_provider.dart';
 import '../models/task.dart';
 import '../widgets/task_list_item.dart';
+import '../widgets/settings_button.dart';
 
 class PriorityScreen extends StatefulWidget {
   const PriorityScreen({super.key});
@@ -35,6 +36,7 @@ class _PriorityScreenState extends State<PriorityScreen> {
               );
             }
           ),
+          const SettingsButton(),
         ],
       ),
       body: Consumer<TaskProvider>(
