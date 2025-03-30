@@ -475,6 +475,415 @@ class BackupHelper {
     return projects;
   }
 
+  // 合并任务和项目数据为单个CSV
+  static Future<String> _mergeCsvData(List<Task> tasks, List<Project> projects) async {
+    final List<List<dynamic>> rows = [];
+    
+    // 添加标题行
+    rows.add([
+      'type', 'title', 'description', 'dueDate', 'reminderDate', 'priority', 
+      'status', 'createdAt', 'completedAt', 'projectName', 'tags', 
+      'isRecurring', 'recurrenceRule', 'colorValue', 'parentProject',
+      'order', 'needsMonthlyReview', 'lastReviewDate'
+    ]);
+    
+    // 添加任务数据行
+    final projectMap = {for (var p in projects) p.id: p.name};
+    
+    for (var task in tasks) {
+      final projectName = task.projectId != null ? projectMap[task.projectId] ?? '' : '';
+      
+      rows.add([
+        'task',
+        task.title,
+        task.notes ?? '',
+        task.dueDate?.toIso8601String() ?? '',
+        task.reminderDate?.toIso8601String() ?? '',
+        task.priority.index,
+        task.status.index,
+        task.createdAt.toIso8601String(),
+        task.completedAt?.toIso8601String() ?? '',
+        projectName,
+        jsonEncode(task.tags),
+        task.isRecurring ? 1 : 0,
+        task.recurrenceRule ?? '',
+        '', // colorValue (空)
+        '', // parentProject (空)
+        '', // order (空)
+        '', // needsMonthlyReview (空)
+        '', // lastReviewDate (空)
+      ]);
+    }
+    
+    // 创建父项目映射
+    final parentProjectMap = {for (var p in projects) p.id: p.name};
+    
+    // 添加项目数据行
+    for (var project in projects) {
+      final parentProjectName = project.parentProjectId != null ? 
+          parentProjectMap[project.parentProjectId] ?? '' : '';
+      
+      rows.add([
+        'project',
+        project.name,
+        project.description ?? '',
+        '', // dueDate (空)
+        '', // reminderDate (空)
+        '', // priority (空)
+        project.status.index,
+        project.createdAt.toIso8601String(),
+        project.completedAt?.toIso8601String() ?? '',
+        '', // projectName (空)
+        '', // tags (空)
+        '', // isRecurring (空)
+        '', // recurrenceRule (空)
+        project.color.value,
+        parentProjectName,
+        project.order ?? 0,
+        project.needsMonthlyReview ? 1 : 0,
+        project.lastReviewDate?.toIso8601String() ?? '',
+      ]);
+    }
+    
+    return const ListToCsvConverter().convert(rows);
+  }
+  
+  // 从合并的CSV中提取任务和项目
+  static Future<Map<String, dynamic>> _extractFromMergedCsv(String csv) async {
+    final List<List<dynamic>> rows = const CsvToListConverter().convert(csv);
+    final List<Task> tasks = [];
+    final List<Project> projects = [];
+    final Map<String, String> projectIdByName = {};
+    
+    // 先处理项目行，创建项目ID映射
+    for (int i = 1; i < rows.length; i++) {
+      final row = rows[i];
+      if (row.isEmpty || row.length < 18) continue;
+      
+      final type = row[0].toString().toLowerCase();
+      if (type != 'project') continue;
+      
+      final projectName = row[1].toString();
+      final projectId = _generateUUID();
+      projectIdByName[projectName] = projectId;
+      
+      projects.add(Project(
+        id: projectId,
+        name: projectName,
+        description: row[2].toString().isNotEmpty ? row[2].toString() : null,
+        color: row[13].toString().isNotEmpty ? Color(int.parse(row[13].toString())) : Colors.blue,
+        status: row[6].toString().isNotEmpty ? ProjectStatus.values[int.parse(row[6].toString())] : ProjectStatus.active,
+        createdAt: row[7].toString().isNotEmpty ? DateTime.parse(row[7].toString()) : DateTime.now(),
+        completedAt: row[8].toString().isNotEmpty ? DateTime.parse(row[8].toString()) : null,
+        parentProjectId: null, // 先设为null，稍后处理
+        order: row[15].toString().isNotEmpty ? int.parse(row[15].toString()) : null,
+        needsMonthlyReview: row[16].toString() == '1',
+        lastReviewDate: row[17].toString().isNotEmpty ? DateTime.parse(row[17].toString()) : null,
+      ));
+    }
+    
+    // 设置项目的父项目ID
+    for (int i = 0; i < projects.length; i++) {
+      final row = rows[i + 1]; // 加1跳过标题行
+      if (row[0].toString().toLowerCase() != 'project') continue;
+      
+      final parentProjectName = row[14].toString();
+      if (parentProjectName.isNotEmpty && projectIdByName.containsKey(parentProjectName)) {
+        projects[i] = projects[i].copyWith(
+          parentProjectId: projectIdByName[parentProjectName],
+        );
+      }
+    }
+    
+    // 处理任务行
+    for (int i = 1; i < rows.length; i++) {
+      final row = rows[i];
+      if (row.isEmpty || row.length < 18) continue;
+      
+      final type = row[0].toString().toLowerCase();
+      if (type != 'task') continue;
+      
+      final projectName = row[9].toString();
+      String? projectId;
+      if (projectName.isNotEmpty && projectIdByName.containsKey(projectName)) {
+        projectId = projectIdByName[projectName];
+      }
+      
+      tasks.add(Task(
+        id: _generateUUID(),
+        title: row[1].toString(),
+        notes: row[2].toString().isNotEmpty ? row[2].toString() : null,
+        dueDate: row[3].toString().isNotEmpty ? DateTime.parse(row[3].toString()) : null,
+        reminderDate: row[4].toString().isNotEmpty ? DateTime.parse(row[4].toString()) : null,
+        priority: row[5].toString().isNotEmpty ? TaskPriority.values[int.parse(row[5].toString())] : TaskPriority.none,
+        status: row[6].toString().isNotEmpty ? TaskStatus.values[int.parse(row[6].toString())] : TaskStatus.notStarted,
+        createdAt: row[7].toString().isNotEmpty ? DateTime.parse(row[7].toString()) : DateTime.now(),
+        completedAt: row[8].toString().isNotEmpty ? DateTime.parse(row[8].toString()) : null,
+        projectId: projectId,
+        tags: row[10].toString().isNotEmpty ? List<String>.from(jsonDecode(row[10].toString())) : [],
+        isRecurring: row[11].toString() == '1',
+        recurrenceRule: row[12].toString().isNotEmpty ? row[12].toString() : null,
+      ));
+    }
+    
+    return {
+      'tasks': tasks,
+      'projects': projects,
+    };
+  }
+  
+  // 生成UUID作为新ID
+  static String _generateUUID() {
+    final random = DateTime.now().millisecondsSinceEpoch.toString() + 
+                   (1000 + (DateTime.now().microsecond % 9000)).toString();
+    return random;
+  }
+
+  // 导出合并的CSV数据
+  static Future<BackupResult> exportMergedData(BuildContext context) async {
+    try {
+      // 请求权限
+      bool hasPermission = await _requestPermissions();
+      if (!hasPermission) {
+        return BackupResult(
+          success: false,
+          message: '无法获取必要的存储权限，请在系统设置中授予应用存储权限',
+        );
+      }
+      
+      // 从数据库获取数据
+      final db = DatabaseHelper.instance;
+      final tasks = await db.getAllTasks();
+      final projects = await db.getAllProjects();
+
+      // 转换为合并的CSV
+      final mergedCsv = await _mergeCsvData(tasks, projects);
+
+      // 获取时间戳
+      final now = DateTime.now().toIso8601String().replaceAll(':', '-').replaceAll('.', '-');
+      
+      // 获取目录路径
+      String directoryPath;
+      String pathDesc;
+      
+      if (Platform.isAndroid) {
+        try {
+          // 尝试使用外部存储下载目录
+          final directory = await _getDownloadDirectory();
+          if (directory == null) {
+            // 如果下载目录不可用，回退到应用目录
+            final appDirectory = await _getStorageDirectory();
+            if (appDirectory == null) {
+              return BackupResult(
+                success: false,
+                message: '无法访问存储目录',
+              );
+            }
+            directoryPath = appDirectory.path;
+            pathDesc = '应用内存储';
+          } else {
+            directoryPath = directory.path;
+            pathDesc = '设备下载文件夹';
+          }
+        } catch (e) {
+          // 获取公共Download目录时出错，降级到应用专用目录
+          final directory = await getExternalStorageDirectory();
+          if (directory == null) {
+            return BackupResult(
+              success: false,
+              message: '无法访问存储目录',
+            );
+          }
+          directoryPath = directory.path;
+          pathDesc = '应用专用存储空间';
+        }
+      } else {
+        // 其他平台使用应用专用存储
+        final directory = await _getStorageDirectory();
+        if (directory == null) {
+          return BackupResult(
+            success: false,
+            message: '无法访问存储目录',
+          );
+        }
+        directoryPath = directory.path;
+        pathDesc = '应用专用存储空间';
+      }
+      
+      // 创建TaskManager子目录
+      final appDir = Directory(path.join(directoryPath, 'TaskManager'));
+      if (!await appDir.exists()) {
+        await appDir.create(recursive: true);
+      }
+      
+      // 保存CSV文件
+      final mergedFilePath = path.join(appDir.path, 'gtd_merged_$now.csv');
+      await File(mergedFilePath).writeAsString(mergedCsv);
+      
+      return BackupResult(
+        success: true,
+        message: '已导出数据到 $pathDesc 的TaskManager文件夹\n文件名: gtd_merged_$now.csv',
+      );
+    } catch (e) {
+      return BackupResult(
+        success: false,
+        message: '导出失败: $e',
+      );
+    }
+  }
+  
+  // 导入合并的CSV数据
+  static Future<BackupResult> importMergedData(BuildContext context) async {
+    try {
+      // 请求权限
+      bool hasPermission = await _requestPermissions();
+      if (!hasPermission) {
+        return BackupResult(
+          success: false,
+          message: '无法获取必要的存储权限，请在系统设置中授予应用存储权限',
+        );
+      }
+      
+      // 显示说明对话框
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('导入合并数据说明'),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('请选择合并格式的CSV备份文件：'),
+              SizedBox(height: 8),
+              Text('• 选择以gtd_merged_开头的CSV文件'),
+              Text('• 导入后将根据标题自动去重'),
+              Text('• 所有任务和项目将获得新的ID'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('明白了'),
+            ),
+          ],
+        ),
+      );
+      
+      if (!context.mounted) return BackupResult(success: false, message: '操作已取消');
+      
+      // 让用户选择文件
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['csv'],
+        dialogTitle: '选择合并CSV文件',
+      );
+      
+      if (result == null || result.files.isEmpty) {
+        return BackupResult(success: false, message: '未选择文件');
+      }
+      
+      String? selectedFile = result.files.single.path;
+      
+      if (selectedFile == null || !await File(selectedFile).exists()) {
+        return BackupResult(success: false, message: '文件无效');
+      }
+      
+      // 读取选择的文件
+      String csvContent;
+      try {
+        csvContent = await File(selectedFile).readAsString();
+      } catch (e) {
+        return BackupResult(success: false, message: '读取CSV文件失败: $e');
+      }
+      
+      // 解析CSV数据
+      Map<String, dynamic> data;
+      try {
+        data = await _extractFromMergedCsv(csvContent);
+      } catch (e) {
+        return BackupResult(success: false, message: '解析CSV文件失败: $e');
+      }
+      
+      final tasks = data['tasks'] as List<Task>;
+      final projects = data['projects'] as List<Project>;
+      
+      // 确认导入
+      if (!context.mounted) return BackupResult(success: false, message: '操作已取消');
+      
+      final shouldImport = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('确认导入'),
+          content: Text('将导入 ${tasks.length} 个任务和 ${projects.length} 个项目，这将覆盖现有数据。确定要继续吗？'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('取消'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('确定导入'),
+            ),
+          ],
+        ),
+      );
+      
+      if (shouldImport != true) {
+        return BackupResult(success: false, message: '导入已取消');
+      }
+      
+      // 导入数据到数据库
+      if (!context.mounted) return BackupResult(success: false, message: '操作已取消');
+      
+      // 显示进度对话框
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('正在导入数据，请稍候...'),
+            ],
+          ),
+        ),
+      );
+      
+      // 执行导入
+      final db = DatabaseHelper.instance;
+      
+      // 清除现有数据
+      await db.clearAllData();
+      
+      // 先导入项目
+      for (var project in projects) {
+        await db.insertProject(project);
+      }
+      
+      // 再导入任务
+      for (var task in tasks) {
+        await db.insertTask(task);
+      }
+      
+      // 关闭进度对话框
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
+
+      return BackupResult(
+        success: true,
+        message: '已导入 ${tasks.length} 个任务和 ${projects.length} 个项目',
+      );
+    } catch (e) {
+      return BackupResult(
+        success: false,
+        message: '导入失败: $e',
+      );
+    }
+  }
+
   // 导出整个数据库
   static Future<BackupResult> exportDatabase(BuildContext context) async {
     try {
@@ -725,5 +1134,31 @@ class BackupHelper {
         message: '导入数据库失败: $e',
       );
     }
+  }
+
+  // 获取Download目录（仅Android可用）
+  static Future<Directory?> _getDownloadDirectory() async {
+    if (Platform.isAndroid) {
+      try {
+        // 尝试使用外部存储下载目录
+        final externalDir = await getExternalStorageDirectory();
+        if (externalDir == null) return null;
+        
+        // 通常外部存储路径为 /storage/emulated/0/Android/data/package/files
+        // 需要回退到 /storage/emulated/0 再加上 Download
+        final downloadsPath = externalDir.path.split('/Android')[0] + '/Download';
+        final downloadsDir = Directory(downloadsPath);
+        
+        if (await downloadsDir.exists()) {
+          return downloadsDir;
+        }
+        return null;
+      } catch (e) {
+        print('获取下载目录失败: $e');
+        return null;
+      }
+    }
+    // 非Android平台不支持
+    return null;
   }
 } 
