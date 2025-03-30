@@ -360,7 +360,7 @@ class _TaskListItemState extends State<TaskListItem> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              Icons.folder_outlined,
+              Icons.library_books,
               size: 12,
               color: labelColor,
             ),

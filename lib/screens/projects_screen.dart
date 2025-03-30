@@ -137,7 +137,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.folder_outlined,
+                    Icons.library_books,
                     size: 64,
                     color: Colors.grey[300],
                   ),

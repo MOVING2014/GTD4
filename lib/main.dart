@@ -196,15 +196,21 @@ class _HomeScreenState extends State<HomeScreen> {
             });
           },
           destinations: [
-            const NavigationDestination(
-              icon: Icon(Icons.calendar_today),
+            NavigationDestination(
+              icon: Icon(Icons.calendar_today, color: Colors.pink),
+              selectedIcon: Icon(Icons.calendar_today, color: Colors.pink),
               label: '日历',
             ),
             NavigationDestination(
               icon: Badge(
                 isLabelVisible: taskProvider.inboxTasksCount > 0,
                 label: Text(taskProvider.inboxTasksCount.toString()),
-                child: const Icon(Icons.inbox),
+                child: Icon(Icons.inbox, color: Colors.grey),
+              ),
+              selectedIcon: Badge(
+                isLabelVisible: taskProvider.inboxTasksCount > 0,
+                label: Text(taskProvider.inboxTasksCount.toString()),
+                child: Icon(Icons.inbox, color: Colors.grey),
               ),
               label: '收件箱',
             ),
@@ -212,19 +218,30 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Badge(
                 isLabelVisible: taskProvider.getPrioritizedTasksCount() > 0,
                 label: Text(taskProvider.getPrioritizedTasksCount().toString()),
-                child: const Icon(Icons.flag),
+                child: Icon(Icons.flag, color: Colors.orange),
+              ),
+              selectedIcon: Badge(
+                isLabelVisible: taskProvider.getPrioritizedTasksCount() > 0,
+                label: Text(taskProvider.getPrioritizedTasksCount().toString()),
+                child: Icon(Icons.flag, color: Colors.orange),
               ),
               label: '优先任务',
             ),
-            const NavigationDestination(
-              icon: Icon(Icons.folder),
+            NavigationDestination(
+              icon: Icon(Icons.library_books, color: Colors.blue),
+              selectedIcon: Icon(Icons.library_books, color: Colors.blue),
               label: '项目',
             ),
             NavigationDestination(
               icon: Badge(
                 isLabelVisible: projectsNeedingReview.isNotEmpty,
                 label: Text(projectsNeedingReview.length.toString()),
-                child: const Icon(Icons.history),
+                child: Icon(Icons.history, color: Colors.indigo),
+              ),
+              selectedIcon: Badge(
+                isLabelVisible: projectsNeedingReview.isNotEmpty,
+                label: Text(projectsNeedingReview.length.toString()),
+                child: Icon(Icons.history, color: Colors.indigo),
               ),
               label: '回顾',
             ),

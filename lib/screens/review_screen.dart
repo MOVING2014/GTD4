@@ -94,7 +94,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.folder, color: project.color),
+                              Icon(Icons.library_books, color: project.color),
                               const SizedBox(width: 8),
                               Flexible(
                                 child: Text(
@@ -317,7 +317,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                   itemBuilder: (context, index) {
                     final project = allProjects[index];
                     return ListTile(
-                      leading: Icon(Icons.folder, color: project.color),
+                      leading: Icon(Icons.library_books, color: project.color),
                       title: Text(project.name),
                       subtitle: Text(
                         project.lastReviewDate == null

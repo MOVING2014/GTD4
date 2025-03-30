@@ -231,7 +231,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
                   child: Row(
                     children: [
-                      Icon(Icons.folder_outlined, color: colorScheme.primary),
+                      Icon(Icons.library_books, color: colorScheme.primary),
                       const SizedBox(width: 12),
                       Expanded(
                         child: DropdownButtonHideUnderline(
