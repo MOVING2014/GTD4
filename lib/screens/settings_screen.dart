@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
+import '../utils/backup_helper.dart';
+import 'dart:io';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -203,6 +205,85 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 color: theme.colorScheme.onSurface.withOpacity(0.8),
                 height: 1.5,
               ),
+            ),
+          ),
+          
+          const SizedBox(height: 30),
+          
+          // Data Backup
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '数据备份与恢复',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                
+                ListTile(
+                  leading: Icon(Icons.upload_file, color: theme.colorScheme.primary),
+                  title: const Text('导出数据'),
+                  subtitle: const Text('将所有任务和项目导出为CSV文件'),
+                  onTap: () async {
+                    final result = await BackupHelper.exportData(context);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(result.success
+                              ? '数据导出成功: ${result.message}'
+                              : '导出失败: ${result.message}'),
+                          duration: const Duration(seconds: 3),
+                        ),
+                      );
+                    }
+                  },
+                ),
+                
+                ListTile(
+                  leading: Icon(Icons.download_rounded, color: theme.colorScheme.primary),
+                  title: const Text('导入数据'),
+                  subtitle: const Text('从CSV文件导入任务和项目'),
+                  onTap: () async {
+                    // Show confirmation dialog before import
+                    final shouldImport = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('导入数据'),
+                        content: const Text('导入数据将覆盖现有数据，确定要继续吗？'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: const Text('取消'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            child: const Text('确定'),
+                          ),
+                        ],
+                      ),
+                    );
+                    
+                    if (shouldImport == true && context.mounted) {
+                      final result = await BackupHelper.importData(context);
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(result.success 
+                                ? '数据导入成功: ${result.message}'
+                                : '导入失败: ${result.message}'),
+                            duration: const Duration(seconds: 3),
+                          ),
+                        );
+                      }
+                    }
+                  },
+                ),
+              ],
             ),
           ),
           

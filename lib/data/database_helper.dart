@@ -242,4 +242,11 @@ class DatabaseHelper {
       whereArgs: [id],
     );
   }
+
+  // Clear all data for import
+  Future<void> clearAllData() async {
+    final db = await database;
+    await db.delete('tasks');
+    await db.delete('projects');
+  }
 } 

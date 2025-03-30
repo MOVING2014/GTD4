@@ -1,0 +1,477 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:csv/csv.dart';
+import 'package:path/path.dart' as path;
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:collection/collection.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+import '../data/database_helper.dart';
+import '../models/task.dart';
+import '../models/project.dart';
+
+class BackupResult {
+  final bool success;
+  final String message;
+
+  BackupResult({required this.success, required this.message});
+}
+
+class BackupHelper {
+  // Request storage permissions
+  static Future<bool> _requestPermissions() async {
+    // 检查并请求权限
+    if (Platform.isAndroid) {
+      // 对于Android 10+，首先尝试使用管理外部存储权限
+      if (await Permission.manageExternalStorage.request().isGranted) {
+        return true;
+      }
+      
+      // 对于Android 10以下版本，使用标准存储权限
+      if (await Permission.storage.request().isGranted) {
+        return true;
+      }
+      
+      // 对于Android 13+，尝试使用媒体库权限
+      if (await Permission.mediaLibrary.request().isGranted) {
+        return true;
+      }
+      
+      return false;
+    }
+    
+    // iOS默认已有对应权限控制
+    return true;
+  }
+
+  // Export data to CSV
+  static Future<BackupResult> exportData(BuildContext context) async {
+    try {
+      // Request permissions first
+      bool hasPermission = await _requestPermissions();
+      if (!hasPermission) {
+        return BackupResult(
+          success: false,
+          message: '无法获取必要的存储权限，请在系统设置中授予应用存储权限',
+        );
+      }
+      
+      // Get data from database
+      final db = DatabaseHelper.instance;
+      final tasks = await db.getAllTasks();
+      final projects = await db.getAllProjects();
+
+      // Convert tasks to CSV
+      final tasksCsv = await _tasksToCSV(tasks);
+      
+      // Convert projects to CSV
+      final projectsCsv = await _projectsToCSV(projects);
+
+      // Get timestamp for filenames
+      final now = DateTime.now().toIso8601String().replaceAll(':', '-').replaceAll('.', '-');
+      
+      // Get Download directory path
+      String directoryPath;
+      String pathDesc;
+      
+      if (Platform.isAndroid) {
+        // 使用公共Download文件夹
+        try {
+          final downloadDir = Directory('/storage/emulated/0/Download');
+          if (await downloadDir.exists()) {
+            try {
+              // Test file writing permission by creating a temporary file
+              final testFile = File('${downloadDir.path}/tmp_test_gtd.txt');
+              await testFile.writeAsString('test');
+              await testFile.delete(); // Clean up
+              directoryPath = downloadDir.path;
+              pathDesc = 'Download/TaskManager 文件夹';
+            } catch (e) {
+              // 无法写入公共Download目录，降级到应用专用目录
+              print('Cannot write to Download directory: $e');
+              final directory = await getExternalStorageDirectory();
+              if (directory == null) {
+                return BackupResult(
+                  success: false,
+                  message: '无法访问存储目录',
+                );
+              }
+              directoryPath = directory.path;
+              pathDesc = '应用专用存储空间/TaskManager 文件夹';
+            }
+          } else {
+            // 公共Download目录不存在，降级到应用专用目录
+            final directory = await getExternalStorageDirectory();
+            if (directory == null) {
+              return BackupResult(
+                success: false,
+                message: '无法访问存储目录',
+              );
+            }
+            directoryPath = directory.path;
+            pathDesc = '应用专用存储空间/TaskManager 文件夹';
+          }
+        } catch (e) {
+          // 获取公共Download目录时出错，降级到应用专用目录
+          print('Error accessing Download directory: $e');
+          final directory = await getExternalStorageDirectory();
+          if (directory == null) {
+            return BackupResult(
+              success: false,
+              message: '无法访问存储目录',
+            );
+          }
+          directoryPath = directory.path;
+          pathDesc = '应用专用存储空间/TaskManager 文件夹';
+        }
+      } else {
+        // 其他平台使用应用专用存储
+        final directory = await _getStorageDirectory();
+        if (directory == null) {
+          return BackupResult(
+            success: false,
+            message: '无法访问存储目录',
+          );
+        }
+        directoryPath = directory.path;
+        pathDesc = '应用专用存储空间/TaskManager 文件夹';
+      }
+      
+      // Create TaskManager subdirectory in Download
+      final appDir = Directory(path.join(directoryPath, 'TaskManager'));
+      if (!await appDir.exists()) {
+        await appDir.create(recursive: true);
+      }
+      
+      // Save tasks CSV file
+      final tasksPath = path.join(appDir.path, 'tasks_$now.csv');
+      final tasksFile = File(tasksPath);
+      await tasksFile.writeAsString(tasksCsv);
+      
+      // Save projects CSV file
+      final projectsPath = path.join(appDir.path, 'projects_$now.csv');
+      final projectsFile = File(projectsPath);
+      await projectsFile.writeAsString(projectsCsv);
+
+      return BackupResult(
+        success: true,
+        message: '已导出 ${tasks.length} 个任务和 ${projects.length} 个项目到：\n$pathDesc',
+      );
+    } catch (e) {
+      return BackupResult(
+        success: false,
+        message: '导出失败: $e',
+      );
+    }
+  }
+
+  // Get suitable storage directory based on platform
+  static Future<Directory?> _getStorageDirectory() async {
+    if (Platform.isAndroid) {
+      try {
+        // 尝试使用文档目录作为备选
+        return await getApplicationDocumentsDirectory();
+      } catch (e) {
+        print('Error accessing documents directory: $e');
+        return null;
+      }
+    } else if (Platform.isIOS) {
+      // On iOS we use the Documents directory
+      return await getApplicationDocumentsDirectory();
+    } else {
+      // For other platforms, use the app documents directory
+      return await getApplicationDocumentsDirectory();
+    }
+  }
+
+  // Import data from CSV
+  static Future<BackupResult> importData(BuildContext context) async {
+    try {
+      // Request permissions first
+      bool hasPermission = await _requestPermissions();
+      if (!hasPermission) {
+        return BackupResult(
+          success: false,
+          message: '无法获取必要的存储权限，请在系统设置中授予应用存储权限',
+        );
+      }
+      
+      List<Task>? tasks;
+      List<Project>? projects;
+      
+      // Show instructions dialog
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('导入数据说明'),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('请选择CSV备份文件：'),
+              SizedBox(height: 8),
+              Text('• 先选择tasks开头的CSV文件'),
+              Text('• 再选择projects开头的CSV文件'),
+              Text('• 导入后将替换现有数据'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('明白了'),
+            ),
+          ],
+        ),
+      );
+      
+      if (!context.mounted) return BackupResult(success: false, message: '操作已取消');
+      
+      // Let user pick tasks file
+      FilePickerResult? tasksResult = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['csv'],
+        dialogTitle: '选择任务文件 (tasks_*.csv)',
+      );
+      
+      if (tasksResult == null || tasksResult.files.isEmpty) {
+        return BackupResult(success: false, message: '未选择任务文件');
+      }
+      
+      String? selectedTaskFile = tasksResult.files.single.path;
+      
+      if (selectedTaskFile == null || !await File(selectedTaskFile).exists()) {
+        return BackupResult(success: false, message: '任务文件无效');
+      }
+      
+      // Let user pick projects file
+      if (!context.mounted) return BackupResult(success: false, message: '操作已取消');
+      
+      FilePickerResult? projectsResult = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['csv'],
+        dialogTitle: '选择项目文件 (projects_*.csv)',
+      );
+      
+      if (projectsResult == null || projectsResult.files.isEmpty) {
+        return BackupResult(success: false, message: '未选择项目文件');
+      }
+      
+      String? selectedProjectFile = projectsResult.files.single.path;
+      
+      if (selectedProjectFile == null || !await File(selectedProjectFile).exists()) {
+        return BackupResult(success: false, message: '项目文件无效');
+      }
+      
+      // Read the selected files
+      try {
+        final taskCsv = await File(selectedTaskFile).readAsString();
+        tasks = await _csvToTasks(taskCsv);
+        
+        final projectCsv = await File(selectedProjectFile).readAsString();
+        projects = await _csvToProjects(projectCsv);
+      } catch (e) {
+        return BackupResult(success: false, message: '读取CSV文件失败: $e');
+      }
+      
+      // Confirm before import
+      if (!context.mounted) return BackupResult(success: false, message: '操作已取消');
+      
+      final shouldImport = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('确认导入'),
+          content: Text('将导入 ${tasks?.length ?? 0} 个任务和 ${projects?.length ?? 0} 个项目，这将覆盖现有数据。确定要继续吗？'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('取消'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('确定导入'),
+            ),
+          ],
+        ),
+      );
+      
+      if (shouldImport != true) {
+        return BackupResult(success: false, message: '导入已取消');
+      }
+      
+      // Import data to database
+      if (!context.mounted) return BackupResult(success: false, message: '操作已取消');
+      
+      // Show progress dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text('正在导入数据，请稍候...'),
+            ],
+          ),
+        ),
+      );
+      
+      // Perform import
+      final db = DatabaseHelper.instance;
+      
+      // Clear existing data
+      await db.clearAllData();
+      
+      // Import projects first
+      for (var project in projects) {
+        await db.insertProject(project);
+      }
+      
+      // Then import tasks
+      for (var task in tasks) {
+        await db.insertTask(task);
+      }
+      
+      // Close progress dialog
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
+
+      return BackupResult(
+        success: true,
+        message: '已导入 ${tasks.length} 个任务和 ${projects.length} 个项目',
+      );
+    } catch (e) {
+      return BackupResult(
+        success: false,
+        message: '导入失败: $e',
+      );
+    }
+  }
+
+  // Convert tasks to CSV
+  static Future<String> _tasksToCSV(List<Task> tasks) async {
+    final List<List<dynamic>> rows = [];
+    
+    // Add header row
+    rows.add([
+      'id', 'title', 'notes', 'dueDate', 'reminderDate', 'priority', 
+      'status', 'createdAt', 'completedAt', 'projectId', 'tags', 
+      'isRecurring', 'recurrenceRule'
+    ]);
+    
+    // Add data rows
+    for (var task in tasks) {
+      rows.add([
+        task.id,
+        task.title,
+        task.notes ?? '',
+        task.dueDate?.toIso8601String() ?? '',
+        task.reminderDate?.toIso8601String() ?? '',
+        task.priority.index,
+        task.status.index,
+        task.createdAt.toIso8601String(),
+        task.completedAt?.toIso8601String() ?? '',
+        task.projectId ?? '',
+        jsonEncode(task.tags),
+        task.isRecurring ? 1 : 0,
+        task.recurrenceRule ?? '',
+      ]);
+    }
+    
+    return const ListToCsvConverter().convert(rows);
+  }
+
+  // Convert projects to CSV
+  static Future<String> _projectsToCSV(List<Project> projects) async {
+    final List<List<dynamic>> rows = [];
+    
+    // Add header row
+    rows.add([
+      'id', 'name', 'description', 'colorValue', 'status', 
+      'createdAt', 'completedAt', 'parentProjectId', 'order', 
+      'needsMonthlyReview', 'lastReviewDate'
+    ]);
+    
+    // Add data rows
+    for (var project in projects) {
+      rows.add([
+        project.id,
+        project.name,
+        project.description ?? '',
+        project.color.value,
+        project.status.index,
+        project.createdAt.toIso8601String(),
+        project.completedAt?.toIso8601String() ?? '',
+        project.parentProjectId ?? '',
+        project.order ?? 0,
+        project.needsMonthlyReview ? 1 : 0,
+        project.lastReviewDate?.toIso8601String() ?? '',
+      ]);
+    }
+    
+    return const ListToCsvConverter().convert(rows);
+  }
+
+  // Convert CSV to tasks
+  static Future<List<Task>> _csvToTasks(String csv) async {
+    final List<List<dynamic>> rows = const CsvToListConverter().convert(csv);
+    final List<Task> tasks = [];
+    
+    // Skip header row
+    for (int i = 1; i < rows.length; i++) {
+      final row = rows[i];
+      if (row.isEmpty || row.length < 13) continue;
+      
+      tasks.add(Task(
+        id: row[0].toString(),
+        title: row[1].toString(),
+        notes: row[2].toString().isNotEmpty ? row[2].toString() : null,
+        dueDate: row[3].toString().isNotEmpty ? DateTime.parse(row[3].toString()) : null,
+        reminderDate: row[4].toString().isNotEmpty ? DateTime.parse(row[4].toString()) : null,
+        priority: TaskPriority.values[int.parse(row[5].toString())],
+        status: TaskStatus.values[int.parse(row[6].toString())],
+        createdAt: DateTime.parse(row[7].toString()),
+        completedAt: row[8].toString().isNotEmpty ? DateTime.parse(row[8].toString()) : null,
+        projectId: row[9].toString().isNotEmpty ? row[9].toString() : null,
+        tags: row[10].toString().isNotEmpty ? List<String>.from(jsonDecode(row[10].toString())) : [],
+        isRecurring: row[11].toString() == '1',
+        recurrenceRule: row[12].toString().isNotEmpty ? row[12].toString() : null,
+      ));
+    }
+    
+    return tasks;
+  }
+
+  // Convert CSV to projects
+  static Future<List<Project>> _csvToProjects(String csv) async {
+    final List<List<dynamic>> rows = const CsvToListConverter().convert(csv);
+    final List<Project> projects = [];
+    
+    // Skip header row
+    for (int i = 1; i < rows.length; i++) {
+      final row = rows[i];
+      if (row.isEmpty || row.length < 11) continue;
+      
+      projects.add(Project(
+        id: row[0].toString(),
+        name: row[1].toString(),
+        description: row[2].toString().isNotEmpty ? row[2].toString() : null,
+        color: Color(int.parse(row[3].toString())),
+        status: ProjectStatus.values[int.parse(row[4].toString())],
+        createdAt: DateTime.parse(row[5].toString()),
+        completedAt: row[6].toString().isNotEmpty ? DateTime.parse(row[6].toString()) : null,
+        parentProjectId: row[7].toString().isNotEmpty ? row[7].toString() : null,
+        order: row[8].toString() != '0' ? int.parse(row[8].toString()) : null,
+        needsMonthlyReview: row[9].toString() == '1',
+        lastReviewDate: row[10].toString().isNotEmpty ? DateTime.parse(row[10].toString()) : null,
+      ));
+    }
+    
+    return projects;
+  }
+} 
