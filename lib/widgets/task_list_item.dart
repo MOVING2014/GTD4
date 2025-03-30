@@ -340,8 +340,51 @@ class _TaskListItemState extends State<TaskListItem> {
     
     final List<Widget> rowItems = [];
     
-    // 显示到期日期（如果有）
+    // 先显示项目信息（如果有）
+    if (project != null && !widget.hideProjectLabel) {
+      rowItems.add(
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.library_books,
+              size: 12,
+              color: labelColor,
+            ),
+            const SizedBox(width: 2),
+            Flexible(
+              child: Text(
+                project.name,
+                style: TextStyle(
+                  color: labelColor,
+                  fontSize: 14.0,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    
+    // 再显示到期日期（如果有）
     if (widget.task.dueDate != null) {
+      // 如果已经有项目信息，添加间隔
+      if (rowItems.isNotEmpty) {
+        rowItems.add(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: Text('•', 
+              style: TextStyle(
+                color: labelColor,
+                fontSize: 14.0,
+              ),
+            ),
+          ),
+        );
+      }
+      
       final dateString = widget.task.isDueToday 
           ? '今天' 
           : _formatChineseDate(widget.task.dueDate!);
@@ -364,49 +407,6 @@ class _TaskListItemState extends State<TaskListItem> {
                 fontWeight: null,
               ),
               overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      );
-    }
-    
-    // 显示项目信息（如果有）
-    if (project != null && !widget.hideProjectLabel) {
-      // 如果已经有日期信息，添加间隔
-      if (rowItems.isNotEmpty) {
-        rowItems.add(
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: Text('•', 
-              style: TextStyle(
-                color: labelColor,
-                fontSize: 14.0,
-              ),
-            ),
-          ),
-        );
-      }
-      
-      rowItems.add(
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.library_books,
-              size: 12,
-              color: labelColor,
-            ),
-            const SizedBox(width: 2),
-            Flexible(
-              child: Text(
-                project.name,
-                style: TextStyle(
-                  color: labelColor,
-                  fontSize: 14.0,
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
             ),
           ],
         ),
