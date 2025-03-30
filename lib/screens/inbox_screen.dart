@@ -21,7 +21,14 @@ class _InboxScreenState extends State<InboxScreen> {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('收件箱'),
+        title: Text(
+          '收件箱',
+          style: TextStyle(
+            fontWeight: FontWeight.normal,
+            color: Colors.grey,
+            fontSize: 34.0,
+          ),
+        ),
         actions: [
           // 显示/隐藏已完成任务的过滤器按钮
           Consumer<TaskProvider>(

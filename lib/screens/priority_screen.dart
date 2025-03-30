@@ -17,7 +17,14 @@ class _PriorityScreenState extends State<PriorityScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('优先任务'),
+        title: Text(
+          '优先任务',
+          style: TextStyle(
+            fontWeight: FontWeight.normal,
+            color: Colors.orange,
+            fontSize: 34.0,
+          ),
+        ),
         actions: [
           // 显示/隐藏已完成任务的过滤器按钮
           Consumer<TaskProvider>(

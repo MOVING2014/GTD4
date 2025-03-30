@@ -26,7 +26,14 @@ class _ReviewScreenState extends State<ReviewScreen> {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('月度回顾'),
+        title: Text(
+          '回顾',
+          style: TextStyle(
+            fontWeight: FontWeight.normal,
+            color: Colors.indigo,
+            fontSize: 34.0,
+          ),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.calendar_month),

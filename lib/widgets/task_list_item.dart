@@ -12,11 +12,13 @@ import '../widgets/add_task_dialog.dart';
 class TaskListItem extends StatefulWidget {
   final Task task;
   final VoidCallback? onTaskChange;
+  final bool hideProjectLabel;
   
   const TaskListItem({
     super.key,
     required this.task,
     this.onTaskChange,
+    this.hideProjectLabel = false,
   });
 
   @override
@@ -215,8 +217,10 @@ class _TaskListItemState extends State<TaskListItem> {
                           // 适配暗黑模式的任务标题文字颜色
                           color: widget.task.status == TaskStatus.completed 
                               ? theme.colorScheme.onSurface.withOpacity(0.6)
-                              : theme.colorScheme.onSurface,
-                          fontSize: 17.0,
+                              : isDarkMode 
+                                  ? Colors.white // 在暗黑模式下使用纯白色
+                                  : theme.colorScheme.onSurface,
+                          fontSize: 18.0,
                         ),
                       ),
                     ),
@@ -318,7 +322,7 @@ class _TaskListItemState extends State<TaskListItem> {
     }
     
     // 显示项目信息（如果有）
-    if (project != null) {
+    if (project != null && !widget.hideProjectLabel) {
       // 如果已经有日期信息，添加间隔
       if (rowItems.isNotEmpty) {
         rowItems.add(

@@ -27,7 +27,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('日历视图'),
+        title: Text(
+          '预测',
+          style: TextStyle(
+            fontWeight: FontWeight.normal,
+            color: Colors.pink,
+            fontSize: 34.0,
+          ),
+        ),
         actions: [
           // 显示/隐藏已完成任务的过滤器按钮
           IconButton(
@@ -284,7 +291,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Divider(
               height: 0,
-              thickness: 0.5,
+              thickness: 3.0,
               color: theme.colorScheme.onSurface.withOpacity(0.2),
               indent: 16.0,
               endIndent: 16.0,
@@ -300,7 +307,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
                     _formatChineseDate(_selectedDay),
-                    style: theme.textTheme.titleLarge,
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onSurface,
+                    ),
                   ),
                 ),
                 

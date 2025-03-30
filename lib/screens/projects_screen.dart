@@ -59,7 +59,14 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     
     return Scaffold(
       appBar: AppBar(
-        title: Text(_getFilterTitle()),
+        title: Text(
+          _getFilterTitle(),
+          style: TextStyle(
+            fontWeight: FontWeight.normal,
+            color: Colors.grey,
+            fontSize: 34.0,
+          ),
+        ),
         actions: [
           // 显示/隐藏已完成任务的过滤器按钮
           IconButton(
@@ -319,7 +326,11 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                     child: Text('该项目还没有任务。'),
                   ),
                 ]
-              : projectTasks.map((task) => TaskListItem(task: task)).toList(),
+              : projectTasks.map((task) => TaskListItem(
+                  task: task,
+                  hideProjectLabel: true,
+                  onTaskChange: () => setState(() {}),
+                )).toList(),
         );
       },
     );
