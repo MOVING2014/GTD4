@@ -194,120 +194,130 @@ class _TaskListItemState extends State<TaskListItem> {
                 widget.onTaskChange!();
               }
             },
-            child: Padding(
+            child: Container(
+              // 设置最小高度，确保卡片有一个固定的最小高度
+              constraints: const BoxConstraints(
+                minHeight: 64, // 最小高度改为64像素
+              ),
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   // 标题行 - 包含复选框和标题在一行
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // 复选框
-                      SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: Center(
-                          child: Checkbox(
-                            value: widget.task.status == TaskStatus.completed,
-                            onChanged: (_) {
-                              taskProvider.toggleTaskCompletion(widget.task.id);
-                              if (widget.onTaskChange != null) {
-                                widget.onTaskChange!();
-                              }
-                            },
-                            activeColor: Colors.transparent,
-                            // 适配暗黑模式的复选框颜色
-                            checkColor: widget.task.priority == TaskPriority.none 
-                                ? isDarkMode ? theme.colorScheme.onSurface : Colors.black87
-                                : widget.task.getPriorityColor(),
-                            fillColor: WidgetStateProperty.resolveWith((states) {
-                              // 始终保持透明背景
-                              return Colors.transparent;
-                            }),
-                            side: WidgetStateBorderSide.resolveWith(
-                              (states) => BorderSide(
-                                width: 1.5,
-                                color: widget.task.priority == TaskPriority.none 
-                                    ? isDarkMode 
-                                        ? theme.colorScheme.onSurface.withOpacity(0.7)
-                                        : Colors.black54
-                                    : widget.task.getPriorityColor(),
+                  SizedBox(
+                    height: 26, // 固定高度确保标题不移动
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // 复选框
+                        SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: Center(
+                            child: Checkbox(
+                              value: widget.task.status == TaskStatus.completed,
+                              onChanged: (_) {
+                                taskProvider.toggleTaskCompletion(widget.task.id);
+                                if (widget.onTaskChange != null) {
+                                  widget.onTaskChange!();
+                                }
+                              },
+                              activeColor: Colors.transparent,
+                              // 适配暗黑模式的复选框颜色
+                              checkColor: widget.task.priority == TaskPriority.none 
+                                  ? isDarkMode ? theme.colorScheme.onSurface : Colors.black87
+                                  : widget.task.getPriorityColor(),
+                              fillColor: WidgetStateProperty.resolveWith((states) {
+                                // 始终保持透明背景
+                                return Colors.transparent;
+                              }),
+                              side: WidgetStateBorderSide.resolveWith(
+                                (states) => BorderSide(
+                                  width: 1.5,
+                                  color: widget.task.priority == TaskPriority.none 
+                                      ? isDarkMode 
+                                          ? theme.colorScheme.onSurface.withOpacity(0.7)
+                                          : Colors.black54
+                                      : widget.task.getPriorityColor(),
+                                ),
                               ),
-                            ),
-                            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
+                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      // 标题和备注开关按钮
-                      Expanded(
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                widget.task.title,
-                                style: TextStyle(
-                                  decoration: widget.task.status == TaskStatus.completed 
-                                      ? TextDecoration.lineThrough 
-                                      : null,
-                                  // 适配暗黑模式的任务标题文字颜色
-                                  color: widget.task.status == TaskStatus.completed 
-                                      ? theme.colorScheme.onSurface.withOpacity(0.6)
-                                      : isDarkMode 
-                                          ? Colors.white // 在暗黑模式下使用纯白色
-                                          : theme.colorScheme.onSurface,
-                                  fontSize: 18.0,
-                                ),
-                              ),
-                            ),
-                            // 备注开关按钮
-                            if (widget.task.notes != null && widget.task.notes!.isNotEmpty)
-                              InkWell(
-                                borderRadius: BorderRadius.circular(16),
-                                onTap: () {
-                                  setState(() {
-                                    _isNotesExpanded = !_isNotesExpanded;
-                                  });
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                                  child: Icon(
-                                    _isNotesExpanded ? Icons.keyboard_arrow_up : Icons.notes,
-                                    size: 18,
-                                    // 适配暗黑模式的图标颜色
-                                    color: theme.colorScheme.onSurface.withOpacity(0.5),
+                        const SizedBox(width: 8),
+                        // 标题和备注开关按钮
+                        Expanded(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  widget.task.title,
+                                  style: TextStyle(
+                                    decoration: widget.task.status == TaskStatus.completed 
+                                        ? TextDecoration.lineThrough 
+                                        : null,
+                                    // 适配暗黑模式的任务标题文字颜色
+                                    color: widget.task.status == TaskStatus.completed 
+                                        ? theme.colorScheme.onSurface.withOpacity(0.6)
+                                        : isDarkMode 
+                                            ? Colors.white // 在暗黑模式下使用纯白色
+                                            : theme.colorScheme.onSurface,
+                                    fontSize: 18.0,
                                   ),
                                 ),
                               ),
-                          ],
+                              // 备注开关按钮
+                              if (widget.task.notes != null && widget.task.notes!.isNotEmpty)
+                                InkWell(
+                                  borderRadius: BorderRadius.circular(16),
+                                  onTap: () {
+                                    setState(() {
+                                      _isNotesExpanded = !_isNotesExpanded;
+                                    });
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                    child: Icon(
+                                      _isNotesExpanded ? Icons.keyboard_arrow_up : Icons.notes,
+                                      size: 18,
+                                      // 适配暗黑模式的图标颜色
+                                      color: theme.colorScheme.onSurface.withOpacity(0.5),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   
-                  // 备注部分 - 在标题行下方独立显示
+                  // 备注部分 - 简单显示，无动画
                   if (widget.task.notes != null && widget.task.notes!.isNotEmpty && _isNotesExpanded)
                     Padding(
-                      padding: const EdgeInsets.only(top: 0, left: 36.0),
+                      padding: const EdgeInsets.only(left: 32.0, top: 0.0, bottom: 4.0),
                       child: Text(
                         widget.task.notes!,
                         style: TextStyle(
                           fontSize: 14.0,
-                          // 适配暗黑模式的备注文字颜色
                           color: theme.colorScheme.onSurface.withOpacity(0.6),
                         ),
                       ),
                     ),
                   
-                  // 子标题（日期和项目信息）
-                  Padding(
-                    padding: const EdgeInsets.only(top: 2.0, left: 36.0),
-                    child: _buildSubtitle(project),
+                  // 子标题区域 - 固定高度确保稳定布局
+                  SizedBox(
+                    height: 20,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 36.0, top: 2.0),
+                      child: _buildSubtitle(project),
+                    ),
                   ),
                 ],
               ),
