@@ -208,8 +208,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               label: '收件箱',
             ),
-            const NavigationDestination(
-              icon: Icon(Icons.priority_high),
+            NavigationDestination(
+              icon: Badge(
+                isLabelVisible: taskProvider.getPrioritizedTasksCount() > 0,
+                label: Text(taskProvider.getPrioritizedTasksCount().toString()),
+                child: const Icon(Icons.priority_high),
+              ),
               label: '优先任务',
             ),
             const NavigationDestination(
@@ -219,6 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
             NavigationDestination(
               icon: Badge(
                 isLabelVisible: projectsNeedingReview.isNotEmpty,
+                label: Text(projectsNeedingReview.length.toString()),
                 child: const Icon(Icons.history),
               ),
               label: '回顾',
