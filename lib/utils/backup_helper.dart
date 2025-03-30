@@ -1146,7 +1146,7 @@ class BackupHelper {
         
         // 通常外部存储路径为 /storage/emulated/0/Android/data/package/files
         // 需要回退到 /storage/emulated/0 再加上 Download
-        final downloadsPath = externalDir.path.split('/Android')[0] + '/Download';
+        final downloadsPath = '${externalDir.path.split('/Android')[0]}/Download';
         final downloadsDir = Directory(downloadsPath);
         
         if (await downloadsDir.exists()) {

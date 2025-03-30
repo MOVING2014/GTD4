@@ -114,7 +114,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // 跟随系统设置
                 Card(
                   elevation: 0,
-                  color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   child: SwitchListTile(
@@ -154,7 +154,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // 深色模式设置 (仅当不跟随系统时可用)
                 Card(
                   elevation: 0,
-                  color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   child: SwitchListTile(
@@ -186,6 +186,67 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         },
                   ),
                 ),
+                
+                // 系统UI设置
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                  child: Text(
+                    'Android系统UI设置',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                
+                // 隐藏导航栏/手势条设置
+                Card(
+                  elevation: 0,
+                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  child: SwitchListTile(
+                    title: const Text('隐藏导航手势条'),
+                    subtitle: Text(
+                      '隐藏底部导航栏/手势提示条，全屏显示应用',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      ),
+                    ),
+                    value: themeProvider.hideNavigationBar,
+                    secondary: Icon(
+                      Icons.fullscreen,
+                      color: theme.colorScheme.primary,
+                    ),
+                    onChanged: (bool value) {
+                      themeProvider.setHideNavigationBar(value);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(value ? '已隐藏导航手势条' : '已显示导航手势条'),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                      
+                      // 如果开启了隐藏，提示用户如何临时显示导航栏
+                      if (value) {
+                        Future.delayed(const Duration(milliseconds: 1500), () {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('提示：从屏幕底部向上滑动可临时显示导航栏'),
+                                duration: Duration(seconds: 3),
+                              ),
+                            );
+                          }
+                        });
+                      }
+                    },
+                  ),
+                ),
               ],
             ),
           ),
@@ -207,7 +268,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // CSV 数据导入导出
                 Card(
                   elevation: 0,
-                  color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   child: Column(
@@ -392,7 +453,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 
                 Card(
                   elevation: 0,
-                  color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   child: ListTile(
@@ -417,7 +478,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 
                 Card(
                   elevation: 0,
-                  color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   child: ListTile(
@@ -572,7 +633,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 
                 Card(
                   elevation: 0,
-                  color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   child: Padding(
@@ -614,7 +675,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 
                 Card(
                   elevation: 0,
-                  color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   child: Column(

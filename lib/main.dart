@@ -24,7 +24,7 @@ void main() async {
     // 不在这里设置固定的图标亮度，而是在MyApp中根据主题动态设置
   ));
   
-  // 启用边缘到边缘显示模式，让应用内容扩展到系统栏区域
+  // 默认使用边缘到边缘显示模式
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   
   // 确保数据库已初始化
@@ -94,6 +94,7 @@ class MyApp extends StatelessWidget {
               
               // 使用延迟执行，确保UI样式在渲染完成后应用
               Future.microtask(() {
+                // 应用系统UI样式，但不改变导航栏显示状态（由ThemeProvider控制）
                 SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
                   // 确保系统导航栏完全透明
                   systemNavigationBarColor: Colors.transparent,
@@ -149,6 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final taskProvider = Provider.of<TaskProvider>(context);
     final projectProvider = Provider.of<ProjectProvider>(context);
     final projectsNeedingReview = projectProvider.projectsNeedingReview;
+    final themeProvider = Provider.of<ThemeProvider>(context);
     
     // 获取底部安全区域的高度
     final bottomPadding = MediaQuery.of(context).padding.bottom;
@@ -157,95 +159,116 @@ class _HomeScreenState extends State<HomeScreen> {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final theme = Theme.of(context);
     
-    return Scaffold(
-      // 使用SafeArea确保内容不会被底部导航手势区遮挡
-      body: SafeArea(
-        // 只应用底部的SafeArea，顶部和侧面不需要
-        top: false,
-        left: false,
-        right: false,
-        bottom: true,
-        child: _pages[_selectedIndex],
-      ),
-      // 设置背景透明以便系统手势条能够更好地融入
-      backgroundColor: theme.scaffoldBackgroundColor,
-      // 确保Scaffold是透明的
-      extendBody: true,
-      extendBodyBehindAppBar: true,
-      bottomNavigationBar: Container(
-        // 添加一个额外的容器来包裹导航栏，便于自定义
-        decoration: BoxDecoration(
-          // 完全透明，没有颜色和边框
-          color: Colors.transparent,
+    return GestureDetector(
+      // 添加上滑手势以临时显示系统UI（仅当导航栏被隐藏时有效）
+      onVerticalDragEnd: (details) {
+        if (themeProvider.hideNavigationBar && details.velocity.pixelsPerSecond.dy < -300) {
+          // 向上滑动显示系统UI
+          SystemChrome.setEnabledSystemUIMode(
+            SystemUiMode.immersiveSticky,
+            overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom],
+          );
+          // 3秒后再次隐藏
+          Future.delayed(const Duration(seconds: 3), () {
+            if (themeProvider.hideNavigationBar) {
+              SystemChrome.setEnabledSystemUIMode(
+                SystemUiMode.immersiveSticky,
+                overlays: [],
+              );
+            }
+          });
+        }
+      },
+      child: Scaffold(
+        // 使用SafeArea确保内容不会被底部导航手势区遮挡
+        body: SafeArea(
+          // 只应用底部的SafeArea，顶部和侧面不需要
+          top: false,
+          left: false,
+          right: false,
+          bottom: true,
+          child: _pages[_selectedIndex],
         ),
-        child: NavigationBar(
-          // 增加底部填充，确保导航栏不会与系统手势区重叠
-          height: kBottomNavigationBarHeight + bottomPadding,
-          // 设置导航栏背景透明
-          backgroundColor: Colors.transparent,
-          // 去掉阴影
-          elevation: 0,
-          // 导航指示器颜色根据主题调整
-          indicatorColor: theme.colorScheme.secondaryContainer.withOpacity(0.7),
-          // 导航项颜色根据主题调整
-          labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-          selectedIndex: _selectedIndex,
-          onDestinationSelected: (int index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
-          destinations: [
-            NavigationDestination(
-              icon: Icon(Icons.calendar_today, color: Colors.pink),
-              selectedIcon: Icon(Icons.calendar_today, color: Colors.pink),
-              label: '日历',
-            ),
-            NavigationDestination(
-              icon: Badge(
-                isLabelVisible: taskProvider.inboxTasksCount > 0,
-                label: Text(taskProvider.inboxTasksCount.toString()),
-                child: Icon(Icons.inbox, color: Colors.grey),
+        // 设置背景透明以便系统手势条能够更好地融入
+        backgroundColor: theme.scaffoldBackgroundColor,
+        // 确保Scaffold是透明的
+        extendBody: true,
+        extendBodyBehindAppBar: true,
+        bottomNavigationBar: Container(
+          // 添加一个额外的容器来包裹导航栏，便于自定义
+          decoration: BoxDecoration(
+            // 完全透明，没有颜色和边框
+            color: Colors.transparent,
+          ),
+          child: NavigationBar(
+            // 增加底部填充，确保导航栏不会与系统手势区重叠
+            height: kBottomNavigationBarHeight + bottomPadding,
+            // 设置导航栏背景透明
+            backgroundColor: Colors.transparent,
+            // 去掉阴影
+            elevation: 0,
+            // 导航指示器颜色根据主题调整
+            indicatorColor: theme.colorScheme.secondaryContainer.withOpacity(0.7),
+            // 导航项颜色根据主题调整
+            labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: (int index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+            destinations: [
+              NavigationDestination(
+                icon: Icon(Icons.calendar_today, color: Colors.pink),
+                selectedIcon: Icon(Icons.calendar_today, color: Colors.pink),
+                label: '日历',
               ),
-              selectedIcon: Badge(
-                isLabelVisible: taskProvider.inboxTasksCount > 0,
-                label: Text(taskProvider.inboxTasksCount.toString()),
-                child: Icon(Icons.inbox, color: Colors.grey),
+              NavigationDestination(
+                icon: Badge(
+                  isLabelVisible: taskProvider.inboxTasksCount > 0,
+                  label: Text(taskProvider.inboxTasksCount.toString()),
+                  child: Icon(Icons.inbox, color: Colors.grey),
+                ),
+                selectedIcon: Badge(
+                  isLabelVisible: taskProvider.inboxTasksCount > 0,
+                  label: Text(taskProvider.inboxTasksCount.toString()),
+                  child: Icon(Icons.inbox, color: Colors.grey),
+                ),
+                label: '收件箱',
               ),
-              label: '收件箱',
-            ),
-            NavigationDestination(
-              icon: Badge(
-                isLabelVisible: taskProvider.getPrioritizedTasksCount() > 0,
-                label: Text(taskProvider.getPrioritizedTasksCount().toString()),
-                child: Icon(Icons.flag, color: Colors.orange),
+              NavigationDestination(
+                icon: Badge(
+                  isLabelVisible: taskProvider.getPrioritizedTasksCount() > 0,
+                  label: Text(taskProvider.getPrioritizedTasksCount().toString()),
+                  child: Icon(Icons.flag, color: Colors.orange),
+                ),
+                selectedIcon: Badge(
+                  isLabelVisible: taskProvider.getPrioritizedTasksCount() > 0,
+                  label: Text(taskProvider.getPrioritizedTasksCount().toString()),
+                  child: Icon(Icons.flag, color: Colors.orange),
+                ),
+                label: '优先任务',
               ),
-              selectedIcon: Badge(
-                isLabelVisible: taskProvider.getPrioritizedTasksCount() > 0,
-                label: Text(taskProvider.getPrioritizedTasksCount().toString()),
-                child: Icon(Icons.flag, color: Colors.orange),
+              NavigationDestination(
+                icon: Icon(Icons.library_books, color: Colors.blue),
+                selectedIcon: Icon(Icons.library_books, color: Colors.blue),
+                label: '项目',
               ),
-              label: '优先任务',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.library_books, color: Colors.blue),
-              selectedIcon: Icon(Icons.library_books, color: Colors.blue),
-              label: '项目',
-            ),
-            NavigationDestination(
-              icon: Badge(
-                isLabelVisible: projectsNeedingReview.isNotEmpty,
-                label: Text(projectsNeedingReview.length.toString()),
-                child: Icon(Icons.history, color: Colors.indigo),
+              NavigationDestination(
+                icon: Badge(
+                  isLabelVisible: projectsNeedingReview.isNotEmpty,
+                  label: Text(projectsNeedingReview.length.toString()),
+                  child: Icon(Icons.history, color: Colors.indigo),
+                ),
+                selectedIcon: Badge(
+                  isLabelVisible: projectsNeedingReview.isNotEmpty,
+                  label: Text(projectsNeedingReview.length.toString()),
+                  child: Icon(Icons.history, color: Colors.indigo),
+                ),
+                label: '回顾',
               ),
-              selectedIcon: Badge(
-                isLabelVisible: projectsNeedingReview.isNotEmpty,
-                label: Text(projectsNeedingReview.length.toString()),
-                child: Icon(Icons.history, color: Colors.indigo),
-              ),
-              label: '回顾',
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
