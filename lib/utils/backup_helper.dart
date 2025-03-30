@@ -474,4 +474,256 @@ class BackupHelper {
     
     return projects;
   }
+
+  // 导出整个数据库
+  static Future<BackupResult> exportDatabase(BuildContext context) async {
+    try {
+      // 请求权限
+      bool hasPermission = await _requestPermissions();
+      if (!hasPermission) {
+        return BackupResult(
+          success: false,
+          message: '无法获取必要的存储权限，请在系统设置中授予应用存储权限',
+        );
+      }
+      
+      // 获取数据库文件路径
+      final db = DatabaseHelper.instance;
+      final dbPath = await db.getDatabasePath();
+      final dbFile = File(dbPath);
+      
+      if (!await dbFile.exists()) {
+        return BackupResult(
+          success: false,
+          message: '数据库文件不存在',
+        );
+      }
+      
+      // 获取时间戳用于文件名
+      final now = DateTime.now().toIso8601String().replaceAll(':', '-').replaceAll('.', '-');
+      
+      // 获取Download目录路径
+      String directoryPath;
+      String pathDesc;
+      
+      if (Platform.isAndroid) {
+        // 使用公共Download文件夹
+        try {
+          final downloadDir = Directory('/storage/emulated/0/Download');
+          if (await downloadDir.exists()) {
+            try {
+              // 测试写入权限
+              final testFile = File('${downloadDir.path}/tmp_test_gtd.txt');
+              await testFile.writeAsString('test');
+              await testFile.delete(); // 清理
+              directoryPath = downloadDir.path;
+              pathDesc = 'Download/TaskManager 文件夹';
+            } catch (e) {
+              // 无法写入公共Download目录，降级到应用专用目录
+              print('Cannot write to Download directory: $e');
+              final directory = await getExternalStorageDirectory();
+              if (directory == null) {
+                return BackupResult(
+                  success: false,
+                  message: '无法访问存储目录',
+                );
+              }
+              directoryPath = directory.path;
+              pathDesc = '应用专用存储空间/TaskManager 文件夹';
+            }
+          } else {
+            // 公共Download目录不存在，降级到应用专用目录
+            final directory = await getExternalStorageDirectory();
+            if (directory == null) {
+              return BackupResult(
+                success: false,
+                message: '无法访问存储目录',
+              );
+            }
+            directoryPath = directory.path;
+            pathDesc = '应用专用存储空间/TaskManager 文件夹';
+          }
+        } catch (e) {
+          // 获取公共Download目录时出错，降级到应用专用目录
+          print('Error accessing Download directory: $e');
+          final directory = await getExternalStorageDirectory();
+          if (directory == null) {
+            return BackupResult(
+              success: false,
+              message: '无法访问存储目录',
+            );
+          }
+          directoryPath = directory.path;
+          pathDesc = '应用专用存储空间/TaskManager 文件夹';
+        }
+      } else {
+        // 其他平台使用应用专用存储
+        final directory = await _getStorageDirectory();
+        if (directory == null) {
+          return BackupResult(
+            success: false,
+            message: '无法访问存储目录',
+          );
+        }
+        directoryPath = directory.path;
+        pathDesc = '应用专用存储空间/TaskManager 文件夹';
+      }
+      
+      // 创建TaskManager子目录
+      final appDir = Directory(path.join(directoryPath, 'TaskManager'));
+      if (!await appDir.exists()) {
+        await appDir.create(recursive: true);
+      }
+      
+      // 复制数据库文件
+      final dbBackupPath = path.join(appDir.path, 'gtd_db_$now.db');
+      await dbFile.copy(dbBackupPath);
+      
+      return BackupResult(
+        success: true,
+        message: '已导出数据库到：\n$pathDesc',
+      );
+    } catch (e) {
+      return BackupResult(
+        success: false,
+        message: '导出数据库失败: $e',
+      );
+    }
+  }
+  
+  // 导入整个数据库
+  static Future<BackupResult> importDatabase(BuildContext context, {String? filePath}) async {
+    try {
+      // 请求权限
+      bool hasPermission = await _requestPermissions();
+      if (!hasPermission) {
+        return BackupResult(
+          success: false,
+          message: '无法获取必要的存储权限，请在系统设置中授予应用存储权限',
+        );
+      }
+      
+      // 在settings_screen.dart中已经处理了文件选择和确认对话框
+      // 这里只处理实际的导入逻辑
+      
+      String? selectedFilePath = filePath;
+      
+      // 如果没有提供文件路径，则尝试使用文件选择器
+      if (selectedFilePath == null) {
+        print('未提供文件路径，尝试使用文件选择器');
+        try {
+          FilePickerResult? result = await FilePicker.platform.pickFiles(
+            type: FileType.any,
+          );
+          
+          if (result == null || result.files.isEmpty) {
+            return BackupResult(success: false, message: '未选择数据库文件');
+          }
+          
+          selectedFilePath = result.files.single.path;
+          
+          if (selectedFilePath == null) {
+            return BackupResult(success: false, message: '获取文件路径失败');
+          }
+        } catch (e) {
+          print('文件选择失败: $e');
+          return BackupResult(success: false, message: '文件选择失败: $e');
+        }
+      }
+      
+      // 显示进度对话框
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text('正在导入数据库，请稍候...'),
+              ],
+            ),
+          ),
+        );
+      }
+      
+      // 获取当前数据库路径和文件
+      final db = DatabaseHelper.instance;
+      await db.close(); // 关闭数据库连接
+      
+      final dbPath = await db.getDatabasePath();
+      final dbFile = File(dbPath);
+      
+      // 备份现有数据库
+      final tempBackupPath = '${dbPath}_temp_backup';
+      if (await dbFile.exists()) {
+        await dbFile.copy(tempBackupPath);
+        print('已备份原数据库到: $tempBackupPath');
+      }
+      
+      try {
+        // 复制新数据库到应用目录
+        final selectedFile = File(selectedFilePath);
+        if (!await selectedFile.exists()) {
+          // 如果选择的文件不存在，关闭进度对话框
+          if (context.mounted) {
+            Navigator.of(context).pop();
+          }
+          return BackupResult(success: false, message: '选择的数据库文件不存在');
+        }
+        
+        print('正在复制数据库文件...');
+        await selectedFile.copy(dbPath);
+        print('数据库文件复制成功');
+        
+        // 重新打开数据库
+        await db.database;
+        print('数据库重新打开成功');
+        
+        // 删除临时备份
+        final tempBackupFile = File(tempBackupPath);
+        if (await tempBackupFile.exists()) {
+          await tempBackupFile.delete();
+          print('临时备份已删除');
+        }
+      } catch (e) {
+        // 如果导入失败，恢复原数据库
+        print('导入失败，恢复备份: $e');
+        final tempBackupFile = File(tempBackupPath);
+        if (await tempBackupFile.exists()) {
+          await tempBackupFile.copy(dbPath);
+          await tempBackupFile.delete();
+          print('原数据库已恢复');
+        }
+        
+        // 关闭进度对话框
+        if (context.mounted) {
+          Navigator.of(context).pop();
+        }
+        
+        return BackupResult(
+          success: false,
+          message: '导入数据库失败: $e',
+        );
+      }
+      
+      // 关闭进度对话框
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
+      
+      return BackupResult(
+        success: true,
+        message: '数据库导入成功，请重启应用以加载新数据',
+      );
+    } catch (e) {
+      print('导入数据库出现异常: $e');
+      return BackupResult(
+        success: false,
+        message: '导入数据库失败: $e',
+      );
+    }
+  }
 } 

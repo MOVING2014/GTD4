@@ -249,4 +249,17 @@ class DatabaseHelper {
     await db.delete('tasks');
     await db.delete('projects');
   }
+  
+  // 获取数据库文件路径
+  Future<String> getDatabasePath() async {
+    return join(await getDatabasesPath(), 'gtd_app.db');
+  }
+  
+  // 关闭数据库连接
+  Future<void> close() async {
+    if (_database != null && _database!.isOpen) {
+      await _database!.close();
+      _database = null;
+    }
+  }
 } 
