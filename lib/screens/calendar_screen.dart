@@ -56,13 +56,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
               });
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () async {
-              // 创建当前选中日期的新任务
-              await _addTaskForSelectedDay();
-            },
-          ),
           const SettingsButton(),
         ],
       ),
