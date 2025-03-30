@@ -284,10 +284,14 @@ class _TaskListItemState extends State<TaskListItem> {
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
                                     child: Icon(
-                                      _isNotesExpanded ? Icons.keyboard_arrow_up : Icons.notes,
+                                      Icons.notes,
                                       size: 18,
-                                      // 适配暗黑模式的图标颜色
-                                      color: theme.colorScheme.onSurface.withOpacity(0.5),
+                                      // 适配暗黑/亮色模式图标颜色
+                                      color: _isNotesExpanded
+                                          ? isDarkMode 
+                                              ? Colors.white // 深色模式下点亮为白色
+                                              : theme.colorScheme.primary // 浅色模式下点亮为主题色
+                                          : theme.colorScheme.onSurface.withOpacity(0.5),
                                     ),
                                   ),
                                 ),
