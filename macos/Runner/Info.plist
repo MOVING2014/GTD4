@@ -28,5 +28,9 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>此应用需要访问您的文档文件夹来导入导出数据库和备份文件。</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>此应用需要访问您的下载文件夹来导入导出数据库和备份文件。</string>
 </dict>
 </plist>

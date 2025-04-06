@@ -4,6 +4,9 @@ import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 import '../utils/backup_helper.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
+import 'dart:io' show Platform;
+import '../models/task.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -490,15 +493,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         context: context,
                         builder: (context) => AlertDialog(
                           title: const Text('导入数据库说明'),
-                          content: const Column(
+                          content: Column(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('请选择备份的数据库文件：'),
-                              SizedBox(height: 8),
-                              Text('• 选择格式为 gtd_db_*.db 的数据库文件'),
-                              Text('• 导入后将完全替换现有数据库'),
-                              Text('• 此操作不可撤销'),
+                              const Text('请选择备份的数据库文件：'),
+                              const SizedBox(height: 8),
+                              const Text('• 选择格式为 gtd_db_*.db 的数据库文件'),
+                              const Text('• 导入后将完全替换现有数据库'),
+                              const Text('• 此操作不可撤销'),
+                              if (Platform.isMacOS)
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 8.0),
+                                  child: Text('在macOS上，你需要手动选择一个.db文件，并确保应用有足够的访问权限', 
+                                    style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+                                ),
                             ],
                           ),
                           actions: [
@@ -518,9 +527,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       // 让用户选择数据库文件
                       try {
                         print('正在打开文件选择器...');
-                        FilePickerResult? result = await FilePicker.platform.pickFiles(
-                          type: FileType.any,
-                        );
+                        
+                        // 为macOS提供特定选项
+                        FilePickerResult? result;
+                        if (Platform.isMacOS) {
+                          print('在macOS上使用特定的文件选择器选项');
+                          result = await FilePicker.platform.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['db'],
+                            allowMultiple: false,
+                            dialogTitle: '选择数据库文件',
+                            // macOS特定选项
+                            lockParentWindow: true,
+                          );
+                        } else {
+                          result = await FilePicker.platform.pickFiles(
+                            type: FileType.any,
+                          );
+                        }
+                        
                         print('文件选择结果: ${result != null ? '已选择文件' : '未选择文件'}');
                         
                         if (result == null) {
@@ -549,6 +574,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           );
                           return;
                         }
+                        
+                        print('选择的文件路径: $filePath');
                         
                         // 继续导入流程
                         final shouldImport = await showDialog<bool>(
@@ -585,9 +612,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         
                         if (shouldImport != true || !context.mounted) return;
                         
+                        print('用户确认导入，开始导入过程');
+                        
                         // 调用实际导入功能
                         final result2 = await BackupHelper.importDatabase(context, filePath: filePath);
                         if (context.mounted) {
+                          print('导入结果: ${result2.success ? '成功' : '失败'} - ${result2.message}');
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(result2.success 
@@ -603,7 +633,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('导入数据库失败: $e'),
-                              duration: Duration(seconds: 3),
+                              duration: const Duration(seconds: 3),
                             ),
                           );
                         }

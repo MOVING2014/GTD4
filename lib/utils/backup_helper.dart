@@ -179,6 +179,31 @@ class BackupHelper {
     } else if (Platform.isIOS) {
       // On iOS we use the Documents directory
       return await getApplicationDocumentsDirectory();
+    } else if (Platform.isMacOS) {
+      // 在macOS上，使用Downloads目录
+      try {
+        final homeDir = await getApplicationDocumentsDirectory();
+        // macOS的Downloads文件夹通常在用户主目录下
+        final downloadDir = Directory('${homeDir.path}/../Downloads');
+        if (await downloadDir.exists()) {
+          try {
+            // 测试权限
+            final testPath = '${downloadDir.path}/gtd_tmp_test.txt';
+            final testFile = File(testPath);
+            await testFile.writeAsString('test');
+            await testFile.delete();
+            return downloadDir;
+          } catch (e) {
+            print('Cannot write to macOS Downloads directory: $e');
+            // 失败时回退到文档目录
+            return await getApplicationDocumentsDirectory();
+          }
+        }
+        return await getApplicationDocumentsDirectory();
+      } catch (e) {
+        print('Error accessing macOS directories: $e');
+        return await getApplicationDocumentsDirectory();
+      }
     } else {
       // For other platforms, use the app documents directory
       return await getApplicationDocumentsDirectory();
@@ -1019,9 +1044,22 @@ class BackupHelper {
       if (selectedFilePath == null) {
         print('未提供文件路径，尝试使用文件选择器');
         try {
-          FilePickerResult? result = await FilePicker.platform.pickFiles(
-            type: FileType.any,
-          );
+          // 为macOS提供更多选项
+          FilePickerResult? result;
+          if (Platform.isMacOS) {
+            result = await FilePicker.platform.pickFiles(
+              type: FileType.custom,
+              allowedExtensions: ['db'],
+              allowMultiple: false,
+              dialogTitle: '选择数据库文件',
+              // macOS特定选项
+              lockParentWindow: true,
+            );
+          } else {
+            result = await FilePicker.platform.pickFiles(
+              type: FileType.any,
+            );
+          }
           
           if (result == null || result.files.isEmpty) {
             return BackupResult(success: false, message: '未选择数据库文件');
@@ -1081,8 +1119,41 @@ class BackupHelper {
           return BackupResult(success: false, message: '选择的数据库文件不存在');
         }
         
+        // 确保目标目录存在
+        final dbDir = Directory(path.dirname(dbPath));
+        if (!await dbDir.exists()) {
+          await dbDir.create(recursive: true);
+        }
+        
         print('正在复制数据库文件...');
-        await selectedFile.copy(dbPath);
+        print('源路径: ${selectedFile.path}');
+        print('目标路径: $dbPath');
+        
+        // 对于macOS，使用不同的复制方式
+        if (Platform.isMacOS) {
+          try {
+            final bytes = await selectedFile.readAsBytes();
+            await dbFile.writeAsBytes(bytes);
+            print('使用readAsBytes/writeAsBytes复制成功');
+          } catch (e) {
+            print('readAsBytes/writeAsBytes复制失败: $e，尝试其他方法');
+            
+            // 尝试备用方式
+            try {
+              // 读取并写入
+              final content = await selectedFile.readAsString();
+              await dbFile.writeAsString(content);
+              print('使用readAsString/writeAsString复制成功');
+            } catch (e2) {
+              print('所有复制方法失败: $e2');
+              throw Exception('无法复制数据库文件: $e2');
+            }
+          }
+        } else {
+          // 非macOS平台使用标准复制
+          await selectedFile.copy(dbPath);
+        }
+        
         print('数据库文件复制成功');
         
         // 重新打开数据库
@@ -1126,7 +1197,7 @@ class BackupHelper {
         message: '数据库导入成功，请重启应用以加载新数据',
       );
     } catch (e) {
-      print('导入数据库出现异常: $e');
+      print('导入数据库过程中出现异常: $e');
       return BackupResult(
         success: false,
         message: '导入数据库失败: $e',
