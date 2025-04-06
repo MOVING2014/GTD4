@@ -136,4 +136,4 @@ flutter_launcher_icons:
   windows:
     generate: false
   macos:
-    generate: false
+    generate: true
