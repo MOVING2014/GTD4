@@ -41,6 +41,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
     ).length;
   }
 
+  bool _isSameDay(DateTime? a, DateTime? b) {
+    if (a == null || b == null) {
+      return false;
+    }
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
   Widget _buildCustomDOWHeader(BuildContext context) {
     final theme = Theme.of(context);
     final taskProvider = Provider.of<TaskProvider>(context, listen: false);
@@ -219,42 +226,106 @@ class _CalendarScreenState extends State<CalendarScreen> {
           Expanded(
             child: Consumer<TaskProvider>(
               builder: (context, taskProvider, child) {
-                List<Task> tasksToDisplay = [];
+                List<Widget> displayItems = [];
                 String emptyListMessage = '没有任务';
+
+                // Helper function to add grouped tasks to displayItems
+                void addGroupToDisplayItems(String title, List<Task> tasks) {
+                  if (tasks.isNotEmpty) {
+                    displayItems.add(
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+                        child: Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface.withOpacity(0.7))),
+                      ),
+                    );
+                    for (final task in tasks) {
+                      displayItems.add(
+                        TaskListItem(
+                          task: task,
+                          onTaskChange: () => setState(() {}),
+                          // Consider hideProjectLabel for future tasks if list can be very long or grouped differently
+                        ),
+                      );
+                    }
+                  }
+                }
 
                 switch (_activeColumnType) {
                   case '过去':
-                    tasksToDisplay = taskProvider.overdueTasks
-                        .where((t) => taskProvider.showCompletedTasks || t.status != TaskStatus.completed).toList();
-                    emptyListMessage = '没有已逾期任务';
-                    break;
-                  case '今天':
-                  // For specific date columns, _activeColumnType will be like '24 周四'
-                  // So we need to handle these by checking if _activeColumnType is NOT '过去' or '将来'
-                  // The _selectedDay is already correctly set by the header tap for these.
-                    tasksToDisplay = taskProvider.getTasksForDate(_selectedDay)
-                        .where((t) => taskProvider.showCompletedTasks || t.status != TaskStatus.completed).toList();
-                    emptyListMessage = '${_formatChineseDate(_selectedDay).split(' - ').lastOrDefault('')} 没有任务';
-                    break;
-                  case '将来':
-                    final fourDaysAhead = DateTime.now().add(const Duration(days: 4));
-                    tasksToDisplay = taskProvider.allTasks
+                    final now = DateTime.now();
+                    final today = DateTime(now.year, now.month, now.day);
+                    final yesterday = today.subtract(const Duration(days: 1));
+                    final sevenDaysAgoBoundary = today.subtract(const Duration(days: 7));
+                    final thirtyDaysAgoBoundary = today.subtract(const Duration(days: 30));
+
+                    List<Task> allRelevantPastTasks = taskProvider.allTasks
                         .where((task) =>
                             (taskProvider.showCompletedTasks || task.status != TaskStatus.completed) &&
                             task.dueDate != null &&
-                            task.dueDate!.isAfter(fourDaysAhead)
+                            task.dueDate!.isBefore(today)
                         ).toList();
-                    tasksToDisplay.sort((a, b) => a.dueDate!.compareTo(b.dueDate!));
+                    allRelevantPastTasks.sort((a, b) => b.dueDate!.compareTo(a.dueDate!));
+
+                    List<Task> tasksForYesterday = allRelevantPastTasks.where((task) => _isSameDay(task.dueDate!, yesterday)).toList();
+                    List<Task> tasksForPastSevenDays = allRelevantPastTasks.where((task) =>
+                        !_isSameDay(task.dueDate!, yesterday) &&
+                        task.dueDate!.isAfter(sevenDaysAgoBoundary.subtract(const Duration(days: 1)))
+                    ).toList();
+                    List<Task> tasksForPastMonth = allRelevantPastTasks.where((task) =>
+                        task.dueDate!.isBefore(sevenDaysAgoBoundary) &&
+                        task.dueDate!.isAfter(thirtyDaysAgoBoundary.subtract(const Duration(days: 1)))
+                    ).toList();
+                    List<Task> tasksForEvenEarlier = allRelevantPastTasks.where((task) =>
+                        task.dueDate!.isBefore(thirtyDaysAgoBoundary)
+                    ).toList();
+
+                    addGroupToDisplayItems('昨天', tasksForYesterday);
+                    addGroupToDisplayItems('过去七天', tasksForPastSevenDays);
+                    addGroupToDisplayItems('过去一个月', tasksForPastMonth);
+                    addGroupToDisplayItems('更早', tasksForEvenEarlier);
+
+                    emptyListMessage = '没有已逾期任务';
+                    break;
+                  case '将来':
+                    final now = DateTime.now();
+                    final today = DateTime(now.year, now.month, now.day);
+                    // Start date for '将来' tasks is after the 4th explicitly shown day in header
+                    final effectiveFutureStartDate = today.add(const Duration(days: 5));
+                    // Boundary for 'next month' relative to today
+                    final nextMonthBoundary = today.add(const Duration(days: 30));
+
+                    List<Task> allRelevantFutureTasks = taskProvider.allTasks
+                        .where((task) =>
+                            (taskProvider.showCompletedTasks || task.status != TaskStatus.completed) &&
+                            task.dueDate != null &&
+                            !task.dueDate!.isBefore(effectiveFutureStartDate) // Due on or after effectiveFutureStartDate
+                        ).toList();
+                    allRelevantFutureTasks.sort((a, b) => a.dueDate!.compareTo(b.dueDate!)); // Nearest future first
+
+                    List<Task> tasksForNextMonth = allRelevantFutureTasks.where((task) =>
+                        !task.dueDate!.isAfter(nextMonthBoundary) // Due on or before nextMonthBoundary (from effective start)
+                    ).toList();
+                    List<Task> tasksForFurtherOut = allRelevantFutureTasks.where((task) =>
+                        task.dueDate!.isAfter(nextMonthBoundary) // Due after nextMonthBoundary
+                    ).toList();
+
+                    addGroupToDisplayItems('未来一个月', tasksForNextMonth);
+                    addGroupToDisplayItems('更远', tasksForFurtherOut);
+
                     emptyListMessage = '未来没有任务';
                     break;
-                  default: // Handles specific date columns like '24 周四' etc.
-                     tasksToDisplay = taskProvider.getTasksForDate(_selectedDay)
+                  case '今天':
+                  default:
+                    final dateTasks = taskProvider.getTasksForDate(_selectedDay)
                         .where((t) => taskProvider.showCompletedTasks || t.status != TaskStatus.completed).toList();
-                    emptyListMessage = '${_formatChineseDate(_selectedDay).split(' - ').lastOrDefault('')} 没有任务';
+                    for (final task in dateTasks) {
+                      displayItems.add(TaskListItem(task: task, onTaskChange: () => setState(() {})));
+                    }
+                    emptyListMessage = '${_activeColumnType == '今天' ? _formatChineseDate(_selectedDay).split(' - ').lastOrDefault('') : _activeColumnType} 没有任务';
                     break;
                 }
 
-                if (tasksToDisplay.isEmpty) {
+                if (displayItems.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -278,14 +349,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 }
                 
                 return ListView.builder(
-                  itemCount: tasksToDisplay.length,
+                  itemCount: displayItems.length,
                   itemBuilder: (context, index) {
-                    final task = tasksToDisplay[index];
-                    return TaskListItem(
-                      task: task,
-                      onTaskChange: () => setState(() {}),
-                      hideProjectLabel: _activeColumnType == '将来',
-                    );
+                    return displayItems[index];
                   },
                 );
               },
