@@ -19,6 +19,46 @@ class _CalendarScreenState extends State<CalendarScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
 
+  // Helper method to determine the starting day of the week
+  StartingDayOfWeek _getStartingDayOfWeek() {
+    final today = DateTime.now();
+    // We want today to be the 3rd day (index 2).
+    // DateTime.weekday: Monday (1) ... Sunday (7)
+    // StartingDayOfWeek: monday (0) ... sunday (6) (based on enum order)
+    // Calculation: (today.weekday - 1 - 2 + 7) % 7
+    // Example: Today is Wednesday (weekday=3) -> (3 - 1 - 2 + 7) % 7 = (0 + 7) % 7 = 0 (Monday)
+    //          Monday, Tuesday, Wednesday (3rd day) -> Correct
+    // Example: Today is Sunday (weekday=7) -> (7 - 1 - 2 + 7) % 7 = (4 + 7) % 7 = 4 (Friday)
+    //          Friday, Saturday, Sunday (3rd day) -> Correct
+    // Example: Today is Monday (weekday=1) -> (1 - 1 - 2 + 7) % 7 = (-2 + 7) % 7 = 5 (Saturday)
+    //          Saturday, Sunday, Monday (3rd day) -> Correct
+
+    int dayOffset = 2; // Today should be the 3rd position (0-indexed)
+    // Adjust weekday to be 0-indexed (Monday=0, ..., Sunday=6) to align with StartingDayOfWeek enum indices
+    int currentWeekdayZeroIndexed = today.weekday - 1; 
+    
+    int startingDayIndex = (currentWeekdayZeroIndexed - dayOffset + 7) % 7;
+
+    switch (startingDayIndex) {
+      case 0:
+        return StartingDayOfWeek.monday;
+      case 1:
+        return StartingDayOfWeek.tuesday;
+      case 2:
+        return StartingDayOfWeek.wednesday;
+      case 3:
+        return StartingDayOfWeek.thursday;
+      case 4:
+        return StartingDayOfWeek.friday;
+      case 5:
+        return StartingDayOfWeek.saturday;
+      case 6:
+        return StartingDayOfWeek.sunday;
+      default: // Should not happen
+        return StartingDayOfWeek.monday; 
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final taskProvider = Provider.of<TaskProvider>(context);
@@ -75,6 +115,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
             lastDay: DateTime.utc(2030, 12, 31),
             focusedDay: _focusedDay,
             calendarFormat: _calendarFormat,
+            startingDayOfWeek: _getStartingDayOfWeek(),
+            daysOfWeekHeight: 22.0, // Explicitly set DOW height
             selectedDayPredicate: (day) {
               // 排除当天，让 todayBuilder 完全控制今天的样式
               return isSameDay(_selectedDay, day) && !isSameDay(day, DateTime.now());
@@ -94,9 +136,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
               _focusedDay = focusedDay;
             },
             calendarStyle: CalendarStyle(
-              // 适配暗黑模式的日历样式
               todayDecoration: BoxDecoration(
-                shape: BoxShape.circle,
+                shape: BoxShape.rectangle,
                 color: Colors.transparent,
                 // 确保内置的今天装饰完全透明
                 border: Border.all(color: Colors.transparent, width: 0),
@@ -107,7 +148,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 fontSize: 16.0,
               ),
               selectedDecoration: const BoxDecoration(
-                shape: BoxShape.circle,
+                shape: BoxShape.rectangle,
                 color: Colors.transparent,
               ),
               selectedTextStyle: TextStyle(
@@ -153,14 +194,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       color: theme.colorScheme.primary,
                       shape: BoxShape.circle,
                     ),
-                    width: 13,
-                    height: 13,
+                    width: 15,
+                    height: 15,
                     child: Center(
                       child: Text(
                         uncompletedTasks.length.toString(),
                         style: TextStyle(
                           color: theme.colorScheme.onPrimary,
-                          fontSize: 8,
+                          fontSize: 9,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -175,11 +216,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 
                 return Center(
                   child: Container(
-                    height: 36,
-                    width: 36,
+                    width: 40,
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      // 使用淡绿色代替淡橙色，透明度为0.3
+                      shape: BoxShape.rectangle,
+                      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(6.0)),
                       color: isDarkMode 
                           ? Colors.green.shade100.withOpacity(0.3) 
                           : Colors.red.shade100.withOpacity(0.3),
@@ -205,10 +245,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 
                 return Center(
                   child: Container(
-                    height: 36,
-                    width: 36,
+                    width: 40,
                     decoration: BoxDecoration(
-                      shape: BoxShape.circle,
+                      shape: BoxShape.rectangle,
+                      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(6.0)),
                       color: theme.colorScheme.primary.withOpacity(0.2),
                     ),
                     child: Center(
@@ -226,15 +266,80 @@ class _CalendarScreenState extends State<CalendarScreen> {
               },
               // 自定义星期几的标题
               dowBuilder: (context, day) {
-                final text = const ['日', '一', '二', '三', '四', '五', '六'][day.weekday % 7];
-                return Center(
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                      color: theme.colorScheme.onSurface.withOpacity(0.8),
-                    ),
+                final String baseDowText = const ['日', '一', '二', '三', '四', '五', '六'][day.weekday % 7];
+                String dowDisplayText = baseDowText;
+                double fontSize = 12.0;
+
+                final now = DateTime.now();
+                final todayDate = DateTime(now.year, now.month, now.day);
+                final tomorrowDate = todayDate.add(const Duration(days: 1));
+                final yesterdayDate = todayDate.subtract(const Duration(days: 1));
+
+                bool isTodayColumn = isSameDay(day, todayDate);
+                bool isSelectedColumn = isSameDay(day, _selectedDay) && !isTodayColumn;
+
+                // Determine DOW display text and base font size
+                if (isTodayColumn) {
+                  dowDisplayText = '$baseDowText 今天';
+                  fontSize = 10.0;
+                } else if (isSameDay(day, yesterdayDate)) {
+                  dowDisplayText = '$baseDowText 昨天';
+                  fontSize = 10.0;
+                } else if (isSameDay(day, tomorrowDate)) {
+                  dowDisplayText = '$baseDowText 明天';
+                  fontSize = 10.0;
+                }
+
+                BoxDecoration? stripDecoration;
+                Color dowTextColor;
+                FontWeight dowFontWeight;
+
+                if (isTodayColumn) {
+                  stripDecoration = BoxDecoration(
+                    color: isDarkMode
+                        ? Colors.green.shade100.withOpacity(0.3)
+                        : Colors.red.shade100.withOpacity(0.3),
+                    shape: BoxShape.rectangle,
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(6.0)),
+                  );
+                  dowTextColor = theme.colorScheme.primary;
+                  dowFontWeight = FontWeight.bold;
+                } else if (isSelectedColumn) {
+                  stripDecoration = BoxDecoration(
+                    color: theme.colorScheme.primary.withOpacity(0.2),
+                    shape: BoxShape.rectangle,
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(6.0)),
+                  );
+                  dowTextColor = theme.colorScheme.primary;
+                  dowFontWeight = FontWeight.bold;
+                } else {
+                  // Default style for DOW text when not in an active column
+                  dowTextColor = theme.colorScheme.onSurface.withOpacity(0.8);
+                  dowFontWeight = FontWeight.normal;
+                }
+
+                Widget dowTextWidget = Text(
+                  dowDisplayText,
+                  style: TextStyle(
+                    color: dowTextColor,
+                    fontSize: fontSize,
+                    fontWeight: dowFontWeight,
                   ),
                 );
+
+                if (stripDecoration != null) {
+                  // Active column: DOW text inside a 36px wide colored strip
+                  return Center(
+                    child: Container(
+                      width: 40,
+                      decoration: stripDecoration,
+                      child: Center(child: dowTextWidget),
+                    ),
+                  );
+                } else {
+                  // Inactive column: DOW text centered in the cell
+                  return Center(child: dowTextWidget);
+                }
               },
               // 自定义月份标题显示
               headerTitleBuilder: (context, month) {
@@ -260,12 +365,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
             // 设置月份格式
             headerStyle: HeaderStyle(
               formatButtonVisible: true,
+              headerPadding: const EdgeInsets.symmetric(vertical: 6.0),
               formatButtonDecoration: BoxDecoration(
                 border: Border.all(color: theme.colorScheme.onSurface.withOpacity(0.5)),
-                borderRadius: BorderRadius.circular(16.0),
+                borderRadius: BorderRadius.circular(20.0),
               ),
               formatButtonTextStyle: TextStyle(color: theme.colorScheme.onSurface),
-              formatButtonPadding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+              formatButtonPadding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 3.0),
               // 调整标题颜色
               titleTextStyle: TextStyle(
                 color: theme.colorScheme.onSurface,
@@ -276,23 +382,23 @@ class _CalendarScreenState extends State<CalendarScreen> {
               leftChevronIcon: Icon(
                 Icons.chevron_left,
                 color: theme.colorScheme.onSurface,
+                size: 28.0,
               ),
               rightChevronIcon: Icon(
                 Icons.chevron_right,
                 color: theme.colorScheme.onSurface,
+                size: 28.0,
               ),
             ),
-            // 不设置国际化locale，但自定义显示元素
-            startingDayOfWeek: StartingDayOfWeek.monday,
           ),
           
-          // 添加分割线
+          // Re-adding a subtle divider
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            padding: const EdgeInsets.only(bottom: 8.0), // Space below the divider
             child: Divider(
-              height: 0,
-              thickness: 3.0,
-              color: theme.colorScheme.onSurface.withOpacity(0.2),
+              height: 0, // No extra space taken by the Divider widget itself
+              thickness: 0.5, // Very thin line
+              color: theme.colorScheme.onSurface.withOpacity(0.15), // Subtle color
               indent: 16.0,
               endIndent: 16.0,
             ),
