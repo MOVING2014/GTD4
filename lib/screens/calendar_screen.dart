@@ -90,7 +90,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     });
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+      padding: const EdgeInsets.only(top: 8.0, left: 4.0, right: 4.0, bottom: 0.0),
       child: Row(
         children: headerItems.map((item) {
           final String itemId = item['id']! as String;
@@ -118,7 +118,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 });
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 2.0),
+                padding: const EdgeInsets.only(top: 2.0, bottom: 6.0, left: 2.0, right: 2.0),
                 decoration: BoxDecoration(
                   color: isActiveColumn ? theme.colorScheme.onSurface.withOpacity(0.08) : null,
                   border: Border(top: BorderSide(
@@ -133,7 +133,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       item['label_top']! as String,
                       style: TextStyle(
                         fontWeight: labelTopFontWeight,
-                        fontSize: 13,
+                        fontSize: 11,
                         color: labelTopColor,
                       ),
                     ),
@@ -200,10 +200,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildCustomDOWHeader(context),
+          Divider(
+            height: 0,
+            thickness: 0.5,
+            color: theme.colorScheme.onSurface.withOpacity(0.15),
+          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
             child: Text(
-              _formatChineseDate(_selectedDay),
+              _activeColumnType == '过去' ? '已逾期任务' : _activeColumnType == '将来' ? '未来任务' : _formatChineseDate(_selectedDay),
               style: TextStyle(
                 fontSize: 18.0,
                 fontWeight: FontWeight.bold,
