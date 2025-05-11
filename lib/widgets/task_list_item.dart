@@ -45,8 +45,8 @@ class _TaskListItemState extends State<TaskListItem> {
         motion: const ScrollMotion(),
         children: [
           CustomSlidableAction(
-            onPressed: (context) {
-              _toggleTaskPriority(taskProvider);
+            onPressed: (context) async {
+              await _toggleTaskPriority(taskProvider);
             },
             backgroundColor: widget.task.priority == TaskPriority.medium ? Colors.grey : Colors.orange,
             foregroundColor: Colors.white,
@@ -62,8 +62,8 @@ class _TaskListItemState extends State<TaskListItem> {
             ),
           ),
           CustomSlidableAction(
-            onPressed: (context) {
-              _delayTaskToday(taskProvider);
+            onPressed: (context) async {
+              await _delayTaskToday(taskProvider);
             },
             backgroundColor: Colors.blue,
             foregroundColor: Colors.white,
@@ -78,8 +78,8 @@ class _TaskListItemState extends State<TaskListItem> {
             ),
           ),
           CustomSlidableAction(
-            onPressed: (context) {
-              _delayTaskTomorrow(taskProvider);
+            onPressed: (context) async {
+              await _delayTaskTomorrow(taskProvider);
             },
             backgroundColor: Colors.teal,
             foregroundColor: Colors.white,
@@ -94,8 +94,8 @@ class _TaskListItemState extends State<TaskListItem> {
             ),
           ),
           CustomSlidableAction(
-            onPressed: (context) {
-              _delayTaskNextWeek(taskProvider);
+            onPressed: (context) async {
+              await _delayTaskNextWeek(taskProvider);
             },
             backgroundColor: Colors.indigo,
             foregroundColor: Colors.white,
@@ -110,8 +110,8 @@ class _TaskListItemState extends State<TaskListItem> {
             ),
           ),
           CustomSlidableAction(
-            onPressed: (context) {
-              _delayTaskNextMonth(taskProvider);
+            onPressed: (context) async {
+              await _delayTaskNextMonth(taskProvider);
             },
             backgroundColor: Colors.purple,
             foregroundColor: Colors.white,
@@ -438,7 +438,7 @@ class _TaskListItemState extends State<TaskListItem> {
   }
   
   // 将任务延期到今天
-  void _delayTaskToday(TaskProvider taskProvider) {
+  Future<void> _delayTaskToday(TaskProvider taskProvider) async {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     
@@ -448,7 +448,7 @@ class _TaskListItemState extends State<TaskListItem> {
     );
     
     // 更新任务
-    taskProvider.updateTask(updatedTask);
+    await taskProvider.updateTask(updatedTask);
     
     // 通知UI更新
     if (widget.onTaskChange != null) {
@@ -456,13 +456,15 @@ class _TaskListItemState extends State<TaskListItem> {
     }
     
     // 显示提示
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('任务已设置为今天到期')),
-    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('任务已设置为今天到期')),
+      );
+    }
   }
   
   // 将任务延期到明天
-  void _delayTaskTomorrow(TaskProvider taskProvider) {
+  Future<void> _delayTaskTomorrow(TaskProvider taskProvider) async {
     final now = DateTime.now();
     final tomorrow = DateTime(now.year, now.month, now.day + 1);
     
@@ -472,7 +474,7 @@ class _TaskListItemState extends State<TaskListItem> {
     );
     
     // 更新任务
-    taskProvider.updateTask(updatedTask);
+    await taskProvider.updateTask(updatedTask);
     
     // 通知UI更新
     if (widget.onTaskChange != null) {
@@ -480,13 +482,15 @@ class _TaskListItemState extends State<TaskListItem> {
     }
     
     // 显示提示
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('任务已设置为明天到期')),
-    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('任务已设置为明天到期')),
+      );
+    }
   }
   
   // 将任务延期到下周
-  void _delayTaskNextWeek(TaskProvider taskProvider) {
+  Future<void> _delayTaskNextWeek(TaskProvider taskProvider) async {
     final now = DateTime.now();
     final nextWeek = DateTime(now.year, now.month, now.day + 7);
     
@@ -496,7 +500,7 @@ class _TaskListItemState extends State<TaskListItem> {
     );
     
     // 更新任务
-    taskProvider.updateTask(updatedTask);
+    await taskProvider.updateTask(updatedTask);
     
     // 通知UI更新
     if (widget.onTaskChange != null) {
@@ -504,13 +508,15 @@ class _TaskListItemState extends State<TaskListItem> {
     }
     
     // 显示提示
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('任务已设置为下周到期')),
-    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('任务已设置为下周到期')),
+      );
+    }
   }
   
   // 将任务延期到下月
-  void _delayTaskNextMonth(TaskProvider taskProvider) {
+  Future<void> _delayTaskNextMonth(TaskProvider taskProvider) async {
     final now = DateTime.now();
     // 如果当前是12月，则下个月是下一年的1月
     int nextYear = now.month == 12 ? now.year + 1 : now.year;
@@ -531,7 +537,7 @@ class _TaskListItemState extends State<TaskListItem> {
     );
     
     // 更新任务
-    taskProvider.updateTask(updatedTask);
+    await taskProvider.updateTask(updatedTask);
     
     // 通知UI更新
     if (widget.onTaskChange != null) {
@@ -539,13 +545,15 @@ class _TaskListItemState extends State<TaskListItem> {
     }
     
     // 显示提示
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('任务已设置为下月到期')),
-    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('任务已设置为下月到期')),
+      );
+    }
   }
 
   // 切换任务优先级
-  void _toggleTaskPriority(TaskProvider taskProvider) {
+  Future<void> _toggleTaskPriority(TaskProvider taskProvider) async {
     // 在高优先级和无优先级之间切换
     final newPriority = widget.task.priority == TaskPriority.medium
         ? TaskPriority.none
@@ -557,7 +565,7 @@ class _TaskListItemState extends State<TaskListItem> {
     );
     
     // 更新任务
-    taskProvider.updateTask(updatedTask);
+    await taskProvider.updateTask(updatedTask);
     
     // 通知UI更新
     if (widget.onTaskChange != null) {
@@ -565,11 +573,13 @@ class _TaskListItemState extends State<TaskListItem> {
     }
     
     // 显示提示
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(newPriority == TaskPriority.medium ? '任务已标记为优先' : '已取消任务优先级标记'),
-        duration: const Duration(seconds: 1),
-      ),
-    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(newPriority == TaskPriority.medium ? '任务已标记为优先' : '已取消任务优先级标记'),
+          duration: const Duration(seconds: 1),
+        ),
+      );
+    }
   }
 } 

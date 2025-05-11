@@ -26,14 +26,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   // Helper to get uncompleted tasks for a specific date
-  int _getUncompletedTasksForDate(BuildContext context, DateTime date) {
-    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+  int _getUncompletedTasksForDate(TaskProvider taskProvider, DateTime date) {
     return taskProvider.getTasksForDate(date).where((task) => task.status != TaskStatus.completed).length;
   }
 
   // Helper to get uncompleted tasks due after a specific future date
-  int _getUncompletedFurtherFutureTasks(BuildContext context, DateTime afterDate) {
-    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+  int _getUncompletedFurtherFutureTasks(TaskProvider taskProvider, DateTime afterDate) {
     return taskProvider.allTasks.where((task) =>
         task.status != TaskStatus.completed &&
         task.dueDate != null &&
@@ -48,9 +46,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
-  Widget _buildCustomDOWHeader(BuildContext context) {
+  Widget _buildCustomDOWHeader(BuildContext context, TaskProvider taskProvider) {
     final theme = Theme.of(context);
-    final taskProvider = Provider.of<TaskProvider>(context, listen: false);
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -70,7 +67,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     headerItems.add({
       'id': '今天',
       'label_top': '今天',
-      'label_bottom': _getUncompletedTasksForDate(context, today).toString(),
+      'label_bottom': _getUncompletedTasksForDate(taskProvider, today).toString(),
       'target_day': today,
       'is_today_column': true,
     });
@@ -82,7 +79,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       headerItems.add({
         'id': label, // Use the label as a unique ID for these columns
         'label_top': label,
-        'label_bottom': _getUncompletedTasksForDate(context, date).toString(),
+        'label_bottom': _getUncompletedTasksForDate(taskProvider, date).toString(),
         'target_day': date,
       });
     }
@@ -92,7 +89,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     headerItems.add({
       'id': '将来',
       'label_top': '将来',
-      'label_bottom': _getUncompletedFurtherFutureTasks(context, fourDaysAhead).toString(),
+      'label_bottom': _getUncompletedFurtherFutureTasks(taskProvider, fourDaysAhead).toString(),
       'target_day': today.add(const Duration(days: 5)), // Focus day after the 4 explicitly shown
     });
 
@@ -206,7 +203,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildCustomDOWHeader(context),
+          Consumer<TaskProvider>(
+            builder: (context, taskProvider, child) {
+              return _buildCustomDOWHeader(context, taskProvider);
+            },
+          ),
           Divider(
             height: 0,
             thickness: 0.5,
