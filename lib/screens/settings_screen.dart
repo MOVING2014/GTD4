@@ -4,9 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 import '../utils/backup_helper.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'dart:io' show Platform;
-import '../models/task.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});

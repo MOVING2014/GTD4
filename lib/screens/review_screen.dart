@@ -65,70 +65,79 @@ class _ReviewScreenState extends State<ReviewScreen> {
             ),
           )
         : Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 项目选择区域
-              Container(
-                padding: const EdgeInsets.all(16),
-                color: Colors.grey.withOpacity(0.1),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '选择需要回顾的项目:',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    DropdownButtonFormField<Project>(
-                      value: _selectedProject,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        hintText: '选择项目',
-                      ),
-                      items: projectsToReview.map((project) {
-                        return DropdownMenuItem<Project>(
-                          value: project,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.library_books, color: project.color),
-                              const SizedBox(width: 8),
-                              Flexible(
-                                child: Text(
-                                  project.name,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Icon(Icons.access_time, size: 16),
-                              Text(
-                                _getLastReviewText(project),
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (Project? project) {
-                        setState(() {
-                          _selectedProject = project;
-                        });
-                      },
-                    ),
-                  ],
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: Text(
+                  '选择需要回顾的项目:',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
               ),
-              
-              // 未完成任务列表
+              SizedBox(
+                height: 80,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  itemCount: projectsToReview.length,
+                  itemBuilder: (context, index) {
+                    final project = projectsToReview[index];
+                    final isSelected = _selectedProject?.id == project.id;
+                    return SizedBox(
+                      width: 200,
+                      child: Card(
+                        elevation: 1.0,
+                        margin: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
+                        clipBehavior: Clip.antiAlias,
+                        color: isSelected
+                            ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5)
+                            : Theme.of(context).cardColor,
+                        child: Theme(
+                          data: Theme.of(context).copyWith(
+                            splashFactory: NoSplash.splashFactory,
+                            highlightColor: Colors.transparent,
+                          ),
+                          child: ListTile(
+                            leading: Icon(Icons.library_books, color: project.color),
+                            title: Text(
+                              project.name,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              ),
+                            ),
+                            subtitle: Text(
+                              _getLastReviewText(project),
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: isSelected
+                                  ? Theme.of(context).colorScheme.onPrimaryContainer
+                                  : Colors.grey,
+                              ),
+                            ),
+                            selected: isSelected,
+                            onTap: () {
+                              setState(() {
+                                _selectedProject = project;
+                              });
+                            },
+                            trailing: isSelected ? const Icon(Icons.check_circle, color: Colors.green) : null,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const Divider(height: 20, thickness: 1),
               if (_selectedProject != null) ...[
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
                     children: [
                       Expanded(
@@ -154,7 +163,6 @@ class _ReviewScreenState extends State<ReviewScreen> {
                 Expanded(
                   child: _buildTaskList(taskProvider),
                 ),
-                // 回顾完成按钮
                 SafeArea(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -171,9 +179,24 @@ class _ReviewScreenState extends State<ReviewScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        onPressed: () {
-                          _markProjectAsReviewed(context);
-                        },
+                        onPressed: _selectedProject == null
+                            ? null
+                            : () {
+                                _markProjectAsReviewed(context);
+                              },
+                      ),
+                    ),
+                  ),
+                ),
+              ] else ...[
+                const Expanded(
+                  child: Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(32.0),
+                      child: Text(
+                        '请先从上方列表选择一个项目进行回顾',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                     ),
                   ),
@@ -224,19 +247,33 @@ class _ReviewScreenState extends State<ReviewScreen> {
   
   String _getLastReviewText(Project project) {
     if (project.lastReviewDate == null) {
-      return ' 从未回顾';
+      return '从未回顾';
     }
     
     final now = DateTime.now();
     final difference = now.difference(project.lastReviewDate!);
     
     if (difference.inDays < 1) {
-      return ' 今天回顾';
+      final reviewTime = project.lastReviewDate!;
+      final todayStart = DateTime(now.year, now.month, now.day);
+      if (reviewTime.isAfter(todayStart)) {
+        return '今天已回顾';
+      } else {
+        return '昨天回顾';
+      }
+    } else if (difference.inDays == 1) {
+       final reviewTime = project.lastReviewDate!;
+       final yesterdayStart = DateTime(now.year, now.month, now.day - 1);
+       if (reviewTime.isAfter(yesterdayStart)) {
+          return '昨天回顾';
+       } else {
+         return '2 天前回顾';
+       }
     } else if (difference.inDays < 30) {
-      return ' ${difference.inDays}天前回顾';
+      return '${difference.inDays} 天前回顾';
     } else {
       final months = (difference.inDays / 30).floor();
-      return ' $months个月前回顾';
+      return '$months 个月前回顾';
     }
   }
   
@@ -279,7 +316,6 @@ class _ReviewScreenState extends State<ReviewScreen> {
               Navigator.of(ctx).pop();
               
               setState(() {
-                // 清除选中的项目，以便用户选择下一个
                 _selectedProject = null;
               });
               
@@ -303,6 +339,18 @@ class _ReviewScreenState extends State<ReviewScreen> {
         .where((p) => p.needsMonthlyReview && p.status == ProjectStatus.active)
         .toList();
     
+    allProjects.sort((a, b) {
+      final aNeedsReview = a.needsReview;
+      final bNeedsReview = b.needsReview;
+      
+      if (aNeedsReview && !bNeedsReview) return -1;
+      if (!aNeedsReview && bNeedsReview) return 1;
+      
+      final dateA = a.lastReviewDate ?? DateTime(1970);
+      final dateB = b.lastReviewDate ?? DateTime(1970);
+      return dateA.compareTo(dateB);
+    });
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
