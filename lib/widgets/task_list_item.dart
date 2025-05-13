@@ -193,23 +193,20 @@ class _TaskListItemState extends State<TaskListItem> {
               }
             },
             child: Container(
-              // 设置最小高度，确保卡片有一个固定的最小高度
-              constraints: const BoxConstraints(
-                minHeight: 64, // 最小高度改为64像素
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+              // 减少垂直内边距
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // 标题行 - 包含复选框和标题在一行
-                  SizedBox(
-                    height: 26, // 固定高度确保标题不移动
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // 复选框
-                        SizedBox(
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 复选框
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2.0),
+                        child: SizedBox(
                           width: 24,
                           height: 24,
                           child: Center(
@@ -247,32 +244,40 @@ class _TaskListItemState extends State<TaskListItem> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        // 标题和备注开关按钮
-                        Expanded(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  widget.task.title,
-                                  style: TextStyle(
-                                    decoration: widget.task.status == TaskStatus.completed 
-                                        ? TextDecoration.lineThrough 
-                                        : null,
-                                    // 适配暗黑模式的任务标题文字颜色
-                                    color: widget.task.status == TaskStatus.completed 
-                                        ? theme.colorScheme.onSurface.withOpacity(0.6)
-                                        : isDarkMode 
-                                            ? Colors.white // 在暗黑模式下使用纯白色
-                                            : theme.colorScheme.onSurface,
-                                    fontSize: 18.0,
-                                  ),
+                      ),
+                      const SizedBox(width: 8),
+                      // 标题和备注开关按钮
+                      Expanded(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                widget.task.title,
+                                style: TextStyle(
+                                  decoration: widget.task.status == TaskStatus.completed 
+                                      ? TextDecoration.lineThrough 
+                                      : null,
+                                  // 适配暗黑模式的任务标题文字颜色
+                                  color: widget.task.status == TaskStatus.completed 
+                                      ? theme.colorScheme.onSurface.withOpacity(0.6)
+                                      : isDarkMode 
+                                          ? Colors.white // 在暗黑模式下使用纯白色
+                                          : theme.colorScheme.onSurface,
+                                  fontSize: 18.0,
+                                  fontWeight: widget.task.status == TaskStatus.completed 
+                                      ? FontWeight.normal
+                                      : FontWeight.normal,
                                 ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              // 备注开关按钮
-                              if (widget.task.notes != null && widget.task.notes!.isNotEmpty)
-                                InkWell(
+                            ),
+                            // 备注开关按钮
+                            if (widget.task.notes != null && widget.task.notes!.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 2.0),
+                                child: InkWell(
                                   borderRadius: BorderRadius.circular(16),
                                   onTap: () {
                                     setState(() {
@@ -293,11 +298,11 @@ class _TaskListItemState extends State<TaskListItem> {
                                     ),
                                   ),
                                 ),
-                            ],
-                          ),
+                              ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                   
                   // 备注部分 - 简单显示，无动画
@@ -313,13 +318,11 @@ class _TaskListItemState extends State<TaskListItem> {
                       ),
                     ),
                   
-                  // 子标题区域 - 固定高度确保稳定布局
-                  SizedBox(
-                    height: 20,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 36.0, top: 2.0),
-                      child: _buildSubtitle(project),
-                    ),
+                  // 子标题区域 - 移除固定高度的 SizedBox
+                  Padding(
+                    // 保留左侧内边距用于对齐
+                    padding: const EdgeInsets.only(left: 36.0), 
+                    child: _buildSubtitle(project),
                   ),
                 ],
               ),
