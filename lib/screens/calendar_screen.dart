@@ -14,8 +14,8 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
-  DateTime _focusedDay = DateTime.now();
   DateTime _selectedDay = DateTime.now();
+  DateTime _focusedDay = DateTime.now();
   String _activeColumnType = '今天';
 
   @override
@@ -110,7 +110,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           } else if (isActiveColumn) {
             labelTopColor = theme.colorScheme.primary;
           } else {
-            labelTopColor = theme.colorScheme.onSurface.withOpacity(0.85);
+            labelTopColor = theme.colorScheme.onSurface.withValues(alpha: 0.85);
           }
           return Expanded(
             child: InkWell(
@@ -124,9 +124,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
               child: Container(
                 padding: const EdgeInsets.only(top: 2.0, bottom: 6.0, left: 2.0, right: 2.0),
                 decoration: BoxDecoration(
-                  color: isActiveColumn ? theme.colorScheme.onSurface.withOpacity(0.08) : null,
+                  color: isActiveColumn ? theme.colorScheme.onSurface.withValues(alpha: 0.08) : null,
                   border: Border(top: BorderSide(
-                    color: isActiveColumn ? theme.colorScheme.onSurface.withOpacity(0.5) : Colors.transparent,
+                    color: isActiveColumn ? theme.colorScheme.onSurface.withValues(alpha: 0.5) : Colors.transparent,
                     width: 2.0
                   )),
                 ),
@@ -150,10 +150,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         color: isPastColumn
                             ? Colors.red.shade400
                             : (isTodayColumn && item['label_bottom']! as String == '0')
-                                ? theme.colorScheme.onSurface.withOpacity(0.3)
+                                ? theme.colorScheme.onSurface.withValues(alpha: 0.3)
                                 : (isActiveColumn
-                                    ? theme.colorScheme.primary.withOpacity(0.9)
-                                    : theme.colorScheme.onSurface.withOpacity(isTodayColumn ? 0.7 : 0.6)),
+                                    ? theme.colorScheme.primary.withValues(alpha: 0.9)
+                                    : theme.colorScheme.onSurface.withValues(alpha: isTodayColumn ? 0.7 : 0.6)),
                       ),
                     ),
                   ],
@@ -188,7 +188,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     ? Icons.check_circle_outline 
                     : Icons.check_circle,
                 color: taskProvider.showCompletedTasks 
-                    ? theme.colorScheme.onSurface.withOpacity(0.5) 
+                    ? theme.colorScheme.onSurface.withValues(alpha: 0.5) 
                     : Colors.green,
               ),
               tooltip: taskProvider.showCompletedTasks ? '隐藏已完成任务' : '显示已完成任务',
@@ -211,7 +211,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
           Divider(
             height: 0,
             thickness: 0.5,
-            color: theme.colorScheme.onSurface.withOpacity(0.15),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.15),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
@@ -236,7 +236,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     displayItems.add(
                       Padding(
                         padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
-                        child: Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface.withOpacity(0.7))),
+                        child: Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
                       ),
                     );
                     for (final task in tasks) {
@@ -334,13 +334,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         Icon(
                           Icons.event_note,
                           size: 64,
-                          color: theme.colorScheme.onSurface.withOpacity(0.2),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
                         ),
                         const SizedBox(height: 16),
                         Text(
                           emptyListMessage,
                           style: TextStyle(
-                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                             fontSize: 16,
                           ),
                         ),

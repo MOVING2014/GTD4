@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:collection/collection.dart';
 import '../models/project.dart';
 import '../data/database_helper.dart';
 import '../screens/projects_screen.dart'; // 导入 ProjectFilter 枚举
@@ -178,7 +179,12 @@ class ProjectProvider with ChangeNotifier {
   
   // Toggle project completion status
   Future<void> toggleProjectCompletion(String projectId) async {
-    final project = _projects.firstWhere((project) => project.id == projectId);
+    final project = _projects.firstWhereOrNull((project) => project.id == projectId);
+    if (project == null) {
+      // Project not found, return early
+      return;
+    }
+    
     final newStatus = project.status == ProjectStatus.completed 
         ? ProjectStatus.active 
         : ProjectStatus.completed;
@@ -194,7 +200,12 @@ class ProjectProvider with ChangeNotifier {
   
   // Archive a project
   Future<void> archiveProject(String projectId) async {
-    final project = _projects.firstWhere((project) => project.id == projectId);
+    final project = _projects.firstWhereOrNull((project) => project.id == projectId);
+    if (project == null) {
+      // Project not found, return early
+      return;
+    }
+    
     final updatedProject = project.copyWith(status: ProjectStatus.archived);
     
     await _dbHelper.updateProject(updatedProject);
@@ -213,7 +224,12 @@ class ProjectProvider with ChangeNotifier {
   
   // 设置项目回顾属性
   Future<void> setProjectReviewStatus(String projectId, bool needsReview) async {
-    final project = _projects.firstWhere((project) => project.id == projectId);
+    final project = _projects.firstWhereOrNull((project) => project.id == projectId);
+    if (project == null) {
+      // Project not found, return early
+      return;
+    }
+    
     final updatedProject = project.copyWith(needsMonthlyReview: needsReview);
     
     await _dbHelper.updateProject(updatedProject);
@@ -222,7 +238,12 @@ class ProjectProvider with ChangeNotifier {
   
   // 标记项目已回顾
   Future<void> markProjectAsReviewed(String projectId) async {
-    final project = _projects.firstWhere((project) => project.id == projectId);
+    final project = _projects.firstWhereOrNull((project) => project.id == projectId);
+    if (project == null) {
+      // Project not found, return early
+      return;
+    }
+    
     final updatedProject = project.copyWith(lastReviewDate: DateTime.now());
     
     await _dbHelper.updateProject(updatedProject);

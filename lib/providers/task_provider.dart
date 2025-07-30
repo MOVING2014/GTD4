@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:collection/collection.dart';
 import '../models/task.dart';
 import '../data/database_helper.dart';
 
@@ -162,7 +163,12 @@ class TaskProvider with ChangeNotifier {
   
   // Toggle task completion status
   Future<void> toggleTaskCompletion(String taskId) async {
-    final task = _tasks.firstWhere((task) => task.id == taskId);
+    final task = _tasks.firstWhereOrNull((task) => task.id == taskId);
+    if (task == null) {
+      // Task not found, return early
+      return;
+    }
+    
     final newStatus = task.status == TaskStatus.completed 
         ? TaskStatus.notStarted 
         : TaskStatus.completed;

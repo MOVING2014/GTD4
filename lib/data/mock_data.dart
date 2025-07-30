@@ -5,8 +5,6 @@ import '../models/project.dart';
 class MockData {
   // Generate demo projects
   static List<Project> getDemoProjects() {
-    final now = DateTime.now();
-    
     return [
       Project(
         id: 'p1',

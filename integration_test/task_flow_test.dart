@@ -11,7 +11,7 @@ void main() {
     void printUITree(WidgetTester tester) {
       print('\n----- 当前UI树 -----');
       try {
-        final String tree = tester.binding.renderViewElement?.toStringDeep() ?? '无法获取UI树';
+        final String tree = tester.binding.rootElement?.toStringDeep() ?? '无法获取UI树';
         print(tree);
       } catch (e) {
         print('打印UI树时出错: $e');
@@ -135,11 +135,6 @@ void main() {
       }
     }
 
-    // 查找任务的可靠方法
-    Finder findTask(String taskName) {
-      return find.text(taskName, findRichText: true);
-    }
-    
     // 主测试用例：添加和验证任务
     testWidgets('添加任务并验证显示', (WidgetTester tester) async {
       // 启动应用

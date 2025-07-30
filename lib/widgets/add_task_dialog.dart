@@ -24,33 +24,34 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
   DateTime? _dueDate;
   String? _selectedProjectId;
   
-  bool get _isEditing => widget.task != null && widget.task!.title.isNotEmpty;
-  bool get _isCreatingWithDefaults => widget.task != null && widget.task!.title.isEmpty;
+  bool get _isEditing => widget.task != null && widget.task?.title.isNotEmpty == true;
+  bool get _isCreatingWithDefaults => widget.task != null && widget.task?.title.isEmpty == true;
 
   @override
   void initState() {
     super.initState();
     
     // 如果是编辑任务，填充表单数据
-    if (_isEditing) {
-      _titleController.text = widget.task!.title;
-      _notesController.text = widget.task!.notes ?? '';
-      _priority = widget.task!.priority;
-      _status = widget.task!.status;
-      _dueDate = widget.task!.dueDate;
-      _selectedProjectId = widget.task!.projectId;
+    final task = widget.task;
+    if (_isEditing && task != null) {
+      _titleController.text = task.title;
+      _notesController.text = task.notes ?? '';
+      _priority = task.priority;
+      _status = task.status;
+      _dueDate = task.dueDate;
+      _selectedProjectId = task.projectId;
     } 
     // 如果是带有默认值创建任务（例如从日历或项目视图）
-    else if (_isCreatingWithDefaults) {
+    else if (_isCreatingWithDefaults && task != null) {
       _priority = TaskPriority.none;
       _status = TaskStatus.notStarted;
       
       // 使用传入的预设值
-      if (widget.task!.dueDate != null) {
-        _dueDate = widget.task!.dueDate;
+      if (task.dueDate != null) {
+        _dueDate = task.dueDate;
       }
       
-      _selectedProjectId = widget.task!.projectId;
+      _selectedProjectId = task.projectId;
     }
     // 创建全新任务
     else {
@@ -77,7 +78,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: Theme.of(context), // Use the app's current theme
-          child: child!,
+          child: child ?? const SizedBox(),
         );
       },
     );
@@ -90,21 +91,23 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
   }
 
   Future<void> _saveTask() async {
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState?.validate() ?? false) {
       final taskProvider = Provider.of<TaskProvider>(context, listen: false);
       
       // 处理截止日期 - 只保留日期部分
       DateTime? dueDateOnly;
-      if (_dueDate != null) {
+      final dueDate = _dueDate;
+      if (dueDate != null) {
         dueDateOnly = DateTime(
-          _dueDate!.year,
-          _dueDate!.month,
-          _dueDate!.day,
+          dueDate.year,
+          dueDate.month,
+          dueDate.day,
         );
       }
       
-      String taskId = _isEditing 
-          ? widget.task!.id 
+      final existingTask = widget.task;
+      String taskId = _isEditing && existingTask != null
+          ? existingTask.id 
           : 't${DateTime.now().millisecondsSinceEpoch}';
       
       // 创建或更新任务
@@ -115,7 +118,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
         dueDate: dueDateOnly,
         priority: _priority,
         status: _status,
-        createdAt: _isEditing ? widget.task!.createdAt : DateTime.now(),
+        createdAt: _isEditing && existingTask != null ? existingTask.createdAt : DateTime.now(),
         completedAt: _status == TaskStatus.completed ? DateTime.now() : null,
         projectId: _selectedProjectId,
         isRecurring: false,
@@ -138,7 +141,6 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
     final List<Project> projects = projectProvider.allProjects;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final isDarkMode = theme.brightness == Brightness.dark;
     
     // 简化优先级处理 - 只判断是"无"还是"有"
     bool hasPriority = _priority != TaskPriority.none;
@@ -148,7 +150,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
         borderRadius: BorderRadius.circular(20.0),
       ),
       elevation: 8,
-      backgroundColor: theme.dialogBackgroundColor,
+      backgroundColor: theme.dialogTheme.backgroundColor ?? theme.cardColor,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
       child: Container(
         width: MediaQuery.of(context).size.width * 0.95, // 增加弹窗宽度
@@ -179,7 +181,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                       borderSide: BorderSide.none,
                     ),
                     filled: true,
-                    fillColor: theme.colorScheme.onSurface.withOpacity(0.1),
+                    fillColor: theme.colorScheme.onSurface.withValues(alpha: 0.1),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
                     prefixIcon: Icon(Icons.title, color: colorScheme.primary),
                   ),
@@ -213,7 +215,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                       borderSide: BorderSide.none,
                     ),
                     filled: true,
-                    fillColor: theme.colorScheme.onSurface.withOpacity(0.1),
+                    fillColor: theme.colorScheme.onSurface.withValues(alpha: 0.1),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
                     prefixIcon: Icon(Icons.note, color: colorScheme.primary),
                   ),
@@ -225,7 +227,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                 // 项目选择
                 Container(
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.onSurface.withOpacity(0.1),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -239,7 +241,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                             value: _selectedProjectId,
                             isExpanded: true,
                             icon: Icon(Icons.arrow_drop_down, color: theme.colorScheme.onSurface),
-                            hint: Text('选择项目', style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.7))),
+                            hint: Text('选择项目', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.7))),
                             items: [
                               DropdownMenuItem<String?>(
                                 value: null,
@@ -257,7 +259,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                                 _selectedProjectId = newValue;
                               });
                             },
-                            dropdownColor: theme.dialogBackgroundColor,
+                            dropdownColor: theme.dialogTheme.backgroundColor ?? theme.cardColor,
                           ),
                         ),
                       ),
@@ -279,14 +281,14 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.onSurface.withOpacity(0.1),
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
                             children: [
                               Icon(Icons.calendar_today, 
                                 size: 18, 
-                                color: _dueDate != null ? colorScheme.primary : theme.colorScheme.onSurface.withOpacity(0.5)
+                                color: _dueDate != null ? colorScheme.primary : theme.colorScheme.onSurface.withValues(alpha: 0.5)
                               ),
                               const SizedBox(width: 10),
                               Expanded(
@@ -297,7 +299,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                                   style: TextStyle(
                                     color: _dueDate != null 
                                         ? theme.colorScheme.onSurface 
-                                        : theme.colorScheme.onSurface.withOpacity(0.5),
+                                        : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -310,7 +312,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                                     });
                                   },
                                   child: Icon(Icons.clear, size: 16, 
-                                      color: theme.colorScheme.onSurface.withOpacity(0.5)),
+                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
                                 ),
                             ],
                           ),
@@ -330,13 +332,13 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                         width: 48,  // 固定宽度
                         height: 48,  // 固定高度
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.onSurface.withOpacity(0.1),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Center(
                           child: Icon(
                             Icons.flag,
-                            color: hasPriority ? Colors.orange : theme.colorScheme.onSurface.withOpacity(0.5),
+                            color: hasPriority ? Colors.orange : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                             size: 24,
                           ),
                         ),

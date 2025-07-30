@@ -59,6 +59,9 @@ dependencies:
   csv: ^5.1.1
   file_picker: ^9.2.3
   permission_handler: ^11.4.0
+  
+  # Collection utilities
+  collection: ^1.18.0
 
 dev_dependencies:
   flutter_test:

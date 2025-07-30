@@ -27,42 +27,45 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   String _recurrenceRule = 'FREQ=DAILY';
   List<String> _tags = [];
   
-  bool get _isEditing => widget.task != null && widget.task!.title.isNotEmpty;
-  bool get _isCreatingWithDefaults => widget.task != null && widget.task!.title.isEmpty;
+  bool get _isEditing => widget.task != null && widget.task?.title.isNotEmpty == true;
+  bool get _isCreatingWithDefaults => widget.task != null && widget.task?.title.isEmpty == true;
 
   @override
   void initState() {
     super.initState();
     
     // 如果是编辑任务，填充表单数据
-    if (_isEditing) {
-      _titleController.text = widget.task!.title;
-      _notesController.text = widget.task!.notes ?? '';
-      _priority = widget.task!.priority;
-      _status = widget.task!.status;
-      _dueDate = widget.task!.dueDate != null ? 
-                 DateTime(widget.task!.dueDate!.year, widget.task!.dueDate!.month, widget.task!.dueDate!.day) : 
+    final task = widget.task;
+    if (_isEditing && task != null) {
+      _titleController.text = task.title;
+      _notesController.text = task.notes ?? '';
+      _priority = task.priority;
+      _status = task.status;
+      final taskDueDate = task.dueDate;
+      _dueDate = taskDueDate != null ? 
+                 DateTime(taskDueDate.year, taskDueDate.month, taskDueDate.day) : 
                  null;
-      _selectedProjectId = widget.task!.projectId;
-      _isRecurring = widget.task!.isRecurring;
-      _recurrenceRule = widget.task!.recurrenceRule ?? 'FREQ=DAILY';
-      _tags = List.from(widget.task!.tags);
+      _selectedProjectId = task.projectId;
+      _isRecurring = task.isRecurring;
+      _recurrenceRule = task.recurrenceRule ?? 'FREQ=DAILY';
+      _tags = List.from(task.tags);
     } 
     // 如果是带有默认值创建任务（例如从日历或项目视图）
-    else if (_isCreatingWithDefaults) {
+    else if (_isCreatingWithDefaults && task != null) {
       _priority = TaskPriority.none;
       _status = TaskStatus.notStarted;
       
       // 使用传入的预设值
-      if (widget.task!.dueDate != null) {
+      final taskDueDate = task.dueDate;
+      if (taskDueDate != null) {
         _dueDate = DateTime(
-          widget.task!.dueDate!.year,
-          widget.task!.dueDate!.month,
-          widget.task!.dueDate!.day
+          taskDueDate.year,
+          taskDueDate.month,
+          taskDueDate.day
         );
       }
       
-      _selectedProjectId = widget.task!.projectId;
+      _selectedProjectId = task.projectId;
       _tags = [];
     }
     // 创建全新任务
@@ -112,7 +115,7 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
   }
 
   Future<void> _saveTask() async {
-    if (_formKey.currentState!.validate()) {
+    if (_formKey.currentState?.validate() ?? false) {
       final taskProvider = Provider.of<TaskProvider>(context, listen: false);
       
       // 处理截止日期 - 只保留日期部分

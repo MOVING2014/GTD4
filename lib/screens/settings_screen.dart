@@ -3,6 +3,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 import '../utils/backup_helper.dart';
+import '../utils/logger.dart';
 import 'package:file_picker/file_picker.dart';
 import 'dart:io' show Platform;
 
@@ -61,7 +62,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withOpacity(0.1),
+                color: theme.colorScheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Icon(
@@ -92,7 +93,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               'Version $_version ($_buildNumber)',
               style: TextStyle(
                 fontSize: 14,
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
           ),
@@ -114,7 +115,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // 跟随系统设置
                 Card(
                   elevation: 0,
-                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   child: SwitchListTile(
@@ -123,7 +124,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       '使用系统深色/浅色模式设置',
                       style: TextStyle(
                         fontSize: 12,
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                     value: isFollowingSystem,
@@ -154,7 +155,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // 深色模式设置 (仅当不跟随系统时可用)
                 Card(
                   elevation: 0,
-                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   child: SwitchListTile(
@@ -163,7 +164,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       isDarkModeCurrent ? '当前使用深色模式' : '当前使用浅色模式',
                       style: TextStyle(
                         fontSize: 12,
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                     value: isDarkModeCurrent,
@@ -205,7 +206,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // 隐藏导航栏/手势条设置
                 Card(
                   elevation: 0,
-                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   child: SwitchListTile(
@@ -214,7 +215,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       '隐藏底部导航栏/手势提示条，全屏显示应用',
                       style: TextStyle(
                         fontSize: 12,
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                     value: themeProvider.hideNavigationBar,
@@ -268,7 +269,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // CSV 数据导入导出
                 Card(
                   elevation: 0,
-                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   child: Column(
@@ -453,7 +454,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 
                 Card(
                   elevation: 0,
-                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   child: ListTile(
@@ -478,7 +479,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 
                 Card(
                   elevation: 0,
-                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   child: ListTile(
@@ -524,12 +525,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       
                       // 让用户选择数据库文件
                       try {
-                        print('正在打开文件选择器...');
+                        Logger.log('正在打开文件选择器...');
                         
                         // 为macOS提供特定选项
                         FilePickerResult? result;
                         if (Platform.isMacOS) {
-                          print('在macOS上使用特定的文件选择器选项');
+                          Logger.log('在macOS上使用特定的文件选择器选项');
                           result = await FilePicker.platform.pickFiles(
                             type: FileType.custom,
                             allowedExtensions: ['db'],
@@ -544,11 +545,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           );
                         }
                         
-                        print('文件选择结果: ${result != null ? '已选择文件' : '未选择文件'}');
+                        Logger.log('文件选择结果: ${result != null ? '已选择文件' : '未选择文件'}');
                         
                         if (result == null) {
                           // 用户未选择文件
-                          print('用户取消了文件选择');
+                          Logger.log('用户取消了文件选择');
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -573,7 +574,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           return;
                         }
                         
-                        print('选择的文件路径: $filePath');
+                        Logger.log('选择的文件路径: $filePath');
                         
                         // 继续导入流程
                         final shouldImport = await showDialog<bool>(
@@ -610,12 +611,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         
                         if (shouldImport != true || !context.mounted) return;
                         
-                        print('用户确认导入，开始导入过程');
+                        Logger.log('用户确认导入，开始导入过程');
                         
                         // 调用实际导入功能
                         final result2 = await BackupHelper.importDatabase(context, filePath: filePath);
                         if (context.mounted) {
-                          print('导入结果: ${result2.success ? '成功' : '失败'} - ${result2.message}');
+                          Logger.log('导入结果: ${result2.success ? '成功' : '失败'} - ${result2.message}');
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(result2.success 
@@ -626,7 +627,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           );
                         }
                       } catch (e) {
-                        print('文件选择或导入过程中出错: $e');
+                        Logger.log('文件选择或导入过程中出错: $e');
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -660,7 +661,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 
                 Card(
                   elevation: 0,
-                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   child: Padding(
@@ -675,7 +676,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       '• 定期回顾，确保任务得到跟进',
                       style: TextStyle(
                         fontSize: 14,
-                        color: theme.colorScheme.onSurface.withOpacity(0.8),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
                         height: 1.5,
                       ),
                     ),
@@ -702,7 +703,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 
                 Card(
                   elevation: 0,
-                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   child: Column(

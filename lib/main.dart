@@ -74,10 +74,9 @@ class MyApp extends StatelessWidget {
                 seedColor: const Color(0xFF5D69B3),
                 brightness: Brightness.dark,
                 // 自定义暗色主题的背景色为更深的黑蓝色
-                background: const Color(0xFF020810),
-                surface: const Color(0xFF030C14),
+                surface: const Color(0xFF020810),
+                surfaceContainerHighest: const Color(0xFF030C14),
                 // 稍微调整其他颜色，保持协调
-                onBackground: const Color(0xFFE1E9F4),
                 onSurface: const Color(0xFFE1E9F4),
               ),
               // 设置AppBar样式
@@ -144,14 +143,6 @@ class _HomeScreenState extends State<HomeScreen> {
     ReviewScreen(),
   ];
   
-  static const List<String> _titles = [
-    '日历',
-    '收件箱',
-    '优先任务',
-    '项目',
-    '回顾',
-  ];
-  
   @override
   Widget build(BuildContext context) {
     final taskProvider = Provider.of<TaskProvider>(context);
@@ -163,7 +154,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     
     // 获取当前主题亮暗模式状态
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final theme = Theme.of(context);
     
     // 判断是否为桌面平台
@@ -186,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
             });
           },
           labelType: NavigationRailLabelType.all,
-          backgroundColor: theme.colorScheme.surface.withOpacity(0.8),
+          backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.8),
           destinations: [
             NavigationRailDestination(
               icon: Icon(Icons.calendar_today, color: Colors.pink),
@@ -306,7 +296,7 @@ class _HomeScreenState extends State<HomeScreen> {
             // 去掉阴影
             elevation: 0,
             // 导航指示器颜色根据主题调整
-            indicatorColor: theme.colorScheme.secondaryContainer.withOpacity(0.7),
+            indicatorColor: theme.colorScheme.secondaryContainer.withValues(alpha: 0.7),
             // 导航项颜色根据主题调整
             labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
             selectedIndex: _selectedIndex,

@@ -94,7 +94,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                         margin: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
                         clipBehavior: Clip.antiAlias,
                         color: isSelected
-                            ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5)
+                            ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5)
                             : Theme.of(context).cardColor,
                         child: Theme(
                           data: Theme.of(context).copyWith(

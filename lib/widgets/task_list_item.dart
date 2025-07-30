@@ -232,7 +232,7 @@ class _TaskListItemState extends State<TaskListItem> {
                                   width: 1.5,
                                   color: widget.task.priority == TaskPriority.none 
                                       ? isDarkMode 
-                                          ? theme.colorScheme.onSurface.withOpacity(0.7)
+                                          ? theme.colorScheme.onSurface.withValues(alpha: 0.7)
                                           : Colors.black54
                                       : widget.task.getPriorityColor(),
                                 ),
@@ -260,7 +260,7 @@ class _TaskListItemState extends State<TaskListItem> {
                                       : null,
                                   // 适配暗黑模式的任务标题文字颜色
                                   color: widget.task.status == TaskStatus.completed 
-                                      ? theme.colorScheme.onSurface.withOpacity(0.6)
+                                      ? theme.colorScheme.onSurface.withValues(alpha: 0.6)
                                       : isDarkMode 
                                           ? Colors.white // 在暗黑模式下使用纯白色
                                           : theme.colorScheme.onSurface,
@@ -294,7 +294,7 @@ class _TaskListItemState extends State<TaskListItem> {
                                           ? isDarkMode 
                                               ? Colors.white // 深色模式下点亮为白色
                                               : theme.colorScheme.primary // 浅色模式下点亮为主题色
-                                          : theme.colorScheme.onSurface.withOpacity(0.5),
+                                          : theme.colorScheme.onSurface.withValues(alpha: 0.5),
                                     ),
                                   ),
                                 ),
@@ -313,7 +313,7 @@ class _TaskListItemState extends State<TaskListItem> {
                         widget.task.notes!,
                         style: TextStyle(
                           fontSize: 14.0,
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                     ),
@@ -336,7 +336,7 @@ class _TaskListItemState extends State<TaskListItem> {
   Widget _buildSubtitle(Project? project) {
     final theme = Theme.of(context);
     // 定义统一的标签颜色，使用主题适配
-    final Color labelColor = theme.colorScheme.onSurface.withOpacity(0.6);
+    final Color labelColor = theme.colorScheme.onSurface.withValues(alpha: 0.6);
     final Color overdueColor = Colors.red.shade300;
     
     final List<Widget> rowItems = [];

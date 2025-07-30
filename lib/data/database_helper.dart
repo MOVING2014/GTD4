@@ -128,7 +128,7 @@ class DatabaseHelper {
       'id': project.id,
       'name': project.name,
       'description': project.description,
-      'colorValue': project.color.value,
+      'colorValue': project.color.toARGB32(),
       'status': project.status.index,
       'createdAt': project.createdAt.toIso8601String(),
       'completedAt': project.completedAt?.toIso8601String(),

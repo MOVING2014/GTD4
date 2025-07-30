@@ -10,6 +10,7 @@ import 'package:permission_handler/permission_handler.dart';
 import '../data/database_helper.dart';
 import '../models/task.dart';
 import '../models/project.dart';
+import 'logger.dart';
 
 class BackupResult {
   final bool success;
@@ -89,7 +90,7 @@ class BackupHelper {
               pathDesc = 'Download/TaskManager 文件夹';
             } catch (e) {
               // 无法写入公共Download目录，降级到应用专用目录
-              print('Cannot write to Download directory: $e');
+              Logger.log('Cannot write to Download directory: $e');
               final directory = await getExternalStorageDirectory();
               if (directory == null) {
                 return BackupResult(
@@ -114,7 +115,7 @@ class BackupHelper {
           }
         } catch (e) {
           // 获取公共Download目录时出错，降级到应用专用目录
-          print('Error accessing Download directory: $e');
+          Logger.log('Error accessing Download directory: $e');
           final directory = await getExternalStorageDirectory();
           if (directory == null) {
             return BackupResult(
@@ -173,7 +174,7 @@ class BackupHelper {
         // 尝试使用文档目录作为备选
         return await getApplicationDocumentsDirectory();
       } catch (e) {
-        print('Error accessing documents directory: $e');
+        Logger.log('Error accessing documents directory: $e');
         return null;
       }
     } else if (Platform.isIOS) {
@@ -194,14 +195,14 @@ class BackupHelper {
             await testFile.delete();
             return downloadDir;
           } catch (e) {
-            print('Cannot write to macOS Downloads directory: $e');
+            Logger.log('Cannot write to macOS Downloads directory: $e');
             // 失败时回退到文档目录
             return await getApplicationDocumentsDirectory();
           }
         }
         return await getApplicationDocumentsDirectory();
       } catch (e) {
-        print('Error accessing macOS directories: $e');
+        Logger.log('Error accessing macOS directories: $e');
         return await getApplicationDocumentsDirectory();
       }
     } else {
@@ -426,7 +427,7 @@ class BackupHelper {
         project.id,
         project.name,
         project.description ?? '',
-        project.color.value,
+        project.color.toARGB32(),
         project.status.index,
         project.createdAt.toIso8601String(),
         project.completedAt?.toIso8601String() ?? '',
@@ -560,7 +561,7 @@ class BackupHelper {
         '', // tags (空)
         '', // isRecurring (空)
         '', // recurrenceRule (空)
-        project.color.value,
+        project.color.toARGB32(),
         parentProjectName,
         project.order ?? 0,
         project.needsMonthlyReview ? 1 : 0,
@@ -952,7 +953,7 @@ class BackupHelper {
               pathDesc = 'Download/TaskManager 文件夹';
             } catch (e) {
               // 无法写入公共Download目录，降级到应用专用目录
-              print('Cannot write to Download directory: $e');
+              Logger.log('Cannot write to Download directory: $e');
               final directory = await getExternalStorageDirectory();
               if (directory == null) {
                 return BackupResult(
@@ -977,7 +978,7 @@ class BackupHelper {
           }
         } catch (e) {
           // 获取公共Download目录时出错，降级到应用专用目录
-          print('Error accessing Download directory: $e');
+          Logger.log('Error accessing Download directory: $e');
           final directory = await getExternalStorageDirectory();
           if (directory == null) {
             return BackupResult(
@@ -1042,7 +1043,7 @@ class BackupHelper {
       
       // 如果没有提供文件路径，则尝试使用文件选择器
       if (selectedFilePath == null) {
-        print('未提供文件路径，尝试使用文件选择器');
+        Logger.log('未提供文件路径，尝试使用文件选择器');
         try {
           // 为macOS提供更多选项
           FilePickerResult? result;
@@ -1071,7 +1072,7 @@ class BackupHelper {
             return BackupResult(success: false, message: '获取文件路径失败');
           }
         } catch (e) {
-          print('文件选择失败: $e');
+          Logger.log('文件选择失败: $e');
           return BackupResult(success: false, message: '文件选择失败: $e');
         }
       }
@@ -1105,7 +1106,7 @@ class BackupHelper {
       final tempBackupPath = '${dbPath}_temp_backup';
       if (await dbFile.exists()) {
         await dbFile.copy(tempBackupPath);
-        print('已备份原数据库到: $tempBackupPath');
+        Logger.log('已备份原数据库到: $tempBackupPath');
       }
       
       try {
@@ -1125,27 +1126,27 @@ class BackupHelper {
           await dbDir.create(recursive: true);
         }
         
-        print('正在复制数据库文件...');
-        print('源路径: ${selectedFile.path}');
-        print('目标路径: $dbPath');
+        Logger.log('正在复制数据库文件...');
+        Logger.log('源路径: ${selectedFile.path}');
+        Logger.log('目标路径: $dbPath');
         
         // 对于macOS，使用不同的复制方式
         if (Platform.isMacOS) {
           try {
             final bytes = await selectedFile.readAsBytes();
             await dbFile.writeAsBytes(bytes);
-            print('使用readAsBytes/writeAsBytes复制成功');
+            Logger.log('使用readAsBytes/writeAsBytes复制成功');
           } catch (e) {
-            print('readAsBytes/writeAsBytes复制失败: $e，尝试其他方法');
+            Logger.log('readAsBytes/writeAsBytes复制失败: $e，尝试其他方法');
             
             // 尝试备用方式
             try {
               // 读取并写入
               final content = await selectedFile.readAsString();
               await dbFile.writeAsString(content);
-              print('使用readAsString/writeAsString复制成功');
+              Logger.log('使用readAsString/writeAsString复制成功');
             } catch (e2) {
-              print('所有复制方法失败: $e2');
+              Logger.log('所有复制方法失败: $e2');
               throw Exception('无法复制数据库文件: $e2');
             }
           }
@@ -1154,26 +1155,26 @@ class BackupHelper {
           await selectedFile.copy(dbPath);
         }
         
-        print('数据库文件复制成功');
+        Logger.log('数据库文件复制成功');
         
         // 重新打开数据库
         await db.database;
-        print('数据库重新打开成功');
+        Logger.log('数据库重新打开成功');
         
         // 删除临时备份
         final tempBackupFile = File(tempBackupPath);
         if (await tempBackupFile.exists()) {
           await tempBackupFile.delete();
-          print('临时备份已删除');
+          Logger.log('临时备份已删除');
         }
       } catch (e) {
         // 如果导入失败，恢复原数据库
-        print('导入失败，恢复备份: $e');
+        Logger.log('导入失败，恢复备份: $e');
         final tempBackupFile = File(tempBackupPath);
         if (await tempBackupFile.exists()) {
           await tempBackupFile.copy(dbPath);
           await tempBackupFile.delete();
-          print('原数据库已恢复');
+          Logger.log('原数据库已恢复');
         }
         
         // 关闭进度对话框
@@ -1197,7 +1198,7 @@ class BackupHelper {
         message: '数据库导入成功，请重启应用以加载新数据',
       );
     } catch (e) {
-      print('导入数据库过程中出现异常: $e');
+      Logger.log('导入数据库过程中出现异常: $e');
       return BackupResult(
         success: false,
         message: '导入数据库失败: $e',
@@ -1223,7 +1224,7 @@ class BackupHelper {
         }
         return null;
       } catch (e) {
-        print('获取下载目录失败: $e');
+        Logger.log('获取下载目录失败: $e');
         return null;
       }
     }
