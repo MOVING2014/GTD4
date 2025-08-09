@@ -111,8 +111,12 @@ class DatabaseHelper {
       notes: map['notes'],
       dueDate: map['dueDate'] != null ? DateTime.parse(map['dueDate']) : null,
       reminderDate: map['reminderDate'] != null ? DateTime.parse(map['reminderDate']) : null,
-      priority: TaskPriority.values[map['priority']],
-      status: TaskStatus.values[map['status']],
+      priority: (map['priority'] >= 0 && map['priority'] < TaskPriority.values.length) 
+          ? TaskPriority.values[map['priority']] 
+          : TaskPriority.low,
+      status: (map['status'] >= 0 && map['status'] < TaskStatus.values.length) 
+          ? TaskStatus.values[map['status']] 
+          : TaskStatus.notStarted,
       createdAt: DateTime.parse(map['createdAt']),
       completedAt: map['completedAt'] != null ? DateTime.parse(map['completedAt']) : null,
       projectId: map['projectId'],
@@ -145,7 +149,9 @@ class DatabaseHelper {
       name: map['name'],
       description: map['description'],
       color: Color(map['colorValue']),
-      status: ProjectStatus.values[map['status']],
+      status: (map['status'] >= 0 && map['status'] < ProjectStatus.values.length) 
+          ? ProjectStatus.values[map['status']] 
+          : ProjectStatus.active,
       createdAt: DateTime.parse(map['createdAt']),
       completedAt: map['completedAt'] != null ? DateTime.parse(map['completedAt']) : null,
       parentProjectId: map['parentProjectId'],

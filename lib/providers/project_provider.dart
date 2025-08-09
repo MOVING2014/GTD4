@@ -15,10 +15,16 @@ class ProjectProvider with ChangeNotifier {
   
   // 从数据库加载所有项目
   Future<void> _loadProjects() async {
-    _projects = await _dbHelper.getAllProjects();
-    // 确保所有项目都有order属性
-    _initializeProjectOrders();
-    notifyListeners();
+    try {
+      _projects = await _dbHelper.getAllProjects();
+      // 确保所有项目都有order属性
+      _initializeProjectOrders();
+      notifyListeners();
+    } catch (e) {
+      print('Error loading projects: $e');
+      _projects = [];
+      notifyListeners();
+    }
   }
   
   // 初始化项目顺序
@@ -46,7 +52,16 @@ class ProjectProvider with ChangeNotifier {
   }
   
   // 重新排序项目
+  bool _isReordering = false;
+  
   Future<void> reorderProjects(int oldIndex, int newIndex, ProjectFilter filter) async {
+    // 防止并发重排序
+    if (_isReordering) {
+      return;
+    }
+    _isReordering = true;
+    
+    try {
     List<Project> filteredProjects;
     
     // 根据过滤类型获取对应的项目列表
@@ -113,6 +128,13 @@ class ProjectProvider with ChangeNotifier {
     
     // 通知监听器数据变化
     notifyListeners();
+    } catch (e) {
+      print('Error reordering projects: $e');
+      // 出错时重新加载项目恢复状态
+      await _loadProjects();
+    } finally {
+      _isReordering = false;
+    }
   }
   
   // Get all projects
@@ -150,66 +172,91 @@ class ProjectProvider with ChangeNotifier {
   
   // Add a new project
   Future<void> addProject(Project project) async {
-    // 为新项目设置顺序，放在最后
-    final int lastOrder = _projects.isEmpty ? 0 : (_projects.map((p) => p.order ?? 0).reduce((a, b) => a > b ? a : b) + 1);
-    final newProject = project.copyWith(order: lastOrder);
-    
-    await _dbHelper.insertProject(newProject);
-    await _loadProjects(); // 重新加载项目来更新UI
+    try {
+      // 为新项目设置顺序，放在最后
+      final int lastOrder = _projects.isEmpty ? 0 : (_projects.map((p) => p.order ?? 0).reduce((a, b) => a > b ? a : b) + 1);
+      final newProject = project.copyWith(order: lastOrder);
+      
+      await _dbHelper.insertProject(newProject);
+      await _loadProjects(); // 重新加载项目来更新UI
+    } catch (e) {
+      print('Error adding project: $e');
+      rethrow;
+    }
   }
   
   // Update an existing project
   Future<void> updateProject(Project updatedProject) async {
-    final index = _projects.indexWhere((project) => project.id == updatedProject.id);
-    if (index != -1) {
-      // 保留原有的order
-      final oldOrder = _projects[index].order;
-      final projectToUpdate = updatedProject.copyWith(order: oldOrder);
-      
-      await _dbHelper.updateProject(projectToUpdate);
-      await _loadProjects(); // 重新加载项目来更新UI
+    try {
+      final index = _projects.indexWhere((project) => project.id == updatedProject.id);
+      if (index != -1) {
+        // 保留原有的order
+        final oldOrder = _projects[index].order;
+        final projectToUpdate = updatedProject.copyWith(order: oldOrder);
+        
+        await _dbHelper.updateProject(projectToUpdate);
+        await _loadProjects(); // 重新加载项目来更新UI
+      }
+    } catch (e) {
+      print('Error updating project: $e');
+      rethrow;
     }
   }
   
   // Delete a project
   Future<void> deleteProject(String projectId) async {
-    await _dbHelper.deleteProject(projectId);
-    await _loadProjects(); // 重新加载项目来更新UI
+    try {
+      await _dbHelper.deleteProject(projectId);
+      await _loadProjects(); // 重新加载项目来更新UI
+    } catch (e) {
+      print('Error deleting project: $e');
+      rethrow;
+    }
   }
   
   // Toggle project completion status
   Future<void> toggleProjectCompletion(String projectId) async {
-    final project = _projects.firstWhereOrNull((project) => project.id == projectId);
-    if (project == null) {
-      // Project not found, return early
-      return;
+    try {
+      final project = _projects.firstWhereOrNull((project) => project.id == projectId);
+      if (project == null) {
+        // Project not found, return early
+        return;
+      }
+      
+      final newStatus = project.status == ProjectStatus.completed 
+          ? ProjectStatus.active 
+          : ProjectStatus.completed;
+      
+      final updatedProject = project.copyWith(
+        status: newStatus,
+        completedAt: newStatus == ProjectStatus.completed ? DateTime.now() : null,
+      );
+      
+      await _dbHelper.updateProject(updatedProject);
+      await _loadProjects(); // 重新加载项目来更新UI
+    } catch (e) {
+      print('Error toggling project completion: $e');
+      rethrow;
     }
-    
-    final newStatus = project.status == ProjectStatus.completed 
-        ? ProjectStatus.active 
-        : ProjectStatus.completed;
-    
-    final updatedProject = project.copyWith(
-      status: newStatus,
-      completedAt: newStatus == ProjectStatus.completed ? DateTime.now() : null,
-    );
-    
-    await _dbHelper.updateProject(updatedProject);
-    await _loadProjects(); // 重新加载项目来更新UI
   }
   
   // Archive a project
   Future<void> archiveProject(String projectId) async {
-    final project = _projects.firstWhereOrNull((project) => project.id == projectId);
-    if (project == null) {
-      // Project not found, return early
-      return;
+    try {
+      final project = _projects.firstWhereOrNull((project) => project.id == projectId);
+      if (project == null) {
+        // Project not found, return early
+        return;
+      }
+      
+      final updatedProject = project.copyWith(status: ProjectStatus.archived);
+      
+      await _dbHelper.updateProject(updatedProject);
+      await _loadProjects(); // 重新加载项目来更新UI
+    } catch (e) {
+      print('Error archiving project: $e');
+      rethrow;
     }
-    
-    final updatedProject = project.copyWith(status: ProjectStatus.archived);
-    
-    await _dbHelper.updateProject(updatedProject);
-    await _loadProjects(); // 重新加载项目来更新UI
   }
   
   // 获取需要月度回顾的项目
@@ -224,34 +271,49 @@ class ProjectProvider with ChangeNotifier {
   
   // 设置项目回顾属性
   Future<void> setProjectReviewStatus(String projectId, bool needsReview) async {
-    final project = _projects.firstWhereOrNull((project) => project.id == projectId);
-    if (project == null) {
-      // Project not found, return early
-      return;
+    try {
+      final project = _projects.firstWhereOrNull((project) => project.id == projectId);
+      if (project == null) {
+        // Project not found, return early
+        return;
+      }
+      
+      final updatedProject = project.copyWith(needsMonthlyReview: needsReview);
+      
+      await _dbHelper.updateProject(updatedProject);
+      await _loadProjects(); // 重新加载项目来更新UI
+    } catch (e) {
+      print('Error setting project review status: $e');
+      rethrow;
     }
-    
-    final updatedProject = project.copyWith(needsMonthlyReview: needsReview);
-    
-    await _dbHelper.updateProject(updatedProject);
-    await _loadProjects(); // 重新加载项目来更新UI
   }
   
   // 标记项目已回顾
   Future<void> markProjectAsReviewed(String projectId) async {
-    final project = _projects.firstWhereOrNull((project) => project.id == projectId);
-    if (project == null) {
-      // Project not found, return early
-      return;
+    try {
+      final project = _projects.firstWhereOrNull((project) => project.id == projectId);
+      if (project == null) {
+        // Project not found, return early
+        return;
+      }
+      
+      final updatedProject = project.copyWith(lastReviewDate: DateTime.now());
+      
+      await _dbHelper.updateProject(updatedProject);
+      await _loadProjects(); // 重新加载项目来更新UI
+    } catch (e) {
+      print('Error marking project as reviewed: $e');
+      rethrow;
     }
-    
-    final updatedProject = project.copyWith(lastReviewDate: DateTime.now());
-    
-    await _dbHelper.updateProject(updatedProject);
-    await _loadProjects(); // 重新加载项目来更新UI
   }
   
   // 刷新项目列表
   Future<void> refreshProjects() async {
-    await _loadProjects();
+    try {
+      await _loadProjects();
+    } catch (e) {
+      print('Error refreshing projects: $e');
+      // 刷新失败时不抛出异常，保持当前列表
+    }
   }
 } 

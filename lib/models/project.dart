@@ -64,7 +64,14 @@ class Project {
     if (lastReviewDate == null) return true;
     
     final now = DateTime.now();
-    final lastMonth = DateTime(now.year, now.month - 1, now.day);
+    // 正确处理跨年的月份计算
+    int targetYear = now.year;
+    int targetMonth = now.month - 1;
+    if (targetMonth <= 0) {
+      targetMonth = 12 + targetMonth;  // 如果是1月，则上月是12月
+      targetYear = targetYear - 1;      // 年份减1
+    }
+    final lastMonth = DateTime(targetYear, targetMonth, now.day);
     return lastReviewDate!.isBefore(lastMonth);
   }
   

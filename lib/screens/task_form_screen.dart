@@ -446,9 +446,9 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
                       onFieldSubmitted: (value) {
                         if (value.isNotEmpty) {
                           _addTag(value);
-                          // 清空输入框
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            (context as Element).markNeedsBuild();
+                          // 使用setState来更新UI，而不是markNeedsBuild
+                          setState(() {
+                            // 触发UI更新
                           });
                         }
                       },

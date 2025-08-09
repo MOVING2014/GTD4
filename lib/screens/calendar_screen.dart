@@ -265,7 +265,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             task.dueDate != null &&
                             task.dueDate!.isBefore(today)
                         ).toList();
-                    allRelevantPastTasks.sort((a, b) => b.dueDate!.compareTo(a.dueDate!));
+                    allRelevantPastTasks.sort((a, b) {
+                      if (a.dueDate == null && b.dueDate == null) return 0;
+                      if (a.dueDate == null) return 1;
+                      if (b.dueDate == null) return -1;
+                      return b.dueDate!.compareTo(a.dueDate!);
+                    });
 
                     List<Task> tasksForYesterday = allRelevantPastTasks.where((task) => _isSameDay(task.dueDate!, yesterday)).toList();
                     List<Task> tasksForPastSevenDays = allRelevantPastTasks.where((task) =>

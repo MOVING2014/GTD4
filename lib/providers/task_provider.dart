@@ -16,8 +16,15 @@ class TaskProvider with ChangeNotifier {
 
   // 从数据库加载所有任务
   Future<void> _loadTasks() async {
-    _tasks = await _dbHelper.getAllTasks();
-    notifyListeners();
+    try {
+      _tasks = await _dbHelper.getAllTasks();
+      notifyListeners();
+    } catch (e) {
+      // 记录错误但不让应用崩溃
+      print('Error loading tasks: $e');
+      _tasks = [];
+      notifyListeners();
+    }
   }
 
   // 获取是否显示已完成任务的状态
@@ -145,45 +152,74 @@ class TaskProvider with ChangeNotifier {
   
   // Add a new task
   Future<void> addTask(Task task) async {
-    await _dbHelper.insertTask(task);
-    await _loadTasks(); // 重新加载任务来更新UI
+    try {
+      await _dbHelper.insertTask(task);
+      await _loadTasks(); // 重新加载任务来更新UI
+    } catch (e) {
+      print('Error adding task: $e');
+      // 重新抛出异常让调用者处理
+      rethrow;
+    }
   }
   
   // Update an existing task
   Future<void> updateTask(Task updatedTask) async {
-    await _dbHelper.updateTask(updatedTask);
-    await _loadTasks(); // 重新加载任务来更新UI
+    try {
+      await _dbHelper.updateTask(updatedTask);
+      await _loadTasks(); // 重新加载任务来更新UI
+    } catch (e) {
+      print('Error updating task: $e');
+      // 重新抛出异常让调用者处理
+      rethrow;
+    }
   }
   
   // Delete a task
   Future<void> deleteTask(String taskId) async {
-    await _dbHelper.deleteTask(taskId);
-    await _loadTasks(); // 重新加载任务来更新UI
+    try {
+      await _dbHelper.deleteTask(taskId);
+      await _loadTasks(); // 重新加载任务来更新UI
+    } catch (e) {
+      print('Error deleting task: $e');
+      // 重新抛出异常让调用者处理
+      rethrow;
+    }
   }
   
   // Toggle task completion status
   Future<void> toggleTaskCompletion(String taskId) async {
-    final task = _tasks.firstWhereOrNull((task) => task.id == taskId);
-    if (task == null) {
-      // Task not found, return early
-      return;
+    try {
+      final task = _tasks.firstWhereOrNull((task) => task.id == taskId);
+      if (task == null) {
+        // Task not found, return early
+        return;
+      }
+      
+      final newStatus = task.status == TaskStatus.completed 
+          ? TaskStatus.notStarted 
+          : TaskStatus.completed;
+      
+      final updatedTask = task.copyWith(
+        status: newStatus,
+        completedAt: newStatus == TaskStatus.completed ? DateTime.now() : null,
+      );
+      
+      await _dbHelper.updateTask(updatedTask);
+      await _loadTasks(); // 重新加载任务来更新UI
+    } catch (e) {
+      print('Error toggling task completion: $e');
+      // 重新抛出异常让调用者处理
+      rethrow;
     }
-    
-    final newStatus = task.status == TaskStatus.completed 
-        ? TaskStatus.notStarted 
-        : TaskStatus.completed;
-    
-    final updatedTask = task.copyWith(
-      status: newStatus,
-      completedAt: newStatus == TaskStatus.completed ? DateTime.now() : null,
-    );
-    
-    await _dbHelper.updateTask(updatedTask);
-    await _loadTasks(); // 重新加载任务来更新UI
   }
 
   // 刷新任务列表
   Future<void> refreshTasks() async {
-    await _loadTasks();
+    try {
+      await _loadTasks();
+    } catch (e) {
+      print('Error refreshing tasks: $e');
+      // 刷新失败时不抛出异常，保持当前列表
+    }
   }
 } 

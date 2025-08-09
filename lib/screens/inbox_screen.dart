@@ -131,10 +131,25 @@ class _InboxScreenState extends State<InboxScreen> {
             }
           }
           
-          // 在每个分组内按到期日期排序
-          overdueTasks.sort((a, b) => a.dueDate!.compareTo(b.dueDate!));
-          nextWeekTasks.sort((a, b) => a.dueDate!.compareTo(b.dueDate!));
-          futureTasks.sort((a, b) => a.dueDate!.compareTo(b.dueDate!));
+          // 在每个分组内按到期日期排序（需要检查null值）
+          overdueTasks.sort((a, b) {
+            if (a.dueDate == null && b.dueDate == null) return 0;
+            if (a.dueDate == null) return 1;
+            if (b.dueDate == null) return -1;
+            return a.dueDate!.compareTo(b.dueDate!);
+          });
+          nextWeekTasks.sort((a, b) {
+            if (a.dueDate == null && b.dueDate == null) return 0;
+            if (a.dueDate == null) return 1;
+            if (b.dueDate == null) return -1;
+            return a.dueDate!.compareTo(b.dueDate!);
+          });
+          futureTasks.sort((a, b) {
+            if (a.dueDate == null && b.dueDate == null) return 0;
+            if (a.dueDate == null) return 1;
+            if (b.dueDate == null) return -1;
+            return a.dueDate!.compareTo(b.dueDate!);
+          });
           
           // 计算底部填充，确保浮动按钮不会遮挡内容
           // 为浮动按钮和导航栏腾出足够空间
