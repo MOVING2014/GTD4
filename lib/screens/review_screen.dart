@@ -69,13 +69,33 @@ class _ReviewScreenState extends State<ReviewScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                child: Text(
-                  '选择需要回顾的项目:',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '选择需要回顾的项目:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        '${projectsToReview.length} 个待回顾',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               SizedBox(
@@ -299,6 +319,10 @@ class _ReviewScreenState extends State<ReviewScreen> {
     if (_selectedProject == null) return;
     
     final projectProvider = Provider.of<ProjectProvider>(context, listen: false);
+    final currentProjectsToReview = projectProvider.projectsNeedingReview;
+    final currentIndex = currentProjectsToReview.indexWhere(
+      (project) => project.id == _selectedProject!.id
+    );
     
     showDialog(
       context: context,
@@ -311,18 +335,44 @@ class _ReviewScreenState extends State<ReviewScreen> {
             child: const Text('取消'),
           ),
           TextButton(
-            onPressed: () {
-              projectProvider.markProjectAsReviewed(_selectedProject!.id);
+            onPressed: () async {
+              await projectProvider.markProjectAsReviewed(_selectedProject!.id);
               Navigator.of(ctx).pop();
               
+              // 获取更新后的项目列表
+              final updatedProjectsToReview = projectProvider.projectsNeedingReview;
+              
               setState(() {
-                _selectedProject = null;
+                if (updatedProjectsToReview.isNotEmpty) {
+                  // 自动选择下一个项目进行回顾
+                  if (currentIndex < updatedProjectsToReview.length) {
+                    // 选择相同位置的项目（当前项目被移除后，下一个项目会占据这个位置）
+                    _selectedProject = updatedProjectsToReview[currentIndex];
+                  } else {
+                    // 如果当前项目是最后一个，选择新列表的最后一个项目
+                    _selectedProject = updatedProjectsToReview.last;
+                  }
+                } else {
+                  // 没有更多项目需要回顾
+                  _selectedProject = null;
+                }
               });
               
+              final completedCount = currentProjectsToReview.length - updatedProjectsToReview.length;
+              final totalOriginalCount = currentProjectsToReview.length;
+              
+              String snackBarMessage;
+              if (updatedProjectsToReview.isEmpty) {
+                snackBarMessage = '🎉 所有项目回顾已完成！';
+              } else {
+                snackBarMessage = '项目回顾已完成 (${completedCount}/${totalOriginalCount})';
+              }
+              
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('项目回顾已完成'),
+                SnackBar(
+                  content: Text(snackBarMessage),
                   backgroundColor: Colors.green,
+                  duration: const Duration(seconds: 2),
                 ),
               );
             },
