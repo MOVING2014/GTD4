@@ -319,10 +319,10 @@ class _ReviewScreenState extends State<ReviewScreen> {
     if (_selectedProject == null) return;
     
     final projectProvider = Provider.of<ProjectProvider>(context, listen: false);
+    // Cache the current projects list to avoid multiple getter calls
     final currentProjectsToReview = projectProvider.projectsNeedingReview;
-    final currentIndex = currentProjectsToReview.indexWhere(
-      (project) => project.id == _selectedProject!.id
-    );
+    final completedProjectId = _selectedProject!.id;
+    final totalOriginalCount = currentProjectsToReview.length;
     
     showDialog(
       context: context,
@@ -336,36 +336,34 @@ class _ReviewScreenState extends State<ReviewScreen> {
           ),
           TextButton(
             onPressed: () async {
-              await projectProvider.markProjectAsReviewed(_selectedProject!.id);
+              await projectProvider.markProjectAsReviewed(completedProjectId);
               Navigator.of(ctx).pop();
               
-              // 获取更新后的项目列表
+              // Get updated project list once and cache it
               final updatedProjectsToReview = projectProvider.projectsNeedingReview;
               
               setState(() {
                 if (updatedProjectsToReview.isNotEmpty) {
-                  // 自动选择下一个项目进行回顾
-                  if (currentIndex < updatedProjectsToReview.length) {
-                    // 选择相同位置的项目（当前项目被移除后，下一个项目会占据这个位置）
-                    _selectedProject = updatedProjectsToReview[currentIndex];
-                  } else {
-                    // 如果当前项目是最后一个，选择新列表的最后一个项目
-                    _selectedProject = updatedProjectsToReview.last;
-                  }
+                  // Find the next project to select after completing the current one
+                  _selectedProject = _getNextProjectToSelect(
+                    currentProjectsToReview, 
+                    updatedProjectsToReview, 
+                    completedProjectId
+                  );
                 } else {
-                  // 没有更多项目需要回顾
+                  // No more projects to review
                   _selectedProject = null;
                 }
               });
               
-              final completedCount = currentProjectsToReview.length - updatedProjectsToReview.length;
-              final totalOriginalCount = currentProjectsToReview.length;
+              // Explicit count - we know exactly 1 project was completed
+              const completedCount = 1;
               
               String snackBarMessage;
               if (updatedProjectsToReview.isEmpty) {
                 snackBarMessage = '🎉 所有项目回顾已完成！';
               } else {
-                snackBarMessage = '项目回顾已完成 (${completedCount}/${totalOriginalCount})';
+                snackBarMessage = '项目回顾已完成 ($completedCount/$totalOriginalCount)';
               }
               
               ScaffoldMessenger.of(context).showSnackBar(
@@ -381,6 +379,33 @@ class _ReviewScreenState extends State<ReviewScreen> {
         ],
       ),
     );
+  }
+
+  /// Determines the next project to select after completing a review
+  Project _getNextProjectToSelect(
+    List<Project> originalList,
+    List<Project> updatedList,
+    String completedProjectId,
+  ) {
+    if (updatedList.isEmpty) {
+      throw StateError('Cannot select next project from empty list');
+    }
+
+    // Find the index of the completed project in the original list
+    final completedIndex = originalList.indexWhere((p) => p.id == completedProjectId);
+    
+    if (completedIndex == -1) {
+      // Fallback: return the first project if we can't find the completed one
+      return updatedList.first;
+    }
+    
+    // If there are projects at or after the completed project's position, select the one at that position
+    if (completedIndex < updatedList.length) {
+      return updatedList[completedIndex];
+    } else {
+      // If the completed project was the last one, select the new last project
+      return updatedList.last;
+    }
   }
   
   void _showLastReviewInfo(BuildContext context) {
