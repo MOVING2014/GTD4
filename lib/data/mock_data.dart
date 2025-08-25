@@ -74,8 +74,8 @@ class MockData {
 
   // Generate demo tasks
   static List<Task> getDemoTasks() {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
+    final today = DateTime.now();
+    final todayStart = DateTime(today.year, today.month, today.day);
     
     return [
       // Today's tasks
@@ -83,22 +83,22 @@ class MockData {
         id: 't1',
         title: '准备会议演示文稿',
         notes: '关注第二季度业绩和未来预测',
-        dueDate: today,
+        dueDate: todayStart,
         priority: TaskPriority.medium,  // 橙色优先级
         status: TaskStatus.inProgress,
         projectId: 'p1',
-        createdAt: today.subtract(const Duration(days: 2)),
+        createdAt: todayStart.subtract(const Duration(days: 2)),
         tags: ['会议', '演示'],
       ),
       Task(
         id: 't2',
         title: '去跑步',
-        dueDate: today,
+        dueDate: todayStart,
         priority: TaskPriority.none,    // 灰色优先级
         status: TaskStatus.completed,
         projectId: 'p4',
-        createdAt: today.subtract(const Duration(days: 1)),
-        completedAt: today,
+        createdAt: todayStart.subtract(const Duration(days: 1)),
+        completedAt: todayStart,
         isRecurring: true,
         recurrenceRule: 'FREQ=DAILY',
       ),
@@ -107,11 +107,11 @@ class MockData {
       Task(
         id: 't3',
         title: '审核项目提案',
-        dueDate: DateTime(today.year, today.month, today.day + 1),
+        dueDate: DateTime(todayStart.year, todayStart.month, todayStart.day + 1),
         priority: TaskPriority.medium,  // 橙色优先级
         status: TaskStatus.notStarted,
         projectId: 'p1',
-        createdAt: today.subtract(const Duration(days: 3)),
+        createdAt: todayStart.subtract(const Duration(days: 3)),
       ),
       
       // This week's tasks
@@ -119,31 +119,31 @@ class MockData {
         id: 't4',
         title: '计划周末旅行',
         notes: '检查住宿和交通选项',
-        dueDate: DateTime(today.year, today.month, today.day + 3),
+        dueDate: DateTime(todayStart.year, todayStart.month, todayStart.day + 3),
         priority: TaskPriority.none,    // 灰色优先级
         status: TaskStatus.notStarted,
         projectId: 'p2',
-        createdAt: today.subtract(const Duration(days: 7)),
+        createdAt: todayStart.subtract(const Duration(days: 7)),
       ),
       Task(
         id: 't5',
         title: '修理厨房水槽',
-        dueDate: DateTime(today.year, today.month, today.day + 4),
+        dueDate: DateTime(todayStart.year, todayStart.month, todayStart.day + 4),
         priority: TaskPriority.medium,  // 橙色优先级
         status: TaskStatus.notStarted,
         projectId: 'p3',
-        createdAt: today.subtract(const Duration(days: 2)),
+        createdAt: todayStart.subtract(const Duration(days: 2)),
       ),
       
       // Next week's tasks
       Task(
         id: 't6',
         title: '季度预算审核',
-        dueDate: DateTime(today.year, today.month, today.day + 8),
+        dueDate: DateTime(todayStart.year, todayStart.month, todayStart.day + 8),
         priority: TaskPriority.medium,  // 橙色优先级
         status: TaskStatus.notStarted,
         projectId: 'p1',
-        createdAt: today.subtract(const Duration(days: 10)),
+        createdAt: todayStart.subtract(const Duration(days: 10)),
         tags: ['财务', '季度'],
       ),
       
@@ -151,11 +151,11 @@ class MockData {
       Task(
         id: 't7',
         title: '联系保险公司',
-        dueDate: DateTime(today.year, today.month, today.day - 2),
+        dueDate: DateTime(todayStart.year, todayStart.month, todayStart.day - 2),
         priority: TaskPriority.medium,  // 橙色优先级
         status: TaskStatus.notStarted,
         projectId: 'p2',
-        createdAt: today.subtract(const Duration(days: 5)),
+        createdAt: todayStart.subtract(const Duration(days: 5)),
       ),
       
       // No due date tasks
@@ -166,7 +166,7 @@ class MockData {
         priority: TaskPriority.none,    // 灰色优先级
         status: TaskStatus.notStarted,
         projectId: 'p5',
-        createdAt: today.subtract(const Duration(days: 14)),
+        createdAt: todayStart.subtract(const Duration(days: 14)),
         tags: ['学习', '编程'],
       ),
       
@@ -174,22 +174,22 @@ class MockData {
       Task(
         id: 't9',
         title: '开始冥想练习',
-        dueDate: DateTime(today.year, today.month, today.day + 2),
+        dueDate: DateTime(todayStart.year, todayStart.month, todayStart.day + 2),
         priority: TaskPriority.medium,  // 橙色优先级
         status: TaskStatus.notStarted,
         projectId: 'p4',
-        createdAt: today.subtract(const Duration(days: 3)),
+        createdAt: todayStart.subtract(const Duration(days: 3)),
         isRecurring: true,
         recurrenceRule: 'FREQ=DAILY',
       ),
       Task(
         id: 't10',
         title: '阅读有关生产力的书籍',
-        dueDate: DateTime(today.year, today.month, today.day + 10),
+        dueDate: DateTime(todayStart.year, todayStart.month, todayStart.day + 10),
         priority: TaskPriority.none,    // 灰色优先级
         status: TaskStatus.inProgress,
         projectId: 'p5',
-        createdAt: today.subtract(const Duration(days: 20)),
+        createdAt: todayStart.subtract(const Duration(days: 20)),
         tags: ['阅读', '生产力'],
       ),
       
@@ -198,21 +198,21 @@ class MockData {
         id: 't11',
         title: '完成客户项目文档',
         notes: '需要包含所有功能规格和实施计划',
-        dueDate: DateTime(today.year, today.month, today.day + 15),
+        dueDate: DateTime(todayStart.year, todayStart.month, todayStart.day + 15),
         priority: TaskPriority.medium,  // 橙色优先级
         status: TaskStatus.notStarted,
         projectId: 'p1',
-        createdAt: today.subtract(const Duration(days: 25)),
+        createdAt: todayStart.subtract(const Duration(days: 25)),
         tags: ['文档', '客户'],
       ),
       Task(
         id: 't12',
         title: '员工季度评估',
-        dueDate: DateTime(today.year, today.month, today.day + 12),
+        dueDate: DateTime(todayStart.year, todayStart.month, todayStart.day + 12),
         priority: TaskPriority.medium,  // 橙色优先级
         status: TaskStatus.notStarted,
         projectId: 'p1',
-        createdAt: today.subtract(const Duration(days: 5)),
+        createdAt: todayStart.subtract(const Duration(days: 5)),
         tags: ['管理', '评估'],
       ),
       
@@ -220,41 +220,41 @@ class MockData {
       Task(
         id: 't13',
         title: '检查房屋保险更新',
-        dueDate: DateTime(today.year, today.month, today.day + 7),
+        dueDate: DateTime(todayStart.year, todayStart.month, todayStart.day + 7),
         priority: TaskPriority.medium,  // 橙色优先级
         status: TaskStatus.notStarted,
         projectId: 'p3',
-        createdAt: today.subtract(const Duration(days: 15)),
+        createdAt: todayStart.subtract(const Duration(days: 15)),
       ),
       Task(
         id: 't14',
         title: '安排院子维护工作',
-        dueDate: DateTime(today.year, today.month, today.day + 3),
+        dueDate: DateTime(todayStart.year, todayStart.month, todayStart.day + 3),
         priority: TaskPriority.none,    // 灰色优先级
         status: TaskStatus.inProgress,
         projectId: 'p3',
-        createdAt: today.subtract(const Duration(days: 10)),
+        createdAt: todayStart.subtract(const Duration(days: 10)),
       ),
       
       // 学习项目(p5)的其他任务 - 很久没回顾
       Task(
         id: 't15',
         title: '完成在线课程第三单元',
-        dueDate: DateTime(today.year, today.month, today.day + 5),
+        dueDate: DateTime(todayStart.year, todayStart.month, todayStart.day + 5),
         priority: TaskPriority.medium,  // 橙色优先级
         status: TaskStatus.inProgress,
         projectId: 'p5',
-        createdAt: today.subtract(const Duration(days: 30)),
+        createdAt: todayStart.subtract(const Duration(days: 30)),
         tags: ['课程', '学习'],
       ),
       Task(
         id: 't16',
         title: '为博客写一篇技术文章',
-        dueDate: DateTime(today.year, today.month, today.day + 9),
+        dueDate: DateTime(todayStart.year, todayStart.month, todayStart.day + 9),
         priority: TaskPriority.none,    // 灰色优先级
         status: TaskStatus.notStarted,
         projectId: 'p5',
-        createdAt: today.subtract(const Duration(days: 40)),
+        createdAt: todayStart.subtract(const Duration(days: 40)),
         tags: ['写作', '技术'],
       ),
       
@@ -262,32 +262,32 @@ class MockData {
       Task(
         id: 't17',
         title: '更新个人预算计划',
-        dueDate: DateTime(today.year, today.month, today.day + 2),
+        dueDate: DateTime(todayStart.year, todayStart.month, todayStart.day + 2),
         priority: TaskPriority.medium,  // 橙色优先级
         status: TaskStatus.notStarted,
         projectId: 'p7',
-        createdAt: today.subtract(const Duration(days: 45)),
+        createdAt: todayStart.subtract(const Duration(days: 45)),
         tags: ['预算', '规划'],
       ),
       Task(
         id: 't18',
         title: '研究投资选项',
         notes: '考虑股票、债券和ETF',
-        dueDate: DateTime(today.year, today.month, today.day + 14),
+        dueDate: DateTime(todayStart.year, todayStart.month, todayStart.day + 14),
         priority: TaskPriority.medium,  // 橙色优先级
         status: TaskStatus.inProgress,
         projectId: 'p7',
-        createdAt: today.subtract(const Duration(days: 20)),
+        createdAt: todayStart.subtract(const Duration(days: 20)),
         tags: ['投资', '研究'],
       ),
       Task(
         id: 't19',
         title: '准备税务文件',
-        dueDate: DateTime(today.year, today.month, today.day + 30),
+        dueDate: DateTime(todayStart.year, todayStart.month, todayStart.day + 30),
         priority: TaskPriority.none,    // 灰色优先级
         status: TaskStatus.notStarted,
         projectId: 'p7',
-        createdAt: today.subtract(const Duration(days: 15)),
+        createdAt: todayStart.subtract(const Duration(days: 15)),
       ),
     ];
   }
