@@ -69,13 +69,33 @@ class _ReviewScreenState extends State<ReviewScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-                child: Text(
-                  '选择需要回顾的项目:',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '选择需要回顾的项目:',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        '${projectsToReview.length} 个待回顾',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Theme.of(context).colorScheme.onPrimaryContainer,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               SizedBox(
@@ -299,6 +319,10 @@ class _ReviewScreenState extends State<ReviewScreen> {
     if (_selectedProject == null) return;
     
     final projectProvider = Provider.of<ProjectProvider>(context, listen: false);
+    // Cache the current projects list to avoid multiple getter calls
+    final currentProjectsToReview = projectProvider.projectsNeedingReview;
+    final completedProjectId = _selectedProject!.id;
+    final totalOriginalCount = currentProjectsToReview.length;
     
     showDialog(
       context: context,
@@ -311,18 +335,42 @@ class _ReviewScreenState extends State<ReviewScreen> {
             child: const Text('取消'),
           ),
           TextButton(
-            onPressed: () {
-              projectProvider.markProjectAsReviewed(_selectedProject!.id);
+            onPressed: () async {
+              await projectProvider.markProjectAsReviewed(completedProjectId);
               Navigator.of(ctx).pop();
               
+              // Get updated project list once and cache it
+              final updatedProjectsToReview = projectProvider.projectsNeedingReview;
+              
               setState(() {
-                _selectedProject = null;
+                if (updatedProjectsToReview.isNotEmpty) {
+                  // Find the next project to select after completing the current one
+                  _selectedProject = _getNextProjectToSelect(
+                    currentProjectsToReview, 
+                    updatedProjectsToReview, 
+                    completedProjectId
+                  );
+                } else {
+                  // No more projects to review
+                  _selectedProject = null;
+                }
               });
               
+              // Explicit count - we know exactly 1 project was completed
+              const completedCount = 1;
+              
+              String snackBarMessage;
+              if (updatedProjectsToReview.isEmpty) {
+                snackBarMessage = '🎉 所有项目回顾已完成！';
+              } else {
+                snackBarMessage = '项目回顾已完成 ($completedCount/$totalOriginalCount)';
+              }
+              
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('项目回顾已完成'),
+                SnackBar(
+                  content: Text(snackBarMessage),
                   backgroundColor: Colors.green,
+                  duration: const Duration(seconds: 2),
                 ),
               );
             },
@@ -331,6 +379,33 @@ class _ReviewScreenState extends State<ReviewScreen> {
         ],
       ),
     );
+  }
+
+  /// Determines the next project to select after completing a review
+  Project _getNextProjectToSelect(
+    List<Project> originalList,
+    List<Project> updatedList,
+    String completedProjectId,
+  ) {
+    if (updatedList.isEmpty) {
+      throw StateError('Cannot select next project from empty list');
+    }
+
+    // Find the index of the completed project in the original list
+    final completedIndex = originalList.indexWhere((p) => p.id == completedProjectId);
+    
+    if (completedIndex == -1) {
+      // Fallback: return the first project if we can't find the completed one
+      return updatedList.first;
+    }
+    
+    // If there are projects at or after the completed project's position, select the one at that position
+    if (completedIndex < updatedList.length) {
+      return updatedList[completedIndex];
+    } else {
+      // If the completed project was the last one, select the new last project
+      return updatedList.last;
+    }
   }
   
   void _showLastReviewInfo(BuildContext context) {
