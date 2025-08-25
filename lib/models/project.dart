@@ -85,8 +85,6 @@ class Project {
         return 'Completed';
       case ProjectStatus.archived:
         return 'Archived';
-      default:
-        return 'Active';
     }
   }
 } 

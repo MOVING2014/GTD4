@@ -76,7 +76,6 @@ class Task {
       case TaskPriority.low:
         return Colors.blue;    // 蓝色表示低优先级
       case TaskPriority.none:
-      default:
         return Colors.grey;    // 灰色表示无优先级
     }
   }
