@@ -356,23 +356,24 @@ class _ReviewScreenState extends State<ReviewScreen> {
                 }
               });
               
+              // Notification disabled as requested - no SnackBar shown
               // Explicit count - we know exactly 1 project was completed
-              const completedCount = 1;
+              // const completedCount = 1;
               
-              String snackBarMessage;
-              if (updatedProjectsToReview.isEmpty) {
-                snackBarMessage = '🎉 所有项目回顾已完成！';
-              } else {
-                snackBarMessage = '项目回顾已完成 ($completedCount/$totalOriginalCount)';
-              }
+              // String snackBarMessage;
+              // if (updatedProjectsToReview.isEmpty) {
+              //   snackBarMessage = '🎉 所有项目回顾已完成！';
+              // } else {
+              //   snackBarMessage = '项目回顾已完成 ($completedCount/$totalOriginalCount)';
+              // }
               
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(snackBarMessage),
-                  backgroundColor: Colors.green,
-                  duration: const Duration(seconds: 2),
-                ),
-              );
+              // ScaffoldMessenger.of(context).showSnackBar(
+              //   SnackBar(
+              //     content: Text(snackBarMessage),
+              //     backgroundColor: Colors.green,
+              //     duration: const Duration(seconds: 2),
+              //   ),
+              // );
             },
             child: const Text('确认'),
           ),
