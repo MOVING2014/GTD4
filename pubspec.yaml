@@ -56,7 +56,6 @@ dependencies:
   
   # Data backup and restore
   path_provider: ^2.1.2
-  csv: ^5.1.1
   file_picker: ^9.2.3
   permission_handler: ^11.4.0
   
